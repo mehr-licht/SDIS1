@@ -1,2 +1,3 @@
 #!/bin/sh
-java -classpath bin service.TestApp //localhost/1 DELETE "files/image1.png"
+file=$1
+java -classpath bin service.TestApp //localhost/1 DELETE $file

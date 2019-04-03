@@ -1,3 +1,0 @@
-cd bin/
-rmiregistry &
-cd ..
