@@ -5,9 +5,7 @@ import service.Peer;
 
 public class Macros {
 
-  /**
-   * Maximum delay for random wait-time for STORED response.
-   */
+  /** Maximum delay for random wait-time for STORED response. */
   public static final int MAX_DELAY = 400;
 
   public static final int MAX_SYSTEM_MEMORY = (int) Math.pow(10, 6) * 8; // 8MB
@@ -30,12 +28,12 @@ public class Macros {
 
   public static final String ENHANCEMENT_ALL = "2.0";
 
-  public static boolean isCompatibleWithEnhancement(String enhancedVersion, Message request,
-      Peer peer) {
-    return ((request.getVersion().equals(enhancedVersion) || request.getVersion()
-        .equals(ENHANCEMENT_ALL)) &&
-        (peer.getVersion().equals(enhancedVersion) || peer.getVersion().equals(ENHANCEMENT_ALL)));
-
+  public static boolean isCompatibleWithEnhancement(
+      String enhancedVersion, Message request, Peer peer) {
+    return ((request.getVersion().equals(enhancedVersion)
+            || request.getVersion().equals(ENHANCEMENT_ALL))
+        && (peer.getVersion().equals(enhancedVersion)
+            || peer.getVersion().equals(ENHANCEMENT_ALL)));
   }
 
   public static boolean isPeerCompatibleWithEnhancement(String enhancedVersion, Peer peer) {
@@ -45,5 +43,4 @@ public class Macros {
   public static boolean isMessageCompatibleWithEnhancement(String enhancedVersion, Message msg) {
     return (msg.getVersion().equals(enhancedVersion) || msg.getVersion().equals(ENHANCEMENT_ALL));
   }
-
 }
