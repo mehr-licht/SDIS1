@@ -65,7 +65,7 @@ public class Peer implements RemoteBackupService {
 
     executor = new ScheduledThreadPoolExecutor(10);
 
-    //sendUPMessage();
+    sendUPMessage();
 
     Log.logWarning("Peer " + id + " online!");
   }
@@ -229,7 +229,7 @@ public class Peer implements RemoteBackupService {
 
     return pathname;
   }
-/*
+
   private void sendUPMessage() {
     if (isPeerCompatibleWithEnhancement(ENHANCEMENT_DELETE, this)) {
       String[] args = {
@@ -244,7 +244,7 @@ public class Peer implements RemoteBackupService {
         Log.logError("Couldn't send message to multicast channel!");
       }
     }
-  }*/
+  }
 
   public void addMsgToHandler(byte[] data, int length) {
     messageDispatcher.pushMessage(data, length);
