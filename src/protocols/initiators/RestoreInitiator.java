@@ -58,7 +58,7 @@ public class RestoreInitiator implements Runnable {
     utilitarios.Notificacoes_Terminal.printAviso("Received all chunks");
     ConcurrentMap<Integer, ChunkData> chunksRestored = parentPeer.getPeerData()
         .getChunksRestored(fileInfo.getFileID());
-    String pathToSave = parentPeer.getPath("restores");
+    String pathToSave = parentPeer.getPath("restored");
 
     getSystemMgr(chunksRestored, pathToSave);
 

@@ -14,8 +14,8 @@ import service.Peer;
 public class SystemManager {
 
   public static final String FILES = "../files/";
-  private static final String CHUNKS = "chunks/";
-  private static final String RESTORES = "restores/";
+  private static final String BACKUPS = "backups/";
+  private static final String RESTORED = "restored/";
   private Peer parentPeer;
   private String rootPath;
   private Database database;
@@ -171,8 +171,8 @@ public class SystemManager {
   }
 
   private void initializePeerFileSystem() {
-    createFolder(rootPath + CHUNKS);
-    createFolder(rootPath + RESTORES);
+    createFolder(rootPath + BACKUPS);
+    createFolder(rootPath + RESTORED);
   }
 
   public String getRootPath() {
@@ -180,11 +180,11 @@ public class SystemManager {
   }
 
   public String getChunksPath() {
-    return rootPath + CHUNKS;
+    return rootPath + BACKUPS;
   }
 
-  public String getRestoresPath() {
-    return rootPath + RESTORES;
+  public String getRestoredPath() {
+    return rootPath + RESTORED;
   }
 
   public Database getDatabase() {

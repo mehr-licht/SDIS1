@@ -218,10 +218,10 @@ public class Peer implements RemoteBackupService {
   public String getPath(String path) {
     String pathname;
 
-    if (path.equals("chunks")){//CH
+    if (path.equals("backups")){//CH
       pathname = systemManager.getChunksPath();
-    }else if (path.equals("restores")){
-      pathname = systemManager.getRestoresPath();
+    }else if (path.equals("restored")){
+      pathname = systemManager.getRestoredPath();
     }else{
       pathname = "";
     }
