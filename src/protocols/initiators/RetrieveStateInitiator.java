@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import service.Peer;
-import utils.Log;
 
 public class RetrieveStateInitiator implements Runnable {
 
@@ -21,7 +20,7 @@ public class RetrieveStateInitiator implements Runnable {
     this.parentPeer = parentPeer;
     this.database = parentPeer.getDatabase();
 
-    Log.logWarning("Starting retrieveStateInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Starting retrieveStateInitiator!");
   }
 
   @Override
@@ -39,7 +38,7 @@ public class RetrieveStateInitiator implements Runnable {
         "\n Used memory: " + mm.getUsedMemory();
 
     System.out.println(out); //TODO: Retrieve to TestApp
-    Log.logWarning("Finished retrieveStateInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Finished retrieveStateInitiator!");
   }
 
   private String getOutput(Collection<FileInfo> files,

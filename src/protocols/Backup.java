@@ -14,7 +14,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import network.Message;
 import service.Peer;
-import utils.Log;
 
 public class Backup implements Runnable, PeerData.MessageObserver {
 
@@ -35,7 +34,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
     this.random = new Random();
     this.scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
-    Log.logWarning("Starting backup!");
+    utilitarios.Notificacoes_Terminal.printAviso("Starting backup!");
   }
 
 
@@ -61,7 +60,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
       handleStandardRequest(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
     }
 
-    Log.logWarning("Finished backup!");
+    utilitarios.Notificacoes_Terminal.printAviso("Finished backup!");
   }
 
   private void handleStandardRequest(String fileID, int chunkNo, int replicationDegree,
@@ -105,7 +104,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
           chunkData
       );
     } catch (IOException e) {
-      Log.logError("Couldn't save the chunk!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't save the chunk!");
       return false;
     }
 
@@ -115,7 +114,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
           parentPeer.getID()
       );
     } else { // Don't send STORED if chunk already existed
-      Log.logWarning("ChunkData Backup: " + ret);
+      utilitarios.Notificacoes_Terminal.printAviso("ChunkData Backup: " + ret);
       return false;
     }
 
@@ -128,7 +127,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
     try {
       parentPeer.sendMessage(Channel.ChannelType.MC, msg);
     } catch (IOException e) {
-      Log.logError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
   }
 

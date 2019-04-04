@@ -1,4 +1,4 @@
-package utils;
+package utilitarios;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,7 +32,7 @@ public class Utils {
     try {
       digest = MessageDigest.getInstance("SHA-256");
     } catch (NoSuchAlgorithmException e) {
-      Log.logError("Hash algorithm not found: " + e.getMessage());
+      Notificacoes_Terminal.printMensagemError("Hash algorithm not found: " + e.getMessage());
       return null;
     }
 
@@ -73,7 +73,7 @@ public class Utils {
     if (m.find()) {
       peer_ap = new String[] {m.group(1), m.group(2), m.group(3)};
     } else {
-      Log.logError("Invalid Access Point!");
+      Notificacoes_Terminal.printMensagemError("Invalid Access Point!");
     }
     return peer_ap;
   }

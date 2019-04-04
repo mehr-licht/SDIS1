@@ -3,7 +3,6 @@ package filesystem;
 import java.io.*;
 import java.util.Timer;
 import java.util.TimerTask;
-import utils.Log;
 
 public abstract class PermanentStateClass implements Serializable {
 
@@ -26,7 +25,7 @@ public abstract class PermanentStateClass implements Serializable {
     if (obj != null) {
       obj.setUp(file.getAbsolutePath());
     } else {
-      Log.logError("Error initializing PermanentStateClass from file");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Error initializing PermanentStateClass from file");
     }
 
     return obj;
@@ -55,7 +54,7 @@ public abstract class PermanentStateClass implements Serializable {
       oos.writeObject(this);
       oos.close();
     } catch (IOException e) {
-      Log.logError("Couldn't save permanent state");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't save permanent state");
       e.printStackTrace();
     }
   }

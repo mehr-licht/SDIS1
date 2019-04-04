@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import service.Peer;
-import utils.Log;
 
 public class SystemManager {
 
@@ -34,7 +33,7 @@ public class SystemManager {
     try {
       Files.createDirectories(Paths.get(name));
     } catch (IOException e) {
-      Log.logError("Couldn't create file directory!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't create file directory!");
     }
   }
 
@@ -47,7 +46,7 @@ public class SystemManager {
       inputStream = Files.newInputStream(Paths.get(pathname));
       fileSize = getFileSize(Paths.get(pathname));
     } catch (IOException e) {
-      Log.logError("File not found!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("File not found!");
       return null;
     }
 
@@ -57,7 +56,7 @@ public class SystemManager {
       inputStream.read(data);
       inputStream.close();
     } catch (IOException e) {
-      Log.logError("Couldn't read data of a file!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't read data of a file!");
     }
 
     return data;
@@ -68,7 +67,7 @@ public class SystemManager {
     try {
       attr = Files.readAttributes(filepath, BasicFileAttributes.class);
     } catch (IOException e) {
-      Log.logError("Couldn't read attributes of a file!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't read attributes of a file!");
     }
     return attr.size();
   }
@@ -105,7 +104,7 @@ public class SystemManager {
       try {
         outputStream.write(chunks.get(i).getData());
       } catch (IOException e) {
-        Log.logError("Couldn't merge chunks of a file!");
+        utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't merge chunks of a file!");
       }
     }
 
@@ -144,13 +143,13 @@ public class SystemManager {
   synchronized public SAVE_STATE saveFile(String fileName, String pathname, byte[] data)
       throws IOException {
     if (memoryManager.getAvailableMemory() < data.length) {
-      Log.logWarning("Not enough space for saveFile!");
+      utilitarios.Notificacoes_Terminal.printAviso("Not enough space for saveFile!");
       return SAVE_STATE.FAILURE;
     }
     String filePath = pathname + "/" + fileName;
 
     if (Files.exists(Paths.get(filePath))) {
-      Log.logWarning("File already exists!");
+      utilitarios.Notificacoes_Terminal.printAviso("File already exists!");
       return SAVE_STATE.EXISTS;
     }
 
@@ -200,7 +199,7 @@ public class SystemManager {
     try {
       Files.delete(path);
     } catch (IOException e) {
-      Log.logError("Couldn't delete file: " + path);
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't delete file: " + path);
     }
     memoryManager.reduceUsedMemory(chunkSize);
     database.removeChunk(fileID, chunkNo);

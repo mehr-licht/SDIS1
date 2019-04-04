@@ -1,11 +1,10 @@
 package network;
 
-import utils.Log;
-import utils.Utils;
+import utilitarios.Utils;
 
 import java.io.*;
 
-import static utils.Utils.getIPV4Address;
+import static utilitarios.Utils.getIPV4Address;
 
 public class Message implements Serializable {
 
@@ -216,7 +215,7 @@ public class Message implements Serializable {
                 outputStream.write(header);
                 outputStream.write(body);
             } catch (IOException e) {
-                Log.logError("Couldn't create message byte[] to send!");
+                utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't create message byte[] to send!");
             }
             return outputStream.toByteArray();
 

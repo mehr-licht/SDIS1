@@ -7,7 +7,6 @@ import filesystem.SystemManager;
 import java.io.IOException;
 import network.Message;
 import service.Peer;
-import utils.Log;
 
 public class ReclaimInitiator implements Runnable {
 
@@ -20,7 +19,7 @@ public class ReclaimInitiator implements Runnable {
     this.systemManager = parentPeer.getSystemManager();
     this.version = version;
 
-    Log.log("Starting reclaimInitiator!");
+    utilitarios.Notificacoes_Terminal.printNotificao("Starting reclaimInitiator!");
   }
 
   @Override
@@ -28,18 +27,18 @@ public class ReclaimInitiator implements Runnable {
     MemoryManager memoryManager = systemManager.getMemoryManager();
     whileMemory(memoryManager);
 
-    Log.log("Available memory: " + memoryManager.getAvailableMemory());
-    Log.log("Finished reclaimInitiator!");
+    utilitarios.Notificacoes_Terminal.printNotificao("Available memory: " + memoryManager.getAvailableMemory());
+    utilitarios.Notificacoes_Terminal.printNotificao("Finished reclaimInitiator!");
   }
 
   private void whileMemory(MemoryManager memoryManager) {
     while (memoryManager.getAvailableMemory() < 0) {
-      Log.log("Available memory: " + memoryManager.getAvailableMemory());
+      utilitarios.Notificacoes_Terminal.printNotificao("Available memory: " + memoryManager.getAvailableMemory());
       ChunkInfo chunkInfo = systemManager.getDatabase().getChunkForRemoval();
 
       byte[] chunkData = systemManager.loadChunk(chunkInfo.getFileID(), chunkInfo.getChunkNo());
       if (chunkData == null) { // Confirm chunk exists
-        Log.logWarning("ChunkData selected for reclaim doesn't exist");
+        utilitarios.Notificacoes_Terminal.printAviso("ChunkData selected for reclaim doesn't exist");
         continue;
       }
 
@@ -68,7 +67,7 @@ public class ReclaimInitiator implements Runnable {
     try {
       parentPeer.sendMessage(Channel.ChannelType.MC, msg);
     } catch (IOException e) {
-      Log.logError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
   }
 

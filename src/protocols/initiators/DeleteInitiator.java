@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import network.Message;
 import service.Peer;
-import utils.Log;
 
 public class DeleteInitiator implements Runnable {
 
@@ -21,7 +20,7 @@ public class DeleteInitiator implements Runnable {
     this.path = path;
     this.parentPeer = parentPeer;
 
-    Log.logWarning("Starting deleteInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Starting deleteInitiator!");
   }
 
   @Override
@@ -30,7 +29,7 @@ public class DeleteInitiator implements Runnable {
     //Obtain info of the file from Database
     FileInfo fileInfo = database.getFileInfoByPath(path);
     if (fileInfo == null) {
-      Log.logError("File didn't exist! Aborting Delete!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("File didn't exist! Aborting Delete!");
       return;
     }
 
@@ -42,7 +41,7 @@ public class DeleteInitiator implements Runnable {
 
     //Delete file from database
     database.removeRestorableFile(fileInfo);
-    Log.logWarning("Finished deleteInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Finished deleteInitiator!");
   }
 
   private void deleteFile() {
@@ -50,7 +49,7 @@ public class DeleteInitiator implements Runnable {
     try {
       Files.delete(Paths.get(path));
     } catch (IOException e) {
-      Log.logError("Couldn't delete a file!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't delete a file!");
     }
   }
 
@@ -60,7 +59,7 @@ public class DeleteInitiator implements Runnable {
     try {
       parentPeer.sendMessage(Channel.ChannelType.MC, msg);
     } catch (IOException e) {
-      Log.logError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
   }
 

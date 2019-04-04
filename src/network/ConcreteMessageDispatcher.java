@@ -14,7 +14,6 @@ import protocols.*;
 import protocols.initiators.helpers.DeleteEnhHelper;
 import protocols.initiators.helpers.RemovedChunkHelper;
 import service.Peer;
-import utils.Log;
 
 public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
 
@@ -91,13 +90,13 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
         return;
       }
       handler.cancel(true);
-      Log.log("Stopping chunk back up, due to received PUTCHUNK");
+      utilitarios.Notificacoes_Terminal.printNotificao("Stopping chunk back up, due to received PUTCHUNK");
     } else if (!database.hasBackedUpFileById(msg.getFileID())) {
       // If file is not a local file, Mirror/Backup ChunkData
       Backup backup = new Backup(parentPeer, msg);
       executor.execute(backup);
     } else {
-      Log.log("Ignoring PUTCHUNK of own file");
+      utilitarios.Notificacoes_Terminal.printNotificao("Ignoring PUTCHUNK of own file");
     }
   }
 
@@ -120,7 +119,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     int chunkNo = msg.getChunkNo();
 
     if (database.removeChunkMirror(fileID, chunkNo, msg.getSenderID()) == null) {
-      Log.log("Ignoring REMOVED of non-local ChunkData");
+      utilitarios.Notificacoes_Terminal.printNotificao("Ignoring REMOVED of non-local ChunkData");
       return;
     }
 

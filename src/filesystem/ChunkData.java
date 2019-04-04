@@ -1,7 +1,5 @@
 package filesystem;
 
-import utils.Log;
-
 public class ChunkData extends BaseChunk {
 
   private byte[] data;
@@ -15,7 +13,7 @@ public class ChunkData extends BaseChunk {
     this(fileID, chunkNo, data);
     setReplicationDegree(replicationDegree);
 
-    Log.log("Created CHUNK " + fileID + " @" + chunkNo);
+    utilitarios.Notificacoes_Terminal.printNotificao("Created CHUNK " + fileID + " @" + chunkNo);
   }
 
   public ChunkData(ChunkInfo chunkInfo, byte[] data) {

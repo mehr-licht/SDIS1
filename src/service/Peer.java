@@ -1,7 +1,7 @@
 package service;
 
 import static protocols.Macros.*;
-import static utils.Utils.parseRMI;
+import static utilitarios.Utils.parseRMI;
 
 import channels.Channel;
 import channels.Channel.ChannelType;
@@ -25,7 +25,6 @@ import network.ConcreteMessageDispatcher;
 import network.Message;
 import protocols.PeerData;
 import protocols.initiators.*;
-import utils.Log;
 
 public class Peer implements RemoteBackupService {
 
@@ -67,7 +66,7 @@ public class Peer implements RemoteBackupService {
 
     sendUPMessage();
 
-    Log.logWarning("Peer " + id + " online!");
+    utilitarios.Notificacoes_Terminal.printAviso("Peer " + id + " online!");
   }
 
   public static void main(String args[]) {
@@ -106,9 +105,9 @@ public class Peer implements RemoteBackupService {
       Registry registry = LocateRegistry.getRegistry();
       registry.rebind(arg, stub);
 
-      Log.log("Server ready!");
+      utilitarios.Notificacoes_Terminal.printNotificao("Server ready!");
     } catch (Exception e) {
-      Log.logError("Server exception: " + e.toString());
+      utilitarios.Notificacoes_Terminal.printMensagemError("Server exception: " + e.toString());
     }
   }
 
@@ -158,7 +157,7 @@ public class Peer implements RemoteBackupService {
     try {
       sendMessage(channelType, message);
     } catch (IOException e) {
-      Log.logError(
+      utilitarios.Notificacoes_Terminal.printMensagemError(
           "Error sending message to channel "
               + channelType
               + " - "
@@ -167,7 +166,7 @@ public class Peer implements RemoteBackupService {
   }
 
   public void sendMessage(ChannelType channelType, Message message) throws IOException {
-    Log.log("S: " + message.toString());
+    utilitarios.Notificacoes_Terminal.printNotificao("S: " + message.toString());
 
     channels.get(channelType).sendMessage(message.getBytes());
   }
@@ -189,7 +188,7 @@ public class Peer implements RemoteBackupService {
     executor.schedule(
         () -> {
           if (handler.cancel(true)) {
-            Log.logWarning("RestoreInitiator was killed for lack of chunks.");
+            utilitarios.Notificacoes_Terminal.printAviso("RestoreInitiator was killed for lack of chunks.");
           }
         },
         20,
@@ -241,7 +240,7 @@ public class Peer implements RemoteBackupService {
       try {
         sendMessage(Channel.ChannelType.MC, msg);
       } catch (IOException e) {
-        Log.logError("Couldn't send message to multicast channel!");
+        utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
       }
     }
   }

@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import protocols.initiators.helpers.BackupChunkHelper;
 import service.Peer;
-import utils.Log;
-import utils.Utils;
+import utilitarios.Utils;
 
 public class BackupInitiator implements Runnable {
 
@@ -34,7 +33,7 @@ public class BackupInitiator implements Runnable {
     this.replicationDegree = replicationDegree;
     this.parentPeer = parentPeer;
 
-    Log.logWarning("Starting backupInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Starting backupInitiator!");
   }
 
   @Override
@@ -55,7 +54,7 @@ public class BackupInitiator implements Runnable {
 
     resetReplic(fileID, helperThreads);
 
-    Log.logWarning("Finished BackupInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Finished BackupInitiator!");
   }
 
   private ArrayList<Thread> getThreadArrayList(ArrayList<ChunkData> chunks) {
@@ -73,18 +72,18 @@ public class BackupInitiator implements Runnable {
       joinWithThreads(helperThreads);
       parentPeer.getPeerData().resetChunkReplication(fileID);
     } catch (InterruptedException e) {
-      Log.logError("Backup: Failed join with helper threads");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Backup: Failed join with helper threads");
     }
   }
 
   private boolean validBackup(int replicationDegree, int size) {
     if (replicationDegree > MAX_REPLICATION_DEGREE) {
-      Log.logError("Backup: Failed replication degree greater than 9");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Backup: Failed replication degree greater than 9");
       return false;
     }
 
     if (size > MAX_NUM_CHUNKS) {
-      Log.logError("Backup: Failed file size greater than 64GB");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Backup: Failed file size greater than 64GB");
       return false;
     }
 
@@ -117,7 +116,7 @@ public class BackupInitiator implements Runnable {
     try {
       attr = Files.readAttributes(Paths.get(absPath), BasicFileAttributes.class);
     } catch (IOException e) {
-      Log.logError("Couldn't read file's metadata: " + e.getMessage());
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't read file's metadata: " + e.getMessage());
       return null;
     }
 

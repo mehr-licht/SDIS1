@@ -8,7 +8,6 @@ import network.Message;
 import protocols.Macros;
 import protocols.initiators.BackupInitiator;
 import service.Peer;
-import utils.Log;
 
 public class BackupChunkHelper implements Runnable {
 
@@ -39,14 +38,14 @@ public class BackupChunkHelper implements Runnable {
 
     for (int i = 0; i < Macros.PUTCHUNK_RETRIES; i++) {
       if (isDesiredReplicationDegree()) {
-        Log.log("Achieved desired replication at i=" + i);
+        utilitarios.Notificacoes_Terminal.printNotificao("Achieved desired replication at i=" + i);
         break;
       }
 
       try {
         parentPeer.sendMessage(Channel.ChannelType.MDB, msg);
       } catch (IOException e) {
-        Log.logError("Couldn't send message to multicast channel!");
+        utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
       }
 
       sleep(waitTime);
@@ -55,7 +54,7 @@ public class BackupChunkHelper implements Runnable {
   }
 
   protected boolean isDesiredReplicationDegree() {
-    Log.log("Current perceived replication of " + chunk.getChunkNo() + ": " + chunkReplication
+    utilitarios.Notificacoes_Terminal.printNotificao("Current perceived replication of " + chunk.getChunkNo() + ": " + chunkReplication
         .get(chunk.getChunkNo()));
     return chunkReplication != null && chunkReplication.get(chunk.getChunkNo()) >= chunk
         .getReplicationDegree();
@@ -65,7 +64,7 @@ public class BackupChunkHelper implements Runnable {
     try {
       Thread.sleep(waitTime);
     } catch (InterruptedException e) {
-      Log.logError(e.getMessage());
+      utilitarios.Notificacoes_Terminal.printMensagemError(e.getMessage());
     }
   }
 

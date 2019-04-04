@@ -13,7 +13,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import network.Message;
 import service.Peer;
-import utils.Log;
 
 public class Restore implements Runnable, PeerData.MessageObserver {
 
@@ -29,7 +28,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
     this.database = parentPeer.getDatabase();
     this.random = new Random();
 
-    Log.logWarning("Starting restore!");
+    utilitarios.Notificacoes_Terminal.printAviso("Starting restore!");
   }
 
   @Override
@@ -48,7 +47,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
 
     compatWenh(chunkData);
 
-    Log.logWarning("Finished restore!");
+    utilitarios.Notificacoes_Terminal.printAviso("Finished restore!");
   }
 
   private void compatWenh(byte[] chunkData) {
@@ -63,7 +62,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   private boolean chunkNotFound(String fileID, int chunkNo) {
     //Access database to get the ChunkData
     if (!database.hasChunk(fileID, chunkNo)) {
-      Log.logError("ChunkData not found locally: " + fileID + "/" + chunkNo);
+      utilitarios.Notificacoes_Terminal.printMensagemError("ChunkData not found locally: " + fileID + "/" + chunkNo);
       return true;
     }
     return false;
@@ -72,7 +71,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   private boolean logIgnore() {
     //Ignore Chunks of own files
     if (request.getSenderID() == parentPeer.getID()) {
-      Log.logWarning("Ignoring CHUNKs of own files");
+      utilitarios.Notificacoes_Terminal.printAviso("Ignoring CHUNKs of own files");
       return true;
     }
     return false;
@@ -99,20 +98,20 @@ public class Restore implements Runnable, PeerData.MessageObserver {
 
     server_socket(msgToSend, hostName, portNumber);
 
-    Log.logWarning("S TCP: " + request.toString());
+    utilitarios.Notificacoes_Terminal.printAviso("S TCP: " + request.toString());
   }
 
   private void server_socket(Message msgToSend, String hostName, int portNumber) {
     Socket serverSocket;
     try {
       serverSocket = new Socket(hostName, portNumber);
-      Log.log("Connected to TCPServer");
+      utilitarios.Notificacoes_Terminal.printNotificao("Connected to TCPServer");
       ObjectOutputStream oos = new ObjectOutputStream(serverSocket.getOutputStream());
       oos.writeObject(msgToSend);
       oos.close();
       serverSocket.close();
     } catch (IOException e) {
-      Log.logError("Couldn't send CHUNK via TCP");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send CHUNK via TCP");
     }
   }
 
@@ -147,7 +146,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
     }
     if (msg.getFileID().equals(request.getFileID()) && msg.getChunkNo() == request.getChunkNo()) {
       this.handler.cancel(true);
-      Log.log("Cancelled CHUNK message, to avoid flooding host");
+      utilitarios.Notificacoes_Terminal.printNotificao("Cancelled CHUNK message, to avoid flooding host");
     }
   }
 }

@@ -1,7 +1,5 @@
 package filesystem;
 
-import utils.Log;
-
 public class MemoryManager extends PermanentStateClass {
 
   private static final long serialVersionUID = 2L;
@@ -36,17 +34,17 @@ public class MemoryManager extends PermanentStateClass {
     usedMemory -= n;
     if (usedMemory < 0) {
       usedMemory = 0;
-      Log.logError("Used memory went below 0");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Used memory went below 0");
     }
   }
 
   public boolean increaseUsedMemory(long n) {
     if (usedMemory + n > maxMemory) {
-      Log.logWarning("Tried to surpass memory restrictions");
+      utilitarios.Notificacoes_Terminal.printAviso("Tried to surpass memory restrictions");
       return false;
     }
     usedMemory += n;
-    Log.logWarning("Used memory: " + usedMemory + " / " + maxMemory);
+    utilitarios.Notificacoes_Terminal.printAviso("Used memory: " + usedMemory + " / " + maxMemory);
     return true;
   }
 

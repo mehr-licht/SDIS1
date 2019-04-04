@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Set;
 import network.Message;
 import service.Peer;
-import utils.Log;
 
 public class DeleteEnhHelper implements Runnable {
 
@@ -17,7 +16,7 @@ public class DeleteEnhHelper implements Runnable {
     this.request = request;
     this.parentPeer = parentPeer;
 
-    Log.log("Starting DeleteEnhHelper");
+    utilitarios.Notificacoes_Terminal.printNotificao("Starting DeleteEnhHelper");
   }
 
   @Override
@@ -26,7 +25,7 @@ public class DeleteEnhHelper implements Runnable {
     Set<String> filesToDelete = database.getFilesToDelete(request.getSenderID());
 
     if (filesToDelete.isEmpty()) {
-      Log.log("No files to delete for peer " + request.getSenderID());
+      utilitarios.Notificacoes_Terminal.printNotificao("No files to delete for peer " + request.getSenderID());
       return;
     }
 
@@ -48,7 +47,7 @@ public class DeleteEnhHelper implements Runnable {
     try {
       parentPeer.sendMessage(Channel.ChannelType.MC, msg);
     } catch (IOException e) {
-      Log.logError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
   }
 }

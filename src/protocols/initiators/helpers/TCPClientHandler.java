@@ -7,7 +7,6 @@ import java.net.Socket;
 import network.Message;
 import protocols.PeerData;
 import service.Peer;
-import utils.Log;
 
 public class TCPClientHandler implements Runnable {
 
@@ -30,13 +29,13 @@ public class TCPClientHandler implements Runnable {
       ois.close();
       clientSocket.close();
     } catch (IOException | ClassNotFoundException e) {
-      Log.logError("Couldn't read the message through TCPServer!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't read the message through TCPServer!");
     }
 
-    Log.logWarning("R TCP: " + msg.toString());
+    utilitarios.Notificacoes_Terminal.printAviso("R TCP: " + msg.toString());
 
     if (msg == null) {
-      Log.logError("Invalid CHUNK from TCP. Aborting!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Invalid CHUNK from TCP. Aborting!");
       return;
     }
 
@@ -44,7 +43,7 @@ public class TCPClientHandler implements Runnable {
     PeerData peerData = parentPeer.getPeerData();
 
     if (!peerData.getFlagRestored(msg.getFileID())) {
-      Log.log("Discarded ChunkData!");
+      utilitarios.Notificacoes_Terminal.printNotificao("Discarded ChunkData!");
       return;
     }
 

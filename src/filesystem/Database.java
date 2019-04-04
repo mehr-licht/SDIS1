@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import utils.Log;
 
 public class Database extends PermanentStateClass {
 
@@ -166,7 +165,7 @@ public class Database extends PermanentStateClass {
     try {
       ret = chunksBackedUp.get(fileID).get(chunkNo).addMirror(peerID);
     } catch (NullPointerException e) {
-      Log.logError("addChunkMirror " + e.getMessage());
+      utilitarios.Notificacoes_Terminal.printMensagemError("addChunkMirror " + e.getMessage());
       return null;
     }
 
@@ -186,7 +185,7 @@ public class Database extends PermanentStateClass {
     try {
       ret = chunksBackedUp.get(fileID).get(chunkNo).removeMirror(peerID);
     } catch (NullPointerException e) {
-      Log.logError("(removeChunkMirror) ChunkData not found: " + e.getMessage());
+      utilitarios.Notificacoes_Terminal.printMensagemError("(removeChunkMirror) ChunkData not found: " + e.getMessage());
       return null;
     }
 
@@ -198,7 +197,7 @@ public class Database extends PermanentStateClass {
     try {
       ret = chunksBackedUp.get(fileID).get(chunkNo).getNumMirrors();
     } catch (NullPointerException e) {
-      Log.logError("getChunkPerceivedReplication " + e.getMessage());
+      utilitarios.Notificacoes_Terminal.printMensagemError("getChunkPerceivedReplication " + e.getMessage());
       return null;
     }
 
@@ -244,11 +243,6 @@ public class Database extends PermanentStateClass {
 
     return mostBackedUpChunk;
   }
-
-  @Override
-  protected void finalize() throws Throwable {
-    savePermanentState();
-    super.finalize();
-  }
+  
 
 }

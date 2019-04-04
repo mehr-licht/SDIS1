@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import network.Message;
-import utils.Log;
 
 public class PeerData {
 
@@ -77,9 +76,9 @@ public class PeerData {
     ChunkData ret = chunksRestored.get(chunk.getFileID()).putIfAbsent(chunk.getChunkNo(), chunk);
 
     if (ret != null) {
-      Log.logWarning("ChunkData already exists!");
+      utilitarios.Notificacoes_Terminal.printAviso("ChunkData already exists!");
     } else {
-      Log.logWarning("Adding chunk to merge!");
+      utilitarios.Notificacoes_Terminal.printAviso("Adding chunk to merge!");
     }
   }
 
@@ -96,18 +95,18 @@ public class PeerData {
   }
 
   public void startChunkReplication(String fileID, int numChunks) {
-    Log.log("Starting rep. log at key " + fileID);
+    utilitarios.Notificacoes_Terminal.printNotificao("Starting rep. log at key " + fileID);
     chunkReplication.putIfAbsent(fileID, new AtomicIntegerArray(numChunks));
   }
 
   public Integer addChunkReplication(String fileID, int chunkNo) {
     if (!chunkReplication.containsKey(fileID)) {
-      Log.logWarning("addChunkReplication: key not found: " + fileID);
+      utilitarios.Notificacoes_Terminal.printAviso("addChunkReplication: key not found: " + fileID);
       return null;
     }
 
     int replication = chunkReplication.get(fileID).addAndGet(chunkNo, 1);
-    Log.logWarning("Incrementing replication of " + fileID + "/" + chunkNo + " to " + replication);
+    utilitarios.Notificacoes_Terminal.printAviso("Incrementing replication of " + fileID + "/" + chunkNo + " to " + replication);
     return replication;
   }
 

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import service.Peer;
-import utils.Log;
 
 public class TCPServer implements Runnable {
 
@@ -31,17 +30,17 @@ public class TCPServer implements Runnable {
       run = false;
       serverSocket.close();
     } catch (IOException e) {
-      Log.logError("Couldn't close TCPServer!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't close TCPServer!");
     }
   }
 
   private void initializeTCPServer() {
     try {
       serverSocket = new ServerSocket(TCPSERVER_PORT + parentPeer.getID());
-      Log.logWarning("Started TCPServer!");
+      utilitarios.Notificacoes_Terminal.printAviso("Started TCPServer!");
       run = true;
     } catch (IOException e) {
-      Log.logError("Couldn't initialize TCPServer!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't initialize TCPServer!");
     }
 
   }
@@ -49,7 +48,7 @@ public class TCPServer implements Runnable {
   private void handleTCPClient() {
     try {
       Socket clientSocket = serverSocket.accept();
-      Log.log("Received a TCPClient");
+      utilitarios.Notificacoes_Terminal.printNotificao("Received a TCPClient");
       new Thread(new TCPClientHandler(parentPeer, clientSocket)).start();
     } catch (IOException e) {
       //e.printStackTrace();

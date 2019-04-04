@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 import network.Message;
 import service.Peer;
-import utils.Log;
 
 public class Delete implements Runnable {
 
@@ -24,7 +23,7 @@ public class Delete implements Runnable {
     this.request = request;
     this.database = parentPeer.getDatabase();
 
-    Log.logWarning("Starting delete!");
+    utilitarios.Notificacoes_Terminal.printAviso("Starting delete!");
   }
 
 
@@ -44,7 +43,7 @@ public class Delete implements Runnable {
 
     compatWenh();
 
-    Log.logWarning("Finished delete!");
+    utilitarios.Notificacoes_Terminal.printAviso("Finished delete!");
   }
 
   private void compatWenh() {
@@ -55,7 +54,7 @@ public class Delete implements Runnable {
 
   private boolean dbHasChunks(String fileID) {
     if (!database.hasChunks(fileID)) {
-      Log.logError("Chunks didn't exist! Aborting Delete!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Chunks didn't exist! Aborting Delete!");
       return true;
     }
     return false;
@@ -67,7 +66,7 @@ public class Delete implements Runnable {
     try {
       parentPeer.sendMessage(Channel.ChannelType.MC, msg);
     } catch (IOException e) {
-      Log.logError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
   }
 

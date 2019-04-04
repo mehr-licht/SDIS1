@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import service.Peer;
-import utils.Log;
 
 public abstract class AbstractMessageDispatcher implements Runnable {
 
@@ -39,13 +38,13 @@ public abstract class AbstractMessageDispatcher implements Runnable {
       return;
     }
 
-    Log.log("R: " + msg.toString());
+    utilitarios.Notificacoes_Terminal.printNotificao("R: " + msg.toString());
 
     MessageHandler handler = messageHandlers.get(msg.getType());
     if (handler != null) {
       handler.handle(msg);
     } else {
-      Log.logError("Received unregistered message");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Received unregistered message");
     }
   }
 
@@ -68,7 +67,7 @@ public abstract class AbstractMessageDispatcher implements Runnable {
     try {
       msgParsed = new Message(data, length);
     } catch (Exception e) {
-      Log.logError(e.getMessage());
+      utilitarios.Notificacoes_Terminal.printMensagemError(e.getMessage());
       return;
     }
 

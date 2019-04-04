@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentMap;
 import network.Message;
 import protocols.initiators.helpers.TCPServer;
 import service.Peer;
-import utils.Log;
 
 public class RestoreInitiator implements Runnable {
 
@@ -29,13 +28,13 @@ public class RestoreInitiator implements Runnable {
     this.parentPeer = parentPeer;
     fileInfo = parentPeer.getDatabase().getFileInfoByPath(filePath);
 
-    Log.logWarning("Starting restoreInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Starting restoreInitiator!");
   }
 
   @Override
   public void run() {
     if (fileInfo == null) {
-      Log.logError("File not found for RESTORE");
+      utilitarios.Notificacoes_Terminal.printMensagemError("File not found for RESTORE");
       return;
     }
 
@@ -56,7 +55,7 @@ public class RestoreInitiator implements Runnable {
       closeTCPServer();
     }
 
-    Log.logWarning("Received all chunks");
+    utilitarios.Notificacoes_Terminal.printAviso("Received all chunks");
     ConcurrentMap<Integer, ChunkData> chunksRestored = parentPeer.getPeerData()
         .getChunksRestored(fileInfo.getFileID());
     String pathToSave = parentPeer.getPath("restores");
@@ -65,7 +64,7 @@ public class RestoreInitiator implements Runnable {
 
     // File no longer restoring
     parentPeer.setRestoring(false, fileInfo.getFileID());
-    Log.logWarning("Finished restoreInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Finished restoreInitiator!");
   }
 
   private void getSystemMgr(ConcurrentMap<Integer, ChunkData> chunksRestored, String pathToSave) {
@@ -76,7 +75,7 @@ public class RestoreInitiator implements Runnable {
           fileMerge(new ArrayList<>(chunksRestored.values()))
       );
     } catch (IOException e) {
-      Log.logError("Failed saving file at " + fileInfo.getPath());
+      utilitarios.Notificacoes_Terminal.printMensagemError("Failed saving file at " + fileInfo.getPath());
     }
   }
 
@@ -119,7 +118,7 @@ public class RestoreInitiator implements Runnable {
     try {
       parentPeer.sendMessage(Channel.ChannelType.MC, msg);
     } catch (IOException e) {
-      Log.logError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
   }
 

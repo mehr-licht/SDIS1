@@ -10,17 +10,17 @@ version=1.0
 peers=$1
 
 
-echo "creating $peers peers"
+echo "Creating $peers peers"
 echo .
 #clear the peers' file system
-echo 'sh ./clearFileSystem.sh'
+echo 'Running: sh ./clearFileSystem.sh'
 sh ./clearFileSystem.sh
-echo 'all peers files system cleared'
+echo 'Warning: all peers files system cleared'
 echo .
 #compile in LINUX/UNIX
-echo 'sh ./compile.sh'
+echo 'Running: sh ./compile.sh'
 sh ./compile.sh
-echo 'recompiled'
+echo 'Warning: recompiled finished'
 echo .
 #start the RMI registry
 count=$(ps aux | grep rmiregistry | wc -l)
@@ -28,9 +28,10 @@ if [ $count -gt 1 ]
 then
 echo "RMIregistry service already running"
 else
-echo 'sh ./rmi.sh'
+echo ' - Rmi not available -'
+echo 'Running: sh ./rmi.sh'
 sh ./rmi.sh
-echo 'started the RMI registry'
+echo 'Started the RMI registry'
 fi
 
 echo .
@@ -38,8 +39,8 @@ echo .
 for i in $(seq 1 1 $peers)
 do
 	echo 'sh ./peer.sh 2.0' $i
-	gnome-terminal --tab --title="peer $i" --command="bash -c 'sh ./peer.sh $version $i; $SHELL'"
+	gnome-terminal --tab --title="Peer $i" -- bash -c "sh ./peer.sh $version $i; $SHELL"
 done
-echo "$i peers created in $i tabs"
+echo "Successfully created $i peers in $i terminal tabs"
 echo .
 
