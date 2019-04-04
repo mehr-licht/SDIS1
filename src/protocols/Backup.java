@@ -100,7 +100,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
     SAVE_STATE ret;
     try {
       ret = parentPeer.getSystemManager().saveFile(
-          Integer.toString(chunkNo),
+          "chk"+chunkNo,
           chunkPath,
           chunkData
       );

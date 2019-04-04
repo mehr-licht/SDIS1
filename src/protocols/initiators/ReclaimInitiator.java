@@ -56,7 +56,7 @@ public class ReclaimInitiator implements Runnable {
         version,
         Integer.toString(parentPeer.getID()),
         fileID,
-        Integer.toString(chunkNo)
+        "chk"+chunkNo
     };
 
     Message msg = new Message(Message.MessageType.REMOVED, args);

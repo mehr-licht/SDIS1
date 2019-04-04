@@ -105,7 +105,7 @@ public class RestoreInitiator implements Runnable {
         version,
         Integer.toString(parentPeer.getID()),
         fileInfo.getFileID(),
-        Integer.toString(chunkNo),
+        "chk"+chunkNo,
         Integer.toString(parentPeer.getID() + TCPSERVER_PORT)
     };
 
