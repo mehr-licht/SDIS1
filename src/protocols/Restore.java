@@ -1,7 +1,7 @@
 package protocols;
 
-import static protocols.Macros.ENHANCEMENT_RESTORE;
-import static protocols.Macros.isCompatibleWithEnhancement;
+//import static protocols.Macros.ENHANCEMENT_RESTORE;
+//import static protocols.Macros.isCompatibleWithEnhancement;
 
 import channels.Channel;
 import filesystem.Database;
@@ -52,12 +52,12 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   }
 
   private void compatWenh(byte[] chunkData) {
-    if (isCompatibleWithEnhancement(ENHANCEMENT_RESTORE, request, parentPeer)) {
+  /*  if (isCompatibleWithEnhancement(ENHANCEMENT_RESTORE, request, parentPeer)) {
       sendMessageToTCP(request, chunkData);
       sendMessageToMDR(request, null);
-    } else {
+    } else {*/
       sendMessageToMDR(request, chunkData);
-    }
+    //}
   }
 
   private boolean chunkNotFound(String fileID, int chunkNo) {

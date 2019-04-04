@@ -37,7 +37,7 @@ echo .
 #start all peers : sh peer.sh <protocol_version> <peer_id>       1 ... $peers;
 for i in $(seq 1 1 $peers)
 do
-	echo 'sh ./peer.sh 2.0' $i
+	echo "sh ./peer.sh $version $i"
 	gnome-terminal --tab --title="peer $i" --command="bash -c 'sh ./peer.sh $version $i; $SHELL'"
 done
 echo "$i peers created in $i tabs"

@@ -63,20 +63,16 @@ fi
 #STATE
 #run the TestApp: "sh [BACKUP|RESTORE|RECLAIM|DELETE|STATE].sh"
 if [ $service = "DELETE" ] || [ $service = "RESTORE" ]; then
-	echo "java TestApp $service $file"
-	gnome-terminal --tab --title="$service" --command="java TestApp $service $file"
+	java -classpath bin service.TestApp //localhost/$peer $service $file
 fi
 if [ $service = "RECLAIM" ]; then
-	echo "java TestApp RECLAIM $space"
-	gnome-terminal --tab --title="$service" --command="java TestApp $RECLAIM $space"
+	java -classpath bin service.TestApp //localhost/$peer RECLAIM $space
 fi
 if [ $service = "BACKUP" ]; then
-	echo "java TestApp BACKUP $file $replic"
-	gnome-terminal --tab --title="$service" --command="java TestApp BACKUP $file $replic"
+	java -classpath bin service.TestApp //localhost/$peer BACKUP $file $replic
 fi
 if [ $service = "STATE" ]; then
-	echo "java TestApp STATE"
-	gnome-terminal --tab --title="$peer $i" --command="java TestApp STATE"
+	java -classpath bin service.TestApp //localhost/$peer STATE
 fi
 
 

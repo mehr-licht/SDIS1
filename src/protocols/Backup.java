@@ -55,11 +55,12 @@ public class Backup implements Runnable, PeerData.MessageObserver {
     String chunkPath = parentPeer.getPath("chunks") + "/" + fileID;
     createFolder(parentPeer.getPath("chunks") + "/" + fileID);
 
+    /*
     if (isCompatibleWithEnhancement(ENHANCEMENT_BACKUP, request, parentPeer)) {
       handleEnhancedRequest(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
     } else {
       handleStandardRequest(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
-    }
+    }*/
 
     Log.logWarning("Finished backup!");
   }

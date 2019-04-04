@@ -1,7 +1,7 @@
 package protocols;
 
-import static protocols.Macros.ENHANCEMENT_DELETE;
-import static protocols.Macros.isCompatibleWithEnhancement;
+//import static protocols.Macros.ENHANCEMENT_DELETE;
+//import static protocols.Macros.isCompatibleWithEnhancement;
 
 import channels.Channel;
 import filesystem.ChunkInfo;
@@ -42,16 +42,16 @@ public class Delete implements Runnable {
       parentPeer.getSystemManager().deleteChunk(chunk.getFileID(), chunk.getChunkNo());
     }
 
-    compatWenh();
+//    compatWenh();
 
     Log.logWarning("Finished delete!");
   }
-
+/*
   private void compatWenh() {
     if (isCompatibleWithEnhancement(ENHANCEMENT_DELETE, request, parentPeer)) {
       sendMessageToMC(request);
     }
-  }
+  }*/
 
   private boolean dbHasChunks(String fileID) {
     if (!database.hasChunks(fileID)) {

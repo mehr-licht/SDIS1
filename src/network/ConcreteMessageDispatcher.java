@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.*;
 import protocols.*;
-import protocols.initiators.helpers.DeleteEnhHelper;
+//import protocols.initiators.helpers.DeleteEnhHelper;
 import protocols.initiators.helpers.RemovedChunkHelper;
 import service.Peer;
 import utils.Log;
@@ -45,20 +45,20 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     Delete delete = new Delete(parentPeer, msg);
     executor.execute(delete);
   }
-
+/*
   private void handleUP(Message msg) {
     if (isCompatibleWithEnhancement(ENHANCEMENT_DELETE, msg, parentPeer)) {
       executor.execute(new DeleteEnhHelper(msg, parentPeer));
     }
-  }
-
+  }*/
+/*
   private void handleDELETED(Message msg) {
     Database database = parentPeer.getDatabase();
 
     if (isCompatibleWithEnhancement(ENHANCEMENT_DELETE, msg, parentPeer)) {
       database.deleteFileMirror(msg.getFileID(), msg.getSenderID());
     }
-  }
+  }*/
 
   private void handleCHUNK(Message msg) {
     PeerData peerData = parentPeer.getPeerData();
@@ -69,10 +69,10 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     if (!peerData.getFlagRestored(msg.getFileID())) { // Restoring File
       return;
     }
-
+/*
     if (!isMessageCompatibleWithEnhancement(ENHANCEMENT_RESTORE, msg)) {
       peerData.addChunkToRestore(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
-    }
+    }*/
   }
 
   private void handlePUTCHUNK(Message msg) {
@@ -152,8 +152,8 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     addMessageHandler(CHUNK, this::handleCHUNK);
     addMessageHandler(REMOVED, this::handleREMOVED);
     addMessageHandler(DELETE, this::handleDELETE);
-    addMessageHandler(DELETED, this::handleDELETED);
-    addMessageHandler(UP, this::handleUP);
+    /*addMessageHandler(DELETED, this::handleDELETED);
+    addMessageHandler(UP, this::handleUP);*/
   }
 
 }

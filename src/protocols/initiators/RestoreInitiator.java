@@ -43,18 +43,18 @@ public class RestoreInitiator implements Runnable {
     parentPeer.setRestoring(true, fileInfo.getFileID());
 
     //Start TCPServer if enhancement
-    if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
+   /* if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
       initializeTCPServer();
-    }
+    }*/
     getChunk();
 
     while (!parentPeer.hasRestoreFinished(filePath, fileInfo.getFileID())) {
       Thread.yield();
     }
 
-    if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
+   /* if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
       closeTCPServer();
-    }
+    }*/
 
     Log.logWarning("Received all chunks");
     ConcurrentMap<Integer, ChunkData> chunksRestored = parentPeer.getPeerData()
@@ -83,11 +83,11 @@ public class RestoreInitiator implements Runnable {
   private void getChunk() {
     // Send GETCHUNK to MC
     for (int i = 0; i < fileInfo.getNumChunks(); i++) {
-      if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
+    /*  if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
         sendMessageToMC(Message.MessageType.ENH_GETCHUNK, i);
-      } else {
+      } else {*/
         sendMessageToMC(Message.MessageType.GETCHUNK, i);
-      }
+      //}
     }
   }
 
