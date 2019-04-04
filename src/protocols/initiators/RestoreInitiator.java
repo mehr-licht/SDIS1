@@ -42,7 +42,7 @@ public class RestoreInitiator implements Runnable {
     parentPeer.setRestoring(true, fileInfo.getFileID());
 
     //Start TCPServer if enhancement
-    if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
+   if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
       initializeTCPServer();
     }
     getChunk();
@@ -51,7 +51,7 @@ public class RestoreInitiator implements Runnable {
       Thread.yield();
     }
 
-    if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
+   if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
       closeTCPServer();
     }
 
