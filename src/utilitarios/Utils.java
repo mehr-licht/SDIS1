@@ -1,24 +1,25 @@
 package utilitarios;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class Utils {
-
 
   public static final String bi_CRLF = "" + (char) 0x0D + (char) 0x0A + (char) 0x0D + (char) 0x0A;
   private static final char[] hex_digits_usados_no_nome = "0123456789ABCDEF".toCharArray();
 
   /**
    * Conversor de Bytes para Hexadecimal
+   *
    * @param bytes array a ser transformado num string hexadecimal
    * @return string Hexadecimal convertida desde o array de Bytes
    */
@@ -33,24 +34,27 @@ public class Utils {
   }
 
   /**
-   * Função de Hash (digest)
-   * @param msg Mensagem a ser hasheada
+   * Função de Hash
+   *
+   * @param unhashed unhashed filename
    * @return Mensagem já hasheada
    */
-  public static String hash(String msg) {
+  public static String hash(String unhashed) {
     MessageDigest digest;
     try {
       digest = MessageDigest.getInstance("SHA-256");
     } catch (NoSuchAlgorithmException e) {
-      Notificacoes_Terminal.printMensagemError("Algoritmo de hash não encontrado: " + e.getMessage());
+      Notificacoes_Terminal.printMensagemError(
+          "Algoritmo de hash não encontrado: " + e.getMessage());
       return null;
     }
-    return get_string(digest, msg);
+    return get_string(digest, unhashed);
   }
 
   /**
-   * Obtem hashado
-   * @param digest
+   * Obtem representação hexadecimal do hash
+   *
+   * @param digest objecto de SHA-256
    * @param msg
    * @return
    */
@@ -62,7 +66,8 @@ public class Utils {
 
   /**
    * Vai buscar o endereço do localhost (IPv4)
-   * @return o enderço do localhost (IPv4)
+   *
+   * @return o endereço do localhost (IPv4)
    */
   public static String get_IPv4_address() {
     String IP = null;
@@ -76,10 +81,10 @@ public class Utils {
   }
 
   /**
-   *
-   * @param accessPoint
-   * @param Server
-   * @return
+   * Obtem ponto de acesso do peer
+   * @param accessPoint ponto de acesso
+   * @param Server se é server ou não
+   * @return ponto de acesso do peer
    */
   public static String[] parse_RMI(String accessPoint, boolean Server) {
     Pattern rmiPattern;
@@ -88,18 +93,18 @@ public class Utils {
     Matcher m = rmiPattern.matcher(accessPoint);
     String[] peer_ap = null;
 
-    peer_ap = get_strings(peer_ap, m);
+    peer_ap = get_ap_strings_from_groups(peer_ap, m);
 
     return peer_ap;
   }
 
   /**
-   *
-   * @param peer_ap
-   * @param m
-   * @return
+   * Obtem ponto de acesso do peer
+   * @param peer_ap ponto de acesso
+   * @param m padrao a encontrar
+   * @return ponto de acesso do peer
    */
-  private static String[] get_strings(String[] peer_ap, Matcher m) {
+  private static String[] get_ap_strings_from_groups(String[] peer_ap, Matcher m) {
     if (m.find()) {
       peer_ap = new String[] {m.group(1), m.group(2), m.group(3)};
     } else {
@@ -109,41 +114,43 @@ public class Utils {
   }
 
   /**
-   *
-   * @param Server
-   * @return
+   * Faz um padrão para o identificador do serviço RMI
+   * @param Server se é server ou não
+   * @return indentificador do serviço RMI
    */
   private static Pattern get_pattern(boolean Server) {
-    Pattern rmiPattern;
-   String aux = Server?"?":"";
-   String pattern="//([\\w.]+)(?::(\\d+))?/(\\w+)"+aux;
-
-   rmiPattern = Pattern.compile(pattern);
-
-   /* if (Server) {
-      rmiPattern = Pattern.compile("//([\\w.]+)(?::(\\d+))?/(\\w+)?");
-    } else {
-      rmiPattern = Pattern.compile("//([\\w.]+)(?::(\\d+))?/(\\w+)");
-    }*/
-    return rmiPattern;
+    Pattern identifier;
+    String aux = Server ? "?" : "";
+    String pattern = "//([\\w.]+)(?::(\\d+))?/(\\w+)" + aux;
+    identifier = Pattern.compile(pattern);
+    return identifier;
   }
 
+  /**
+   * Obtem o registo RMI
+   * @param serviceAccessPoint pontos de acesso para o RMIservice
+   * @return localização do registo RMI
+   */
   public static Registry get_registry(String[] serviceAccessPoint) {
     Registry registry = null;
     // Bind the remote object's stub in the registry
-      if (serviceAccessPoint[1] == null) {
-        registry = locate_registry(serviceAccessPoint[0]);
-      } else {
-        registry = locate_registryAP(serviceAccessPoint);
-      }
+    if (serviceAccessPoint[1] == null) {
+      registry = locate_registry(serviceAccessPoint[0]);
+    } else {
+      registry = locate_registryAP(serviceAccessPoint);
+    }
     return registry;
   }
 
+  /**
+   * Obtem o ponto de acesso do registo RMI
+   * @param serviceAccessPoint pontos de acesso do RMIservice
+   * @return registo RMI
+   */
   private static Registry locate_registryAP(String[] serviceAccessPoint) {
-    Registry registry=null;
+    Registry registry = null;
     try {
       if (serviceAccessPoint[0] == "localhost") {
-
         registry = LocateRegistry.getRegistry(serviceAccessPoint[1]);
       } else {
         registry =
@@ -156,19 +163,23 @@ public class Utils {
     return registry;
   }
 
-  private static Registry locate_registry(String string) {
-    Registry registry=null;
-    try{
-    if (string == "localhost") {
 
-      registry = LocateRegistry.getRegistry();
-
-    } else {
-      registry = LocateRegistry.getRegistry(string);
+  /**
+   * Localiza o ponto de acesso do serviço
+   * @param access_point ponto de acesso do serviço
+   * @return registo RMI
+   */
+  private static Registry locate_registry(String access_point) {
+    Registry registry = null;
+    try {
+      if (access_point == "localhost") {
+        registry = LocateRegistry.getRegistry();
+      } else {
+        registry = LocateRegistry.getRegistry(access_point);
+      }
+    } catch (RemoteException e) {
+      e.printStackTrace();
     }
-  } catch (RemoteException e) {
-    e.printStackTrace();
-  }
     return registry;
   }
 }
