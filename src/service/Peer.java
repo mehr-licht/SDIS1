@@ -1,7 +1,7 @@
 package service;
 
 import static protocols.Macros.*;
-import static utilitarios.Utils.parseRMI;
+import static utilitarios.Utils.parse_RMI;
 
 import channels.Channel;
 import channels.Channel.ChannelType;
@@ -66,7 +66,7 @@ public class Peer implements RemoteBackupService {
 
     sendUPMessage();
 
-    utilitarios.Notificacoes_Terminal.printAviso("Peer " + id + " online!");
+    utilitarios.Notificacoes_Terminal.printAviso("peer " + id + " online!");
   }
 
   public static void main(String args[]) {
@@ -79,7 +79,7 @@ public class Peer implements RemoteBackupService {
 
     // Parse RMI address
     // host/ or   //host:port/
-    String[] serviceAccessPoint = parseRMI(true, args[2]);
+    String[] serviceAccessPoint = parse_RMI(args[2], true);
     if (serviceAccessPoint == null) {
       return;
     }
@@ -218,7 +218,7 @@ public class Peer implements RemoteBackupService {
   public String getPath(String path) {
     String pathname;
 
-    if (path.equals("backups")){//CH
+    if (path.equals("backup")){//CH
       pathname = systemManager.getChunksPath();
     }else if (path.equals("restored")){
       pathname = systemManager.getRestoredPath();

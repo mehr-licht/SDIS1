@@ -14,7 +14,7 @@ import service.Peer;
 public class SystemManager {
 
   public static final String FILES = "../files/";
-  private static final String BACKUPS = "backups/";
+  private static final String BACKUPS = "backup/";
   private static final String RESTORED = "restored/";
   private Peer parentPeer;
   private String rootPath;
@@ -22,7 +22,7 @@ public class SystemManager {
   private MemoryManager memoryManager;
   public SystemManager(Peer parentPeer, long maxMemory) {
     this.parentPeer = parentPeer;
-    this.rootPath = "fileSystem/Peer" + parentPeer.getID() + "/";
+    this.rootPath = "fileSystem/peer" + parentPeer.getID() + "/";
 
     initializePeerFileSystem();
 

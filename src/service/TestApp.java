@@ -1,7 +1,7 @@
 package service;
 
-import static utilitarios.Utils.getRegistry;
-import static utilitarios.Utils.parseRMI;
+import static utilitarios.Utils.get_registry;
+import static utilitarios.Utils.parse_RMI;
 
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
@@ -41,7 +41,7 @@ public class TestApp implements Runnable {
     }
     //System.setProperty("java.rmi.server.hostname","127.0.0.1");//ADDED
     //host/name or   //host:port/name
-    String[] peer_ap = parseRMI(false, args[0]);
+    String[] peer_ap = parse_RMI(args[0], false);
     if (peer_ap == null) {
       return;
     }
@@ -62,7 +62,7 @@ public class TestApp implements Runnable {
 
   private void initiateRMIStub() {
     try {
-      Registry registry = getRegistry(peer_ap);
+      Registry registry = get_registry(peer_ap);
       stub = (RemoteBackupService) registry.lookup(peer_ap[2]);
     } catch (Exception e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Error when opening RMI stub");

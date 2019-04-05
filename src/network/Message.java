@@ -4,7 +4,7 @@ import utilitarios.Utils;
 
 import java.io.*;
 
-import static utilitarios.Utils.getIPV4Address;
+import static utilitarios.Utils.get_IPv4_address;
 
 public class Message implements Serializable {
 
@@ -66,7 +66,7 @@ public class Message implements Serializable {
 
         if (type == MessageType.ENH_GETCHUNK) {
             mTCPPort = Integer.parseInt(args[4]);
-            mTCPHost = getIPV4Address();
+            mTCPHost = get_IPv4_address();
         }
     }
 
@@ -184,21 +184,21 @@ public class Message implements Serializable {
 
         switch (type) {
             case PUTCHUNK:
-                str = type + " " + version + " " + senderID + " " + fileID + " " + chunkNo + " " + replicationDegree + " " + Utils.CRLF + Utils.CRLF;
+                str = type + " " + version + " " + senderID + " " + fileID + " " + chunkNo + " " + replicationDegree + " " + Utils.bi_CRLF;
                 break;
             case DELETE:
             case DELETED:
-                str = type + " " + version + " " + senderID + " " + fileID + " " + Utils.CRLF + Utils.CRLF;
+                str = type + " " + version + " " + senderID + " " + fileID + " " + Utils.bi_CRLF;
                 break;
             case ENH_GETCHUNK:
                 str = type + " " + version + " " + senderID + " " + fileID + " " + chunkNo + " " +
-                        mTCPHost + ":" + mTCPPort + " " + Utils.CRLF + Utils.CRLF;
+                        mTCPHost + ":" + mTCPPort + " " +  Utils.bi_CRLF;
                 break;
             case UP:
-                str = type + " " + version + " " + senderID + " " + Utils.CRLF + Utils.CRLF;
+                str = type + " " + version + " " + senderID + " " + Utils.bi_CRLF;
                 break;
             default:
-                str = type + " " + version + " " + senderID + " " + fileID + " " + chunkNo + " " + Utils.CRLF + Utils.CRLF;
+                str = type + " " + version + " " + senderID + " " + fileID + " " + chunkNo + " " + Utils.bi_CRLF;
                 break;
         }
 
