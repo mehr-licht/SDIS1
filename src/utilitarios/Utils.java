@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-  //public static final String my_CRLF = "" + (char) 0x0D + (char) 0x0A;
+
   public static final String bi_CRLF = "" + (char) 0x0D + (char) 0x0A + (char) 0x0D + (char) 0x0A;
-  private static final char[] digits = "0123456789ABCDEF".toCharArray();
-  //public static final char[] high_prime = "2147483647".toCharArray();
+  private static final char[] hex_digits_usados_no_nome = "0123456789ABCDEF".toCharArray();
+
   /**
-   * Converte Bytes numa string Hexadecimal
+   * Conversor de Bytes para Hexadecimal
    * @param bytes array a ser transformado num string hexadecimal
    * @return string Hexadecimal convertida desde o array de Bytes
    */
@@ -26,8 +26,8 @@ public class Utils {
     char[] hexChars = new char[bytes.length * 2];
     for (int j = 0; j < bytes.length; j++) {
       int v = bytes[j] & 0xFF;
-      hexChars[j * 2] = digits[v >>> 4];
-      hexChars[j * 2 + 1] = digits[v & 0x0F];
+      hexChars[j * 2] = hex_digits_usados_no_nome[v >>> 4];
+      hexChars[j * 2 + 1] = hex_digits_usados_no_nome[v & 0x0F];
     }
     return new String(hexChars);
   }
@@ -115,16 +115,16 @@ public class Utils {
    */
   private static Pattern get_pattern(boolean Server) {
     Pattern rmiPattern;
-   // String aux = Server?"?":"";
-    //String pattern="//([\\w.]+)(?::(\\d+))?/(\\w+)"+aux;
+   String aux = Server?"?":"";
+   String pattern="//([\\w.]+)(?::(\\d+))?/(\\w+)"+aux;
 
-   // rmiPattern = Pattern.compile(pattern);
+   rmiPattern = Pattern.compile(pattern);
 
-    if (Server) {
+   /* if (Server) {
       rmiPattern = Pattern.compile("//([\\w.]+)(?::(\\d+))?/(\\w+)?");
     } else {
       rmiPattern = Pattern.compile("//([\\w.]+)(?::(\\d+))?/(\\w+)");
-    }
+    }*/
     return rmiPattern;
   }
 

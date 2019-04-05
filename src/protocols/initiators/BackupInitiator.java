@@ -108,20 +108,23 @@ public class BackupInitiator implements Runnable {
   }
 
   private String generateFileID(String pathname) {
-    return Utils.hash(generateUnhashedFileID(pathname));
+     return Utils.hash(generateUnhashedFileID(pathname));
   }
 
+  //CH
   private String generateUnhashedFileID(String absPath) {
     BasicFileAttributes attr;
+    String owner;//CH
     try {
       attr = Files.readAttributes(Paths.get(absPath), BasicFileAttributes.class);
+      owner = Files.getOwner(Paths.get(absPath)).getName() ;
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't read file's metadata: " + e.getMessage());
       return null;
     }
 
     Path pathObj = Paths.get(absPath);
-    return pathObj.getFileName().toString() + attr.lastModifiedTime() + attr.size();
+    return pathObj.getFileName().toString() + attr.lastModifiedTime() + owner;//CH
   }
 
   public Peer getParentPeer() {
