@@ -1,11 +1,12 @@
 package utilitarios;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 /**
  * Classe para visualização de Notificações, Erros e Avisos
@@ -19,15 +20,15 @@ public class Notificacoes_Terminal {
      * Padrao body de notificacao, para impresão na consola do número de thread e data e hora
      * @return String body da mensagem impressa na consola
      */
-    private static String getNotificacaoNormal() {
+    private static  String getNotificacaoNormal() {
         Date date = new Date();
-        return "" + Thread.currentThread().getId() + ", " + dateFormat.format(date) + ": ";
+        return "" + "ID: " + Thread.currentThread().getId()+ ", PID: "+ ProcessHandle.current().pid() + ", " + dateFormat.format(date) + ": ";
     }
 
     /**
      * Impressão da mensagem total de erro predefinida
      * @param msg mensagem de erro
-     * @return
+     *
      */
     synchronized public static void printMensagemError(String msg) {
         String mensagemHeader = "Ocorreu um ERRO: ";
@@ -40,7 +41,7 @@ public class Notificacoes_Terminal {
     /**
      * Impressão da mensagem total de erro
      * @param msg mensagem com o aviso definido
-     * @return
+     *
      */
     synchronized public static void printAviso(String msg) {
         String mensagemHeader = "AVISO: ";
@@ -56,7 +57,7 @@ public class Notificacoes_Terminal {
      * @return
      */
     synchronized public static void printNotificao(String msg) {
-        String mensagemHeader = "Notificacao: ";
+        String mensagemHeader = "Notificacao => ";
         String mensagemEnd = "--";
 
         printConsola.println(mensagemHeader + getNotificacaoNormal() + mensagemEnd);

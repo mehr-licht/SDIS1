@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 
 public class TestApp implements Runnable {
   private String[] peer_ap;
-  private String sub_protocol;
+  private String operation;
   private String opnd_1;
   private String opnd_2;
 
@@ -19,15 +19,16 @@ public class TestApp implements Runnable {
   private Map<String, Runnable> service_handlers;
 
   /**
-   * Corre o serviço pedido de acordo com os parametros passados
-   * @param peer_ap ponto de acesso do peer (localhost/n)
-   * @param sub_protocol serviço a executar
+   * Corre o serviço pedido de acordo com os parametros passados no terminal do TestApp
+   * Default command: service.TestApp //127.0.0.1/1 BACKUP $file $replic
+   * @param peer_ap ponto de acesso do peer (localhost/n) em que n é o número do peer
+   * @param operation serviço a executar
    * @param opnd_1 operando 1 do serviço a executar
    * @param opnd_2 operando 2 do serviço a executar
    */
-  public TestApp(String[] peer_ap, String sub_protocol, String opnd_1, String opnd_2) {
+  public TestApp(String[] peer_ap, String operation, String opnd_1, String opnd_2) {
     this.peer_ap = peer_ap;
-    this.sub_protocol = sub_protocol;
+    this.operation = operation;
     this.opnd_1 = opnd_1;
     this.opnd_2 = opnd_2;
 
@@ -41,7 +42,13 @@ public class TestApp implements Runnable {
 
   /**
    * main TestApp
-   * @param args peer_ap ; sub_protocol ; opnd_1 ; opnd_2
+   * @param args [0] <peer_ap> acess point
+   * @param args [1] <operation> recebe o nome do subprotocol (BACKUP | RESTORE | DELETE | RECLAIM | STATE)
+   *             ou no caso de melhoramentos ( BACKUPENH | RESTOREENH | DELETEENH | RECLAIMENH )
+   * @param args [2] <opnd_1> pathname of the file case: (BACKUP | RESTORE | DELETE )
+   *                    or espaço maximo do disco KBYTE  case: ( RECLAIM )
+   * @param args [3] <opnd_2> grau de replicação = replication degree VALID only on ( BACKUP | BACKUPENH )
+   *             NOTE: IF (args[2] == deletion){doRECLAIMprotocol;}
    */
   public static void main(String[] args) {
     if (!usage_ok(args)) {
@@ -63,11 +70,11 @@ public class TestApp implements Runnable {
    * @param peer_ap ponto de acesso do peer
    */
   private static void start_thread(String[] args, String[] peer_ap) {
-    String sub_protocol = args[1];
+    String operation_ = args[1];
     String operand1 = get_operand(args,1);
     String operand2 =get_operand(args,2);
 
-    TestApp app = new TestApp(peer_ap, sub_protocol, operand1, operand2);
+    TestApp app = new TestApp(peer_ap, operation_, operand1, operand2);
     new Thread(app).start();
   }
 
@@ -94,7 +101,7 @@ public class TestApp implements Runnable {
    */
   private static boolean usage_ok(String[] args) {
     if (args.length > 1 && args.length < 5) {
-      utilitarios.Notificacoes_Terminal.printAviso("Usage: java TestApp <peer_ap> <sub_protocol> <opnd_1> <opnd_2>");
+      utilitarios.Notificacoes_Terminal.printAviso("Usage: java TestApp <peer_ap> <operation> <opnd_1> <opnd_2>");
       return true;
     }
     return false;
@@ -107,7 +114,7 @@ public class TestApp implements Runnable {
   @Override
   public void run() {
     initiate_RMI_stub();
-    service_handlers.get(sub_protocol).run();
+    service_handlers.get(operation).run();
   }
 
   /**
