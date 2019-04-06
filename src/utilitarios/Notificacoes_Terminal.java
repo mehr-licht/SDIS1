@@ -16,7 +16,8 @@ public class Notificacoes_Terminal {
     private static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
 
     /**
-     * Padrao de notificacao
+     * Padrao body de notificacao, para impresão na consola do número de thread e data e hora
+     * @return String body da mensagem impressa na consola
      */
     private static String getNotificacaoNormal() {
         Date date = new Date();
@@ -24,29 +25,35 @@ public class Notificacoes_Terminal {
     }
 
     /**
-     * Definição da mensagem de erro
+     * Impressão da mensagem total de erro predefinida
+     * @param msg mensagem de erro
+     * @return
      */
     synchronized public static void printMensagemError(String msg) {
-        String mensagemHeader = "Ocorreu um erro: ";
+        String mensagemHeader = "Ocorreu um ERRO: ";
         String mensagemBody = getNotificacaoNormal() + msg;
-        String mensagemEnd = "----- End";
+        String mensagemEnd = "--";
         printConsola.println(mensagemHeader + mensagemBody + mensagemEnd);
         printConsola.flush();
     }
 
     /**
-     * Definição da mensagem de aviso
+     * Impressão da mensagem total de erro
+     * @param msg mensagem com o aviso definido
+     * @return
      */
     synchronized public static void printAviso(String msg) {
-        String mensagemHeader = "Aviso: ";
-        String mensagemEnd = "----- End";
+        String mensagemHeader = "AVISO: ";
+        String mensagemEnd = "--";
 
         printConsola.println(mensagemHeader + getNotificacaoNormal() + msg + mensagemEnd);
         printConsola.flush();
     }
 
     /**
-     * Definição da mensagem de Notificação
+     * Impressão da mensagem total de notificação
+     * @param msg mensagem com a notificação definido
+     * @return
      */
     synchronized public static void printNotificao(String msg) {
         String mensagemHeader = "Notificacao: "+msg;
