@@ -39,7 +39,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleDELETE(Message msg) {
-    parentPeer.getDatabase().addToFilesToDelete(msg.getFileID());
+    parentPeer.get_database().addToFilesToDelete(msg.getFileID());
 
     Delete delete = new Delete(parentPeer, msg);
     executor.execute(delete);
@@ -52,7 +52,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleDELETED(Message msg) {
-    Database database = parentPeer.getDatabase();
+    Database database = parentPeer.get_database();
 
     if (isCompatibleWithEnhancement(ENHANCEMENT_DELETE, msg, parentPeer)) {
       database.deleteFileMirror(msg.getFileID(), msg.getSenderID());
@@ -60,7 +60,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleCHUNK(Message msg) {
-    PeerData peerData = parentPeer.getPeerData();
+    PeerData peerData = parentPeer.get_peer_data();
 
     // Notify RESTORE observers of new CHUNK message
     peerData.notifyChunkObservers(msg);
@@ -75,7 +75,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handlePUTCHUNK(Message msg) {
-    Database database = parentPeer.getDatabase();
+    Database database = parentPeer.get_database();
     database.removeFromFilesToDelete(msg.getFileID());
 
     if (database.hasChunk(msg.getFileID(), msg.getChunkNo())) {
@@ -102,19 +102,19 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
 
   private void handleSTORED(Message msg) {
     // Notify BACKUP observers of new STORED message
-    parentPeer.getPeerData().notifyStoredObservers(msg);
+    parentPeer.get_peer_data().notifyStoredObservers(msg);
 
-    Database database = parentPeer.getDatabase();
+    Database database = parentPeer.get_database();
     if (database.hasChunk(msg.getFileID(), msg.getChunkNo())) {
       database.addChunkMirror(msg.getFileID(), msg.getChunkNo(), msg.getSenderID());
     } else if (database.hasBackedUpFileById(msg.getFileID())) {
-      parentPeer.getPeerData().addChunkReplication(msg.getFileID(), msg.getChunkNo());
+      parentPeer.get_peer_data().addChunkReplication(msg.getFileID(), msg.getChunkNo());
       database.addFileMirror(msg.getFileID(), msg.getSenderID());
     }
   }
 
   private void handleREMOVED(Message msg) {
-    Database database = parentPeer.getDatabase();
+    Database database = parentPeer.get_database();
     String fileID = msg.getFileID();
     int chunkNo = msg.getChunkNo();
 
@@ -129,7 +129,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     int desiredReplication = chunkInfo.getReplicationDegree();
 
     if (perceivedReplication < desiredReplication) {
-      byte[] chunkData = parentPeer.loadChunk(fileID, chunkNo);
+      byte[] chunkData = parentPeer.load_chunk(fileID, chunkNo);
 
       Future handler = executor.schedule(
           new RemovedChunkHelper(parentPeer, chunkInfo, chunkData),

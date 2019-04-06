@@ -34,11 +34,11 @@ public abstract class AbstractMessageDispatcher implements Runnable {
 
   private void dispatchMessage(Message msg) {
     //Ignoring invalid messages
-    if (msg == null || msg.getSenderID() == parentPeer.getID()) {
+    if (msg == null || msg.getSenderID() == parentPeer.get_ID()) {
       return;
     }
 
-    utilitarios.Notificacoes_Terminal.printNotificao("R: " + msg.toString());
+    utilitarios.Notificacoes_Terminal.printNotificao("Recetor: " + msg.toString());
 
     MessageHandler handler = messageHandlers.get(msg.getType());
     if (handler != null) {

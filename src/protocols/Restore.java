@@ -25,7 +25,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   public Restore(Peer parentPeer, Message request) {
     this.parentPeer = parentPeer;
     this.request = request;
-    this.database = parentPeer.getDatabase();
+    this.database = parentPeer.get_database();
     this.random = new Random();
 
     utilitarios.Notificacoes_Terminal.printAviso("Starting restore!");
@@ -43,7 +43,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
       return;
     }
 
-    byte[] chunkData = parentPeer.loadChunk(fileID, chunkNo);
+    byte[] chunkData = parentPeer.load_chunk(fileID, chunkNo);
 
     compatWenh(chunkData);
 
@@ -70,7 +70,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
 
   private boolean logIgnore() {
     //Ignore Chunks of own files
-    if (request.getSenderID() == parentPeer.getID()) {
+    if (request.getSenderID() == parentPeer.get_ID()) {
       utilitarios.Notificacoes_Terminal.printAviso("Ignoring CHUNKs of own files");
       return true;
     }
@@ -79,8 +79,8 @@ public class Restore implements Runnable, PeerData.MessageObserver {
 
   private Message createMessage(Message request, byte[] chunkData) {
     String[] args = {
-        parentPeer.getVersion(),
-        Integer.toString(parentPeer.getID()),
+        parentPeer.get_version(),
+        Integer.toString(parentPeer.get_ID()),
         request.getFileID(),
         Integer.toString(request.getChunkNo())
     };
@@ -118,10 +118,9 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   private void sendMessageToMDR(Message request, byte[] chunkData) {
     Message msgToSend = createMessage(request, chunkData);
 
-    parentPeer.getPeerData().attachChunkObserver(this);
-    this.handler = parentPeer.sendDelayedMessage(
-        Channel.ChannelType.MDR,
-        msgToSend,
+    parentPeer.get_peer_data().attachChunkObserver(this);
+    this.handler = parentPeer.send_delayed_message(
+        msgToSend, Channel.ChannelType.MDR,
         random.nextInt(Macros.MAX_DELAY),
         TimeUnit.MILLISECONDS
     );
@@ -133,7 +132,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   private void handler_wait() {
     try {
       this.handler.wait();
-      parentPeer.getPeerData().detachChunkObserver(this);
+      parentPeer.get_peer_data().detachChunkObserver(this);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

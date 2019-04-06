@@ -15,7 +15,7 @@ public class TestApp implements Runnable {
   private String opnd_1;
   private String opnd_2;
 
-  private RemoteBackupService stub;
+  private MyRemote stub;
   private Map<String, Runnable> service_handlers;
 
   /**
@@ -89,8 +89,8 @@ public class TestApp implements Runnable {
 
   /**
    * Verifica se o número de argumentos está correcto
-   * @param args arguments received by main
-   * @return true or false
+   * @param args arguments recebidos pela main
+   * @return verdadeiro ou falso
    */
   private static boolean usage_ok(String[] args) {
     if (args.length > 1 && args.length < 5) {
@@ -116,7 +116,7 @@ public class TestApp implements Runnable {
   private void initiate_RMI_stub() {
     try {
       Registry registry = get_registry(peer_ap);
-      stub = (RemoteBackupService) registry.lookup(peer_ap[2]);
+      stub = (MyRemote) registry.lookup(peer_ap[2]);
     } catch (Exception e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Erro ao abrir o stub do RMI");
       e.printStackTrace();

@@ -40,7 +40,7 @@ public class TCPClientHandler implements Runnable {
     }
 
     //Handle the CHUNK
-    PeerData peerData = parentPeer.getPeerData();
+    PeerData peerData = parentPeer.get_peer_data();
 
     if (!peerData.getFlagRestored(msg.getFileID())) {
       utilitarios.Notificacoes_Terminal.printNotificao("Discarded ChunkData!");

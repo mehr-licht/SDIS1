@@ -3,7 +3,7 @@ package service;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBackupService extends Remote {
+public interface MyRemote extends Remote {
 
   void backup(String pathname, int replicationDegree) throws RemoteException;
 

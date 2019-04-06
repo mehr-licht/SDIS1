@@ -21,7 +21,7 @@ public class DeleteEnhHelper implements Runnable {
 
   @Override
   public void run() {
-    Database database = parentPeer.getDatabase();
+    Database database = parentPeer.get_database();
     Set<String> filesToDelete = database.getFilesToDelete(request.getSenderID());
 
     if (filesToDelete.isEmpty()) {
@@ -37,15 +37,15 @@ public class DeleteEnhHelper implements Runnable {
 
   private void sendDELETE(String fileID) {
     String[] args = {
-        parentPeer.getVersion(),
-        Integer.toString(parentPeer.getID()),
+        parentPeer.get_version(),
+        Integer.toString(parentPeer.get_ID()),
         fileID
     };
 
     Message msg = new Message(Message.MessageType.DELETE, args);
 
     try {
-      parentPeer.sendMessage(Channel.ChannelType.MC, msg);
+      parentPeer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }

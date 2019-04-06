@@ -16,7 +16,7 @@ public class ReclaimInitiator implements Runnable {
 
   public ReclaimInitiator(String version, Peer parentPeer) {
     this.parentPeer = parentPeer;
-    this.systemManager = parentPeer.getSystemManager();
+    this.systemManager = parentPeer.get_system_manager();
     this.version = version;
 
     utilitarios.Notificacoes_Terminal.printNotificao("Starting reclaimInitiator!");
@@ -54,7 +54,7 @@ public class ReclaimInitiator implements Runnable {
   private void sendREMOVED(String fileID, int chunkNo) {
     String args[] = {
         version,
-        Integer.toString(parentPeer.getID()),
+        Integer.toString(parentPeer.get_ID()),
         fileID,
         "chk"+chunkNo
     };
@@ -65,7 +65,7 @@ public class ReclaimInitiator implements Runnable {
 
   private void sendMsg(Message msg) {
     try {
-      parentPeer.sendMessage(Channel.ChannelType.MC, msg);
+      parentPeer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }

@@ -48,7 +48,7 @@ public class BackupInitiator implements Runnable {
     }
 
     addRestorableFile(chunks, fileID);
-    parentPeer.getPeerData().startChunkReplication(fileID, chunks.size());
+    parentPeer.get_peer_data().startChunkReplication(fileID, chunks.size());
 
     ArrayList<Thread> helperThreads = getThreadArrayList(chunks);
 
@@ -70,7 +70,7 @@ public class BackupInitiator implements Runnable {
   private void resetReplic(String fileID, ArrayList<Thread> helperThreads) {
     try {
       joinWithThreads(helperThreads);
-      parentPeer.getPeerData().resetChunkReplication(fileID);
+      parentPeer.get_peer_data().resetChunkReplication(fileID);
     } catch (InterruptedException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Backup: Failed join with helper threads");
     }
@@ -97,7 +97,7 @@ public class BackupInitiator implements Runnable {
       chunkInfoArray[i] = new ChunkInfo(fileID, chunk.getChunkNo(), chunk.getReplicationDegree(),
           chunk.getSize());
     }
-    parentPeer.getDatabase()
+    parentPeer.get_database()
         .addRestorableFile(new FileInfo(pathname, fileID, replicationDegree, chunkInfoArray));
   }
 

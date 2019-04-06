@@ -22,7 +22,7 @@ public class SystemManager {
   private MemoryManager memoryManager;
   public SystemManager(Peer parentPeer, long maxMemory) {
     this.parentPeer = parentPeer;
-    this.rootPath = "fileSystem/peer" + parentPeer.getID() + "/";
+    this.rootPath = "fileSystem/peer" + parentPeer.get_ID() + "/";
 
     initializePeerFileSystem();
 

@@ -32,12 +32,12 @@ public class Macros {
       String enhancedVersion, Message request, Peer peer) {
     return ((request.getVersion().equals(enhancedVersion)
             || request.getVersion().equals(ENHANCEMENT_ALL))
-        && (peer.getVersion().equals(enhancedVersion)
-            || peer.getVersion().equals(ENHANCEMENT_ALL)));
+        && (peer.get_version().equals(enhancedVersion)
+            || peer.get_version().equals(ENHANCEMENT_ALL)));
   }
 
   public static boolean isPeerCompatibleWithEnhancement(String enhancedVersion, Peer peer) {
-    return (peer.getVersion().equals(enhancedVersion) || peer.getVersion().equals(ENHANCEMENT_ALL));
+    return (peer.get_version().equals(enhancedVersion) || peer.get_version().equals(ENHANCEMENT_ALL));
   }
 
   public static boolean isMessageCompatibleWithEnhancement(String enhancedVersion, Message msg) {
