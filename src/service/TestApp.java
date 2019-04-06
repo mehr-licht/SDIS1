@@ -42,6 +42,7 @@ public class TestApp implements Runnable {
 
   /**
    * main TestApp
+   *
    * @param args [0] <peer_ap> acess point
    * @param args [1] <operation> recebe o nome do subprotocol (BACKUP | RESTORE | DELETE | RECLAIM | STATE)
    *             ou no caso de melhoramentos ( BACKUPENH | RESTOREENH | DELETEENH | RECLAIMENH )
@@ -66,6 +67,7 @@ public class TestApp implements Runnable {
 
   /**
    * Inicia uma thread com o serviço pedido
+   *
    * @param args argumentos recebidos pela main
    * @param peer_ap ponto de acesso do peer
    */
@@ -80,6 +82,7 @@ public class TestApp implements Runnable {
 
   /**
    * Partindo dos argumentos recebidos pela main inicializa correctamente o operando1 e operando2
+   *
    * @param args argumentos recebidos pela main
    * @param which qual o operando pedido
    * @return o valor do operando pedido
@@ -96,14 +99,15 @@ public class TestApp implements Runnable {
 
   /**
    * Verifica se o número de argumentos está correcto
+   *
    * @param args arguments recebidos pela main
    * @return verdadeiro ou falso
    */
   private static boolean usage_ok(String[] args) {
     if (args.length > 1 && args.length < 5) {
-      utilitarios.Notificacoes_Terminal.printAviso("Usage: java TestApp <peer_ap> <operation> <opnd_1> <opnd_2>");
       return true;
     }
+    utilitarios.Notificacoes_Terminal.printAviso("Usage: java TestApp <peer_ap> <operation> <opnd_1> <opnd_2>");
     return false;
   }
 

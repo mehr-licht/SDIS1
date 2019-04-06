@@ -106,7 +106,7 @@ public class PeerData {
     }
 
     int replication = chunkReplication.get(fileID).addAndGet(chunkNo, 1);
-    utilitarios.Notificacoes_Terminal.printAviso("Incrementing replication of " + fileID + "/" + chunkNo + " to " + replication);
+    utilitarios.Notificacoes_Terminal.printAviso("Incrementing replication of " + fileID + "/chk" + chunkNo + " to " + replication);
     return replication;
   }
 

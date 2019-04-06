@@ -82,6 +82,7 @@ public class Utils {
 
   /**
    * Obtem ponto de acesso do peer
+   *
    * @param accessPoint ponto de acesso
    * @param Server se é server ou não
    * @return ponto de acesso do peer
@@ -100,6 +101,7 @@ public class Utils {
 
   /**
    * Obtem ponto de acesso do peer
+   *
    * @param peer_ap ponto de acesso
    * @param m padrao a encontrar
    * @return ponto de acesso do peer
@@ -115,6 +117,7 @@ public class Utils {
 
   /**
    * Faz um padrão para o identificador do serviço RMI
+   *
    * @param Server se é server ou não
    * @return indentificador do serviço RMI
    */
@@ -128,6 +131,7 @@ public class Utils {
 
   /**
    * Obtem o registo RMI
+   *
    * @param serviceAccessPoint pontos de acesso para o RMIservice
    * @return localização do registo RMI
    */
@@ -144,6 +148,7 @@ public class Utils {
 
   /**
    * Obtem o ponto de acesso do registo RMI
+   *
    * @param serviceAccessPoint pontos de acesso do RMIservice
    * @return registo RMI
    */
@@ -166,6 +171,7 @@ public class Utils {
 
   /**
    * Localiza o ponto de acesso do serviço
+   *
    * @param access_point ponto de acesso do serviço
    * @return registo RMI
    */

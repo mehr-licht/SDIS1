@@ -27,6 +27,7 @@ public class DeleteInitiator implements Runnable {
   public void run() {
     Database database = parentPeer.get_database();
     //Obtain info of the file from Database
+
     FileInfo fileInfo = database.getFileInfoByPath(path);
     if (fileInfo == null) {
       utilitarios.Notificacoes_Terminal.printMensagemError("File didn't exist! Aborting Delete!");

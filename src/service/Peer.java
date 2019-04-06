@@ -47,6 +47,7 @@ public class Peer implements MyRemote {
 
   /**
    * Construtor de um Peer
+   *
    * @param protocol_version versão do protocolo
    * @param id id do peer
    * @param server_access_point ponto de acesso do peer
@@ -74,6 +75,7 @@ public class Peer implements MyRemote {
 
   /**
    * main Peer
+   *
    * @param args argumentos recebidos pela main
    */
   public static void main(String args[]) {
@@ -103,7 +105,8 @@ public class Peer implements MyRemote {
   }
 
   /**
-   * new peer constructor
+   * Constructor do peer
+   *
    * @param obj1 Peer
    * @param arg argumentos para o construtor
    */
@@ -124,6 +127,7 @@ public class Peer implements MyRemote {
 
   /**
    * Verifica se o número de argumentos está correcto
+   *
    * @param args  arguments recebidos pela main
    * @return verdadeiro ou falso
    */
@@ -139,7 +143,7 @@ public class Peer implements MyRemote {
   }
 
   /**
-   * cria o handler da mensagem
+   * Cria o handler da mensagem
    */
   private void setup_message_handler() {
     peer_data = new PeerData();
@@ -149,6 +153,7 @@ public class Peer implements MyRemote {
 
   /**
    * Cria os canais de comunicação e inicia as suas threads
+   *
    * @param mc_address endereço do canal de controle
    * @param mdb_address endereço do canal do backup de dados
    * @param mdr_address endereço do canal do restore de dados
@@ -169,7 +174,8 @@ public class Peer implements MyRemote {
   }
 
   /**
-   * Enviar mensagem quando possivel
+   * Enviar mensagem quando possível
+   *
    * @param message mensagem a enviar
    * @param channel_type qual o canal
    * @param delay atraso
@@ -183,6 +189,7 @@ public class Peer implements MyRemote {
 
   /**
    * Envio de notificações pelo emissor
+   *
    * @param message mensagem a enviar
    * @param channel_type qual o canal
    */
@@ -200,9 +207,10 @@ public class Peer implements MyRemote {
 
   /**
    * Envio da notificação do emissor
+   *
    * @param message mensagem a enviar
    * @param channel_type qual o canal
-   * @throws IOException In/Out Exception to be thrown if error occurs
+   * @throws IOException Exceção In/Out a ser lançado se acontecer um erro
    */
   public void send_message(Message message, ChannelType channel_type) throws IOException {
     utilitarios.Notificacoes_Terminal.printNotificao("Emissor: " + message.toString());
@@ -211,6 +219,7 @@ public class Peer implements MyRemote {
 
   /**
    * Vai buscar o canal
+   *
    * @param channel_type tipo do canal
    * @return
    */
@@ -220,6 +229,7 @@ public class Peer implements MyRemote {
 
   /**
    * Faz backup de ficheiro
+   *
    * @param pathname caminho do ficheiro
    * @param replication_degree grau de replicação
    */
@@ -230,10 +240,12 @@ public class Peer implements MyRemote {
 
   /**
    * Restaura ficheiro
+   *
    * @param pathname caminho do ficheiro
    */
   @Override
   public void restore(String pathname) {
+    
     final Future handler;
     handler = executor.submit(new RestoreInitiator(protocol_version, pathname, this));
 
@@ -249,6 +261,7 @@ public class Peer implements MyRemote {
 
   /**
    * Apaga ficheiro
+   *
    * @param pathname caminho do ficheiro
    */
   @Override
@@ -258,6 +271,7 @@ public class Peer implements MyRemote {
 
   /**
    * Recupera espaço em disco
+   *
    * @param space espaço a ser recuperado
    */
   @Override
@@ -276,6 +290,7 @@ public class Peer implements MyRemote {
 
   /**
    * Vai buscar o id do peer
+   *
    * @return id do peer
    */
   public int get_ID() {
@@ -284,6 +299,7 @@ public class Peer implements MyRemote {
 
   /**
    * Vai buscar o path completo onde guardar
+   *
    * @param path directorio
    * @return o path completo onde guardae
    */
@@ -321,9 +337,10 @@ public class Peer implements MyRemote {
   }
 
   /**
-   * Mete a mensagem no message_dispatcher
+   * Mete o datagrama no message_dispatcher
+   *
    * @param data dados do datagrama
-   * @param length tamanho do dataagrama
+   * @param length tamanho do datagrama
    */
   public void add_msg_to_handler(byte[] data, int length) {
     message_dispatcher.pushMessage(data, length);
@@ -331,6 +348,7 @@ public class Peer implements MyRemote {
 
   /**
    * Vai buscar um chunk para restaurar ficheiro ou para garantir o grau de replicação
+   *
    * @param fileID identificação do ficheiro
    * @param chunkNo número do chunk
    * @return
@@ -342,6 +360,7 @@ public class Peer implements MyRemote {
   /**
    * Altera o estado de restore de um ficheiro
    * Enquanto está a ser restaurado o estado do ficheiro em relação ao restore é true
+   *
    * @param flag true, quando se inicia o restauro e false quando se termina
    * @param fileID identificação do ficheiro
    */
@@ -351,6 +370,7 @@ public class Peer implements MyRemote {
 
   /**
    * Verifica se processo de restore do ficheiro terminou
+   *
    * @param pathName caminho do ficherio a restaurar
    * @param fileID identificação do ficheiro a restaurar
    * @return verdadeiro ou falso
@@ -364,6 +384,7 @@ public class Peer implements MyRemote {
 
   /**
    * Obtem dados do peer
+   *
    * @return dados do peer
    */
   public PeerData get_peer_data() {
@@ -372,6 +393,7 @@ public class Peer implements MyRemote {
 
   /**
    * Obtem a base de dados
+   *
    * @return base de dados
    */
   public Database get_database() {
@@ -380,6 +402,7 @@ public class Peer implements MyRemote {
 
   /**
    * Obtem os dados do sistema (directorios, etc)
+   *
    * @return dados do sistema
    */
   public SystemManager get_system_manager() {
@@ -388,6 +411,7 @@ public class Peer implements MyRemote {
 
   /**
    * Obtem a versão do protocolo
+   *
    * @return versão do protocolo
    */
   public String get_version() {
