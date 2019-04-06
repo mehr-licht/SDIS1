@@ -21,7 +21,7 @@ public class Delete implements Runnable {
   public Delete(Peer parentPeer, Message request) {
     this.parentPeer = parentPeer;
     this.request = request;
-    this.database = parentPeer.getDatabase();
+    this.database = parentPeer.get_database();
 
     utilitarios.Notificacoes_Terminal.printAviso("Starting delete!");
   }
@@ -38,7 +38,7 @@ public class Delete implements Runnable {
     Map<Integer, ChunkInfo> chunkMap = database.removeChunksBackedUpByFileID(fileID);
     Collection<ChunkInfo> chunks = chunkMap.values();
     for (ChunkInfo chunk : chunks) {
-      parentPeer.getSystemManager().deleteChunk(chunk.getFileID(), chunk.getChunkNo());
+      parentPeer.get_system_manager().deleteChunk(chunk.getFileID(), chunk.getChunkNo());
     }
 
     compatWenh();
@@ -64,7 +64,7 @@ public class Delete implements Runnable {
     Message msg = makeDELETED(request);
 
     try {
-      parentPeer.sendMessage(Channel.ChannelType.MC, msg);
+      parentPeer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
@@ -72,8 +72,8 @@ public class Delete implements Runnable {
 
   private Message makeDELETED(Message request) {
     String[] args = {
-        parentPeer.getVersion(),
-        Integer.toString(parentPeer.getID()),
+        parentPeer.get_version(),
+        Integer.toString(parentPeer.get_ID()),
         request.getFileID()
     };
 

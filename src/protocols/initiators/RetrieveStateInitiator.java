@@ -18,7 +18,7 @@ public class RetrieveStateInitiator implements Runnable {
   public RetrieveStateInitiator(String version, Peer parentPeer) {
     this.version = version;
     this.parentPeer = parentPeer;
-    this.database = parentPeer.getDatabase();
+    this.database = parentPeer.get_database();
 
     utilitarios.Notificacoes_Terminal.printAviso("Starting retrieveStateInitiator!");
   }
@@ -32,7 +32,7 @@ public class RetrieveStateInitiator implements Runnable {
     String out = getOutput(files, chunks);
 
     // Storage capacity
-    MemoryManager mm = parentPeer.getSystemManager().getMemoryManager();
+    MemoryManager mm = parentPeer.get_system_manager().getMemoryManager();
     out += "\n\nStorage: " +
         "\n Available memory: " + mm.getAvailableMemory() +
         "\n Used memory: " + mm.getUsedMemory();

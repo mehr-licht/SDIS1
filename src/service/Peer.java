@@ -3,135 +3,160 @@ package service;
 import static protocols.Macros.*;
 import static utilitarios.Utils.parse_RMI;
 
-import channels.Channel;
-import channels.Channel.ChannelType;
-import channels.MChannel;
-import channels.MDBChannel;
-import channels.MDRChannel;
-import filesystem.Database;
-import filesystem.SystemManager;
-import java.io.IOException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import protocols.PeerData;
+import protocols.initiators.*;
 import network.AbstractMessageDispatcher;
 import network.ConcreteMessageDispatcher;
 import network.Message;
-import protocols.PeerData;
-import protocols.initiators.*;
+import filesystem.Database;
+import filesystem.SystemManager;
+import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import channels.Channel;
+import channels.Channel.ChannelType;
+import channels.MChannel;
+import channels.MDBChannel;
+import channels.MDRChannel;
 
-public class Peer implements RemoteBackupService {
+/**
+ * classe Peer
+ */
+public class Peer implements MyRemote {
 
-  private final String protocolVersion;
+  private final String[] server_access_point;
+  private final String protocol_version;
   private final int id;
-  private final String[] serverAccessPoint;
 
-  private AbstractMessageDispatcher messageDispatcher;
+  private AbstractMessageDispatcher message_dispatcher;
   private Map<ChannelType, Channel> channels;
 
-  /**
-   * Executor service responsible for scheduling delayed responses and performing all RMI
-   * sub-protocol tasks (backup, restore, ...).
-   */
+  //serviço Executor service responsável pelo escalonamento das respostas e fazer todas as tarefas dos sub-protocolos RMI.
   private ScheduledExecutorService executor;
 
-  private SystemManager systemManager;
+  private SystemManager system_manager;
   private Database database;
-  private PeerData peerData;
+  private PeerData peer_data;
 
-  public Peer(
-      String protocolVersion,
-      int id,
-      String[] serverAccessPoint,
-      String[] mcAddress,
-      String[] mdbAddress,
-      String[] mdrAddress) {
-    this.protocolVersion = protocolVersion;
+  /**
+   * Construtor de um Peer
+   * @param protocol_version versão do protocolo
+   * @param id id do peer
+   * @param server_access_point ponto de acesso do peer
+   * @param mc_address endereço do canal de controle
+   * @param mdb_address endereço do canal do backup de dados
+   * @param mdr_address endereço do canal do restore de dados
+   */
+  public Peer(String protocol_version,int id,String[] server_access_point,String[] mc_address,String[] mdb_address,String[] mdr_address) {
+    this.protocol_version = protocol_version;
     this.id = id;
-    this.serverAccessPoint = serverAccessPoint;
+    this.server_access_point = server_access_point;
 
-    systemManager = new SystemManager(this, MAX_SYSTEM_MEMORY);
-    database = systemManager.getDatabase();
+    system_manager = new SystemManager(this, MAX_SYSTEM_MEMORY);
+    database = system_manager.getDatabase();
 
-    setupChannels(mcAddress, mdbAddress, mdrAddress);
-    setupMessageHandler();
+    setup_channels(mc_address, mdb_address, mdr_address);
+    setup_message_handler();
 
     executor = new ScheduledThreadPoolExecutor(10);
 
-    sendUPMessage();
+    send_UP_message();
 
-    utilitarios.Notificacoes_Terminal.printAviso("peer " + id + " online!");
+    utilitarios.Notificacoes_Terminal.printAviso("peer " + id + " activo");
   }
 
+  /**
+   * main Peer
+   * @param args argumentos recebidos pela main
+   */
   public static void main(String args[]) {
-    if (usage(args)) {
+    if (!usage(args)) {
       return;
     }
 
-    String protocolVersion = args[0];
-    int serverID = Integer.parseInt(args[1]);
+    String protocol_version = args[0];
+    int server_ID = Integer.parseInt(args[1]);
 
-    // Parse RMI address
-    // host/ or   //host:port/
-    String[] serviceAccessPoint = parse_RMI(args[2], true);
-    if (serviceAccessPoint == null) {
+    // host/     ou   //host:port/
+    String[] service_access_point = parse_RMI(args[2], true);
+    if (service_access_point == null) {
       return;
     }
 
-    String[] mcAddress = args[3].split(":");
-    String[] mdbAddress = args[4].split(":");
-    String[] mdrAddress = args[5].split(":");
+    String[] mc_address = args[3].split(":");
+    String[] mdb_address = args[4].split(":");
+    String[] mdr_address = args[5].split(":");
 
-    // Flag needed for systems that use IPv6 by default
+    // Os sistemas que usam o IPv6 por omissão precisam da flag seguinte
     System.setProperty("java.net.preferIPv4Stack", "true");
 
-    construct(args[1], new Peer(
-        protocolVersion, serverID, serviceAccessPoint, mcAddress, mdbAddress, mdrAddress));
+    construct(new Peer(
+        protocol_version, server_ID, service_access_point, mc_address, mdb_address, mdr_address),
+        args[1]);
   }
 
-  private static void construct(String arg, service.Peer obj1) {
+  /**
+   * new peer constructor
+   * @param obj1 Peer
+   * @param arg argumentos para o construtor
+   */
+  private static void construct(Peer obj1, String arg) {
     try {
-      Peer obj =
-          obj1;
-      RemoteBackupService stub = (RemoteBackupService) UnicastRemoteObject.exportObject(obj, 0);
+      Peer obj = obj1;
+      MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(obj, 0);
 
       // Get own registry, to rebind to correct stub
       Registry registry = LocateRegistry.getRegistry();
       registry.rebind(arg, stub);
 
-      utilitarios.Notificacoes_Terminal.printNotificao("Server ready!");
+      utilitarios.Notificacoes_Terminal.printNotificao("Servidor "+arg+ " pronto");
     } catch (Exception e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Server exception: " + e.toString());
+      utilitarios.Notificacoes_Terminal.printMensagemError("Excepção no Servidor: " + e.toString());
     }
   }
 
+  /**
+   * Verifica se o número de argumentos está correcto
+   * @param args  arguments recebidos pela main
+   * @return verdadeiro ou falso
+   */
   private static boolean usage(String[] args) {
-    if (args.length != 6) {
+    if (!(args.length == 6)) {
       System.out.println(
           "Usage: java -classpath bin service.Peer"
               + " <protocol_version> <server_id> <service_access_point>"
               + " <mc:port> <mdb:port> <mdr:port>");
-      return true;
+      return false;
     }
-    return false;
+    return true;
   }
 
-  private void setupMessageHandler() {
-    peerData = new PeerData();
-    messageDispatcher = new ConcreteMessageDispatcher(this);
-    new Thread(messageDispatcher).start();
+  /**
+   * cria o handler da mensagem
+   */
+  private void setup_message_handler() {
+    peer_data = new PeerData();
+    message_dispatcher = new ConcreteMessageDispatcher(this);
+    new Thread(message_dispatcher).start();
   }
 
-  private void setupChannels(String[] mcAddress, String[] mdbAddress, String[] mdrAddress) {
-    Channel mc = new MChannel(this, mcAddress[0], mcAddress[1]);
-    Channel mdb = new MDBChannel(this, mdbAddress[0], mdbAddress[1]);
-    Channel mdr = new MDRChannel(this, mdrAddress[0], mdrAddress[1]);
+  /**
+   * Cria os canais de comunicação e inicia as suas threads
+   * @param mc_address endereço do canal de controle
+   * @param mdb_address endereço do canal do backup de dados
+   * @param mdr_address endereço do canal do restore de dados
+   */
+  private void setup_channels(String[] mc_address, String[] mdb_address, String[] mdr_address) {
+    Channel mc = new MChannel(this, mc_address[0], mc_address[1]);
+    Channel mdb = new MDBChannel(this, mdb_address[0], mdb_address[1]);
+    Channel mdr = new MDRChannel(this, mdr_address[0], mdr_address[1]);
 
     new Thread(mc).start();
     new Thread(mdb).start();
@@ -143,85 +168,132 @@ public class Peer implements RemoteBackupService {
     channels.put(ChannelType.MDR, mdr);
   }
 
-  public Future sendDelayedMessage(
-      ChannelType channelType, Message message, long delay, TimeUnit unit) {
-    return executor.schedule(
-        () -> {
-          sendMsg(channelType, message);
-        },
-        delay,
-        unit);
+  /**
+   * Enviar mensagem quando possivel
+   * @param message mensagem a enviar
+   * @param channel_type qual o canal
+   * @param delay atraso
+   * @param unit unidades de tempo em que o atraso está definido
+   * @return
+   */
+  public Future send_delayed_message(
+      Message message, ChannelType channel_type, long delay, TimeUnit unit) {
+    return executor.schedule( () -> {   sender_message(message, channel_type);   },  delay,   unit);
   }
 
-  private void sendMsg(ChannelType channelType, Message message) {
+  /**
+   * Envio de notificações pelo emissor
+   * @param message mensagem a enviar
+   * @param channel_type qual o canal
+   */
+  private void sender_message(Message message, ChannelType channel_type) {
     try {
-      sendMessage(channelType, message);
+      send_message(message, channel_type);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError(
-          "Error sending message to channel "
-              + channelType
+          "Erro ao enviar mensagem para o canal "
+              + channel_type
               + " - "
               + message.getHeaderAsString());
     }
   }
 
-  public void sendMessage(ChannelType channelType, Message message) throws IOException {
-    utilitarios.Notificacoes_Terminal.printNotificao("S: " + message.toString());
-
-    channels.get(channelType).sendMessage(message.getBytes());
+  /**
+   * Envio da notificação do emissor
+   * @param message mensagem a enviar
+   * @param channel_type qual o canal
+   * @throws IOException In/Out Exception to be thrown if error occurs
+   */
+  public void send_message(Message message, ChannelType channel_type) throws IOException {
+    utilitarios.Notificacoes_Terminal.printNotificao("Emissor: " + message.toString());
+    channels.get(channel_type).sendMessage(message.getBytes());
   }
 
-  public Channel getChannel(ChannelType channelType) {
-    return channels.get(channelType);
+  /**
+   * Vai buscar o canal
+   * @param channel_type tipo do canal
+   * @return
+   */
+  public Channel get_channel(ChannelType channel_type) {
+    return channels.get(channel_type);
   }
 
+  /**
+   * Faz backup de ficheiro
+   * @param pathname caminho do ficheiro
+   * @param replication_degree grau de replicação
+   */
   @Override
-  public void backup(String pathname, int replicationDegree) {
-    executor.execute(new BackupInitiator(protocolVersion, pathname, replicationDegree, this));
+  public void backup(String pathname, int replication_degree) {
+    executor.execute(new BackupInitiator(protocol_version, pathname, replication_degree, this));
   }
 
+  /**
+   * Restaura ficheiro
+   * @param pathname caminho do ficheiro
+   */
   @Override
   public void restore(String pathname) {
     final Future handler;
-    handler = executor.submit(new RestoreInitiator(protocolVersion, pathname, this));
+    handler = executor.submit(new RestoreInitiator(protocol_version, pathname, this));
 
     executor.schedule(
         () -> {
           if (handler.cancel(true)) {
-            utilitarios.Notificacoes_Terminal.printAviso("RestoreInitiator was killed for lack of chunks.");
+            utilitarios.Notificacoes_Terminal.printAviso("o restore_initiator foi terminado devido a falta de chunks.");
           }
         },
         20,
         TimeUnit.SECONDS);
   }
 
+  /**
+   * Apaga ficheiro
+   * @param pathname caminho do ficheiro
+   */
   @Override
   public void delete(String pathname) {
-    executor.execute(new DeleteInitiator(protocolVersion, pathname, this));
+    executor.execute(new DeleteInitiator(protocol_version, pathname, this));
   }
 
+  /**
+   * Recupera espaço em disco
+   * @param space espaço a ser recuperado
+   */
   @Override
   public void reclaim(int space) {
-    systemManager.getMemoryManager().setMaxMemory(space);
-    executor.execute(new ReclaimInitiator(protocolVersion, this));
+    system_manager.getMemoryManager().setMaxMemory(space);
+    executor.execute(new ReclaimInitiator(protocol_version, this));
   }
 
+  /**
+   * Devolve o estado do peer
+   */
   @Override
   public void state() {
-    executor.execute(new RetrieveStateInitiator(protocolVersion, this));
+    executor.execute(new RetrieveStateInitiator(protocol_version, this));
   }
 
-  public int getID() {
+  /**
+   * Vai buscar o id
+   * @return
+   */
+  public int get_ID() {
     return id;
   }
 
-  public String getPath(String path) {
+  /**
+   * Vai buscar o path
+   * @param path
+   * @return
+   */
+  public String get_path(String path) {
     String pathname;
 
     if (path.equals("backup")){//CH
-      pathname = systemManager.getChunksPath();
+      pathname = system_manager.getChunksPath();
     }else if (path.equals("restored")){
-      pathname = systemManager.getRestoredPath();
+      pathname = system_manager.getRestoredPath();
     }else{
       pathname = "";
     }
@@ -229,54 +301,93 @@ public class Peer implements RemoteBackupService {
     return pathname;
   }
 
-  private void sendUPMessage() {
+  /**
+   *
+   */
+  private void send_UP_message() {
     if (isPeerCompatibleWithEnhancement(ENHANCEMENT_DELETE, this)) {
       String[] args = {
-          getVersion(), Integer.toString(getID()),
+          get_version(), Integer.toString(get_ID()),
       };
 
       Message msg = new Message(Message.MessageType.UP, args);
 
       try {
-        sendMessage(Channel.ChannelType.MC, msg);
+        send_message(msg, Channel.ChannelType.MC);
       } catch (IOException e) {
-        utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
+        utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possivel enviar a mensagem para o canal multicast");
       }
     }
   }
 
-  public void addMsgToHandler(byte[] data, int length) {
-    messageDispatcher.pushMessage(data, length);
+  /**
+   *  @param data
+   * @param length
+   */
+  public void add_msg_to_handler(byte[] data, int length) {
+    message_dispatcher.pushMessage(data, length);
   }
 
-  public byte[] loadChunk(String fileID, int chunkNo) {
-    return systemManager.loadChunk(fileID, chunkNo);
+  /**
+   *
+   * @param fileID
+   * @param chunkNo
+   * @return
+   */
+  public byte[] load_chunk(String fileID, int chunkNo) {
+    return system_manager.loadChunk(fileID, chunkNo);
   }
 
-  public void setRestoring(boolean flag, String fileID) {
-    peerData.setFlagRestored(flag, fileID);
+  /**
+   *  @param flag
+   * @param fileID
+   */
+  public void set_restoring(boolean flag, String fileID) {
+    peer_data.setFlagRestored(flag, fileID);
   }
 
-  public boolean hasRestoreFinished(String pathName, String fileID) {
+  /**
+   *
+   * @param pathName
+   * @param fileID
+   * @return
+   */
+  public boolean has_restore_finished(String pathName, String fileID) {
     int numChunks = database.getNumChunksByFilePath(pathName);
-    int chunksRestored = peerData.getChunksRestoredSize(fileID);
+    int chunksRestored = peer_data.getChunksRestoredSize(fileID);
 
     return numChunks == chunksRestored;
   }
 
-  public PeerData getPeerData() {
-    return peerData;
+  /**
+   *
+   * @return
+   */
+  public PeerData get_peer_data() {
+    return peer_data;
   }
 
-  public Database getDatabase() {
+  /**
+   *
+   * @return
+   */
+  public Database get_database() {
     return database;
   }
 
-  public SystemManager getSystemManager() {
-    return systemManager;
+  /**
+   *
+   * @return
+   */
+  public SystemManager get_system_manager() {
+    return system_manager;
   }
 
-  public String getVersion() {
-    return protocolVersion;
+  /**
+   *
+   * @return
+   */
+  public String get_version() {
+    return protocol_version;
   }
 }

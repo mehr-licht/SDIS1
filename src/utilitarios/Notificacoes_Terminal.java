@@ -57,8 +57,8 @@ public class Notificacoes_Terminal {
      * @return
      */
     synchronized public static void printNotificao(String msg) {
-        String mensagemHeader = "Notificacao => ";
-        String mensagemEnd = "--";
+        String mensagemHeader = "Notificacao: "+msg;
+        String mensagemEnd = "----- End";
 
         printConsola.println(mensagemHeader + getNotificacaoNormal() + mensagemEnd);
         printConsola.flush();

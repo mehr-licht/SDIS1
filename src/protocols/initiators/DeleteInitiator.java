@@ -25,7 +25,7 @@ public class DeleteInitiator implements Runnable {
 
   @Override
   public void run() {
-    Database database = parentPeer.getDatabase();
+    Database database = parentPeer.get_database();
     //Obtain info of the file from Database
     FileInfo fileInfo = database.getFileInfoByPath(path);
     if (fileInfo == null) {
@@ -57,7 +57,7 @@ public class DeleteInitiator implements Runnable {
     Message msg = makeDELETE(fileInfo);
 
     try {
-      parentPeer.sendMessage(Channel.ChannelType.MC, msg);
+      parentPeer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
@@ -66,7 +66,7 @@ public class DeleteInitiator implements Runnable {
   private Message makeDELETE(FileInfo fileInfo) {
     String[] args = {
         version,
-        Integer.toString(parentPeer.getID()),
+        Integer.toString(parentPeer.get_ID()),
         fileInfo.getFileID()
     };
 

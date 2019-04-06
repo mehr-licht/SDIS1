@@ -45,14 +45,14 @@ public class Backup implements Runnable, PeerData.MessageObserver {
     int chunkNo = request.getChunkNo();
     int replicationDegree = request.getReplicationDegree();
 
-    if (senderID == parentPeer.getID()) { // a peer never stores the chunks of its own files
+    if (senderID == parentPeer.get_ID()) { // a peer never stores the chunks of its own files
       return;
     }
 
     byte[] chunkData = request.getBody();
 
-    String chunkPath = parentPeer.getPath("backup") + "/" + fileID;
-    createFolder(parentPeer.getPath("backup") + "/" + fileID);
+    String chunkPath = parentPeer.get_path("backup") + "/" + fileID;
+    createFolder(parentPeer.get_path("backup") + "/" + fileID);
 
 
     if (isCompatibleWithEnhancement(ENHANCEMENT_BACKUP, request, parentPeer)) {
@@ -74,7 +74,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
 
   private void handleEnhancedRequest(String fileID, int chunkNo, int replicationDegree,
       byte[] chunkData, String chunkPath) {
-    parentPeer.getPeerData().attachStoredObserver(this);
+    parentPeer.get_peer_data().attachStoredObserver(this);
 
     this.handler = scheduledExecutor.schedule(
         () -> {
@@ -89,7 +89,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
 
     try {
       this.handler.wait();
-      parentPeer.getPeerData().detachStoredObserver(this);
+      parentPeer.get_peer_data().detachStoredObserver(this);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
@@ -99,7 +99,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
       String chunkPath) {
     SAVE_STATE ret;
     try {
-      ret = parentPeer.getSystemManager().saveFile(
+      ret = parentPeer.get_system_manager().saveFile(
           "chk"+chunkNo,
           chunkPath,
           chunkData
@@ -110,9 +110,9 @@ public class Backup implements Runnable, PeerData.MessageObserver {
     }
 
     if (ret == SAVE_STATE.SUCCESS) {
-      parentPeer.getDatabase().addChunk(
+      parentPeer.get_database().addChunk(
           new ChunkInfo(fileID, chunkNo, replicationDegree, chunkData.length),
-          parentPeer.getID()
+          parentPeer.get_ID()
       );
     } else { // Don't send STORED if chunk already existed
       utilitarios.Notificacoes_Terminal.printAviso("ChunkData Backup: " + ret);
@@ -126,7 +126,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
     Message msg = makeSTORED(request);
 
     try {
-      parentPeer.sendMessage(Channel.ChannelType.MC, msg);
+      parentPeer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }
@@ -135,9 +135,8 @@ public class Backup implements Runnable, PeerData.MessageObserver {
   private void sendDelayedSTORED(Message request) {
     Message msg = makeSTORED(request);
 
-    parentPeer.sendDelayedMessage(
-        Channel.ChannelType.MC,
-        msg,
+    parentPeer.send_delayed_message(
+        msg, Channel.ChannelType.MC,
         random.nextInt(MAX_DELAY + 1),
         TimeUnit.MILLISECONDS
     );
@@ -145,8 +144,8 @@ public class Backup implements Runnable, PeerData.MessageObserver {
 
   private Message makeSTORED(Message request) {
     String[] args = {
-        parentPeer.getVersion(),
-        Integer.toString(parentPeer.getID()),
+        parentPeer.get_version(),
+        Integer.toString(parentPeer.get_ID()),
         request.getFileID(),
         Integer.toString(request.getChunkNo())
     };

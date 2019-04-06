@@ -26,7 +26,7 @@ public class RestoreInitiator implements Runnable {
     this.version = version;
     this.filePath = filePath;
     this.parentPeer = parentPeer;
-    fileInfo = parentPeer.getDatabase().getFileInfoByPath(filePath);
+    fileInfo = parentPeer.get_database().getFileInfoByPath(filePath);
 
     utilitarios.Notificacoes_Terminal.printAviso("Starting restoreInitiator!");
   }
@@ -39,7 +39,7 @@ public class RestoreInitiator implements Runnable {
     }
 
     // Activate restore flag
-    parentPeer.setRestoring(true, fileInfo.getFileID());
+    parentPeer.set_restoring(true, fileInfo.getFileID());
 
     //Start TCPServer if enhancement
    if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
@@ -47,7 +47,7 @@ public class RestoreInitiator implements Runnable {
     }
     getChunk();
 
-    while (!parentPeer.hasRestoreFinished(filePath, fileInfo.getFileID())) {
+    while (!parentPeer.has_restore_finished(filePath, fileInfo.getFileID())) {
       Thread.yield();
     }
 
@@ -56,20 +56,20 @@ public class RestoreInitiator implements Runnable {
     }
 
     utilitarios.Notificacoes_Terminal.printAviso("Received all chunks");
-    ConcurrentMap<Integer, ChunkData> chunksRestored = parentPeer.getPeerData()
+    ConcurrentMap<Integer, ChunkData> chunksRestored = parentPeer.get_peer_data()
         .getChunksRestored(fileInfo.getFileID());
-    String pathToSave = parentPeer.getPath("restored");
+    String pathToSave = parentPeer.get_path("restored");
 
     getSystemMgr(chunksRestored, pathToSave);
 
     // File no longer restoring
-    parentPeer.setRestoring(false, fileInfo.getFileID());
+    parentPeer.set_restoring(false, fileInfo.getFileID());
     utilitarios.Notificacoes_Terminal.printAviso("Finished restoreInitiator!");
   }
 
   private void getSystemMgr(ConcurrentMap<Integer, ChunkData> chunksRestored, String pathToSave) {
     try {
-      parentPeer.getSystemManager().saveFile(
+      parentPeer.get_system_manager().saveFile(
           fileInfo.getFileName(),
           pathToSave,
           fileMerge(new ArrayList<>(chunksRestored.values()))
@@ -103,10 +103,10 @@ public class RestoreInitiator implements Runnable {
   private void sendMessageToMC(Message.MessageType type, int chunkNo) {
     String[] args = {
         version,
-        Integer.toString(parentPeer.getID()),
+        Integer.toString(parentPeer.get_ID()),
         fileInfo.getFileID(),
         "chk"+chunkNo,
-        Integer.toString(parentPeer.getID() + TCPSERVER_PORT)
+        Integer.toString(parentPeer.get_ID() + TCPSERVER_PORT)
     };
 
     Message msg = new Message(type, args);
@@ -116,7 +116,7 @@ public class RestoreInitiator implements Runnable {
 
   private void sendMsg(Message msg) {
     try {
-      parentPeer.sendMessage(Channel.ChannelType.MC, msg);
+      parentPeer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }

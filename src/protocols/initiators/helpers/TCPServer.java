@@ -36,7 +36,7 @@ public class TCPServer implements Runnable {
 
   private void initializeTCPServer() {
     try {
-      serverSocket = new ServerSocket(TCPSERVER_PORT + parentPeer.getID());
+      serverSocket = new ServerSocket(TCPSERVER_PORT + parentPeer.get_ID());
       utilitarios.Notificacoes_Terminal.printAviso("Started TCPServer!");
       run = true;
     } catch (IOException e) {

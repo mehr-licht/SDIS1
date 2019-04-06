@@ -20,13 +20,13 @@ public class BackupChunkHelper implements Runnable {
     this.chunk = chunk;
     this.parentPeer = backupInitiator.getParentPeer();
     this.protocolVersion = backupInitiator.getProtocolVersion();
-    this.chunkReplication = parentPeer.getPeerData().getChunkReplication(chunk.getFileID());
+    this.chunkReplication = parentPeer.get_peer_data().getChunkReplication(chunk.getFileID());
   }
 
   BackupChunkHelper(Peer parentPeer, ChunkData chunk) {
     this.chunk = chunk;
     this.parentPeer = parentPeer;
-    this.protocolVersion = parentPeer.getVersion();
+    this.protocolVersion = parentPeer.get_version();
     this.chunkReplication = null;
   }
 
@@ -43,7 +43,7 @@ public class BackupChunkHelper implements Runnable {
       }
 
       try {
-        parentPeer.sendMessage(Channel.ChannelType.MDB, msg);
+        parentPeer.send_message(msg, Channel.ChannelType.MDB);
       } catch (IOException e) {
         utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
       }
@@ -71,7 +71,7 @@ public class BackupChunkHelper implements Runnable {
   private Message generatePutChunkMsg(ChunkData chunk, String protocolVersion) {
     String[] args = {
         protocolVersion,
-        Integer.toString(parentPeer.getID()),
+        Integer.toString(parentPeer.get_ID()),
         chunk.getFileID(),
         Integer.toString(chunk.getChunkNo()),
         Integer.toString(chunk.getReplicationDegree())

@@ -47,7 +47,7 @@ public abstract class Channel implements Runnable {
 
       try { // blocking method
         this.socket.receive(packet);
-        this.parentPeer.addMsgToHandler(packet.getData(), packet.getLength());
+        this.parentPeer.add_msg_to_handler(packet.getData(), packet.getLength());
       } catch (IOException e) {
         e.printStackTrace();
       }
