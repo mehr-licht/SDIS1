@@ -29,7 +29,7 @@ import channels.MDRChannel;
 /**
  * classe Peer
  */
-public class Peer implements MyRemote {
+public class Peer implements My_Interface_Remote {
 
   private final String[] server_access_point;
   private final String protocol_version;
@@ -110,7 +110,7 @@ public class Peer implements MyRemote {
   private static void construct(Peer obj1, String arg) {
     try {
       Peer obj = obj1;
-      MyRemote stub = (MyRemote) UnicastRemoteObject.exportObject(obj, 0);
+      My_Interface_Remote stub = (My_Interface_Remote) UnicastRemoteObject.exportObject(obj, 0);
 
       // Get own registry, to rebind to correct stub
       Registry registry = LocateRegistry.getRegistry();
