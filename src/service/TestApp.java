@@ -66,7 +66,7 @@ public class TestApp implements Runnable {
 
   /**
    * Inicia uma thread com o serviço pedido
-   * @param args arguments received by main
+   * @param args argumentos recebidos pela main
    * @param peer_ap ponto de acesso do peer
    */
   private static void start_thread(String[] args, String[] peer_ap) {
