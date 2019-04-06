@@ -275,17 +275,17 @@ public class Peer implements My_Interface_Remote {
   }
 
   /**
-   * Vai buscar o id
-   * @return
+   * Vai buscar o id do peer
+   * @return id do peer
    */
   public int get_ID() {
     return id;
   }
 
   /**
-   * Vai buscar o path
-   * @param path
-   * @return
+   * Vai buscar o path completo onde guardar
+   * @param path directorio
+   * @return o path completo onde guardae
    */
   public String get_path(String path) {
     String pathname;
@@ -302,7 +302,7 @@ public class Peer implements My_Interface_Remote {
   }
 
   /**
-   *
+   * Envia mensagem a dizer que está ativo. Fundamental para versão 1.3
    */
   private void send_UP_message() {
     if (isPeerCompatibleWithEnhancement(ENHANCEMENT_DELETE, this)) {
@@ -321,17 +321,18 @@ public class Peer implements My_Interface_Remote {
   }
 
   /**
-   *  @param data
-   * @param length
+   * Mete a mensagem no message_dispatcher
+   * @param data dados do datagrama
+   * @param length tamanho do dataagrama
    */
   public void add_msg_to_handler(byte[] data, int length) {
     message_dispatcher.pushMessage(data, length);
   }
 
   /**
-   *
-   * @param fileID
-   * @param chunkNo
+   * Vai buscar um chunk para restaurar ficheiro ou para garantir o grau de replicação
+   * @param fileID identificação do ficheiro
+   * @param chunkNo número do chunk
    * @return
    */
   public byte[] load_chunk(String fileID, int chunkNo) {
@@ -339,18 +340,20 @@ public class Peer implements My_Interface_Remote {
   }
 
   /**
-   *  @param flag
-   * @param fileID
+   * Altera o estado de restore de um ficheiro
+   * Enquanto está a ser restaurado o estado do ficheiro em relação ao restore é true
+   * @param flag true, quando se inicia o restauro e false quando se termina
+   * @param fileID identificação do ficheiro
    */
   public void set_restoring(boolean flag, String fileID) {
     peer_data.setFlagRestored(flag, fileID);
   }
 
   /**
-   *
-   * @param pathName
-   * @param fileID
-   * @return
+   * Verifica se processo de restore do ficheiro terminou
+   * @param pathName caminho do ficherio a restaurar
+   * @param fileID identificação do ficheiro a restaurar
+   * @return verdadeiro ou falso
    */
   public boolean has_restore_finished(String pathName, String fileID) {
     int numChunks = database.getNumChunksByFilePath(pathName);
@@ -360,32 +363,32 @@ public class Peer implements My_Interface_Remote {
   }
 
   /**
-   *
-   * @return
+   * Obtem dados do peer
+   * @return dados do peer
    */
   public PeerData get_peer_data() {
     return peer_data;
   }
 
   /**
-   *
-   * @return
+   * Obtem a base de dados
+   * @return base de dados
    */
   public Database get_database() {
     return database;
   }
 
   /**
-   *
-   * @return
+   * Obtem os dados do sistema (directorios, etc)
+   * @return dados do sistema
    */
   public SystemManager get_system_manager() {
     return system_manager;
   }
 
   /**
-   *
-   * @return
+   * Obtem a versão do protocolo
+   * @return versão do protocolo
    */
   public String get_version() {
     return protocol_version;
