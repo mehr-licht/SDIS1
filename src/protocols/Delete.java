@@ -38,7 +38,7 @@ public class Delete implements Runnable {
 
     delete_loop(file_ID);
 
-    enhancement_compatibility();
+    enhancement_compatibility_send();
 
     utilitarios.Notificacoes_Terminal.printAviso("acabei de apagar os chunks");
   }
@@ -73,7 +73,7 @@ public class Delete implements Runnable {
   /**
    * Verifica a compatibilidade e envia o datagrama para o canal multicast
    */
-  private void enhancement_compatibility() {
+  private void enhancement_compatibility_send() {
     if (enhancements_compatible(parent_peer, request, DELETE_ENH)) {
       send_to_multicast(request);
     }

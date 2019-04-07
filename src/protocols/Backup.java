@@ -3,149 +3,230 @@ package protocols;
 import static filesystem.SystemManager.createFolder;
 import static utilitarios.Utils.*;
 
-import channels.Channel;
-import filesystem.ChunkInfo;
-import filesystem.SystemManager.SAVE_STATE;
 import java.io.IOException;
 import java.util.Random;
+import channels.Channel;
+import service.Peer;
+import filesystem.ChunkInfo;
+import filesystem.SystemManager.SAVE_STATE;
+import network.Message;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import network.Message;
-import service.Peer;
 
 public class Backup implements Runnable, Peer_Info.MessageObserver {
 
-  private Peer parentPeer;
+  private Peer parent_peer;
   private Message request;
 
   private Random random;
   private Future handler = null;
 
-  private int storedCount = 0;
+  private int stored_count = 0;
 
-  private ScheduledExecutorService scheduledExecutor;
+  private ScheduledExecutorService scheduled_executor;
 
-  public Backup(Peer parentPeer, Message request) {
-    this.parentPeer = parentPeer;
+  public Backup(Peer parent_peer, Message request) {
+    this.parent_peer = parent_peer;
     this.request = request;
 
     this.random = new Random();
-    this.scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+    this.scheduled_executor = Executors.newSingleThreadScheduledExecutor();
 
-    utilitarios.Notificacoes_Terminal.printAviso("Starting backup!");
+    utilitarios.Notificacoes_Terminal.printAviso("A iniciar o backup");
   }
 
-
+  /**
+   * Lançamento do backup
+   */
   @Override
   public void run() {
-    int senderID = request.getSenderID();
-    String fileID = request.getFileID();
-    int chunkNo = request.getChunkNo();
-    int replicationDegree = request.getReplicationDegree();
+    int sender_ID = request.getSenderID();
+    String file_ID = request.getFileID();
+    int chunk_No = request.getChunkNo();
+    int replication_degree = request.getReplicationDegree();
 
-    if (senderID == parentPeer.get_ID()) { // a peer never stores the chunks of its own files
+    if (sender_ID == parent_peer.get_ID()) { // a peer never stores the chunks of its own files
       return;
     }
 
-    byte[] chunkData = request.getBody();
+    byte[] chunk_data = request.getBody();
 
-    String chunkPath = parentPeer.get_path("backup") + "/" + fileID;
-    createFolder(parentPeer.get_path("backup") + "/" + fileID);
+    String chunk_path = parent_peer.get_path("backup") + "/" + file_ID;
+    createFolder(parent_peer.get_path("backup") + "/" + file_ID);
 
+    enhancement_compatibility_handle(file_ID, chunk_No, chunk_data, chunk_path, replication_degree);
 
-    if (enhancements_compatible(parentPeer, request, BACKUP_ENH)) {
-      handleEnhancedRequest(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
+    utilitarios.Notificacoes_Terminal.printAviso("-----------------Backup terminado-----------------------");
+  }
+
+  /**
+   * Decide que tipo de Backup handler, se acordo com versao do protocolo
+   *
+   * @param file_ID identificação do ficheiro
+   * @param chunk_No numero do chunk
+   * @param chunk_data data do chunk
+   * @param chunk_path caminho do chunk
+   * @param replication_degree grau de replicação
+   */
+  private void enhancement_compatibility_handle(String file_ID, int chunk_No,
+      byte[] chunk_data, String chunk_path, int replication_degree) {
+    if (enhancements_compatible(parent_peer, request, BACKUP_ENH)) {
+      handle_enhanced_request(file_ID, chunk_No, chunk_data, chunk_path, replication_degree);
     } else {
-      handleStandardRequest(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
+      handle_standard_request(file_ID, chunk_No, chunk_path, chunk_data, replication_degree);
     }
-
-    utilitarios.Notificacoes_Terminal.printAviso("Finished backup!");
   }
 
-  private void handleStandardRequest(String fileID, int chunkNo, int replicationDegree,
-      byte[] chunkData, String chunkPath) {
-    boolean success = saveChunk(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
+  /**
+   * Versão standard do protocolo: envia quando possível
+   *
+   * @param file_ID identificação do ficheiro
+   * @param chunk_No numero do chunk
+   * @param chunk_data data do chunk
+   * @param chunk_path caminho do chunk
+   * @param replication_degree grau de replicação
+   */
+  private void handle_standard_request(String file_ID, int chunk_No, String chunk_path,
+      byte[] chunk_data, int replication_degree) {
+    boolean success = save_chunk(file_ID, chunk_No, chunk_data, chunk_path, replication_degree);
     if (success) {
-      sendDelayedSTORED(request);
+      send_delayed_STORED(request);
     }
   }
 
-  private void handleEnhancedRequest(String fileID, int chunkNo, int replicationDegree,
-      byte[] chunkData, String chunkPath) {
-    parentPeer.get_peer_data().add_stored_observer(this);
+  /**
+   * Versão melhorada do protocolo: envia logo
+   *
+   * @param file_ID identificação do ficheiro
+   * @param chunk_No numero do chunk
+   * @param chunk_data data do chunk
+   * @param chunk_path caminho do chunk
+   * @param replication_degree grau de replicação
+   */
+  private void handle_enhanced_request(String file_ID, int chunk_No, byte[] chunk_data,
+      String chunk_path, int replication_degree) {
+    parent_peer.get_peer_data().add_stored_observer(this);
 
-    this.handler = scheduledExecutor.schedule(
+    create_handler(file_ID, chunk_No, chunk_data, chunk_path, replication_degree);
+
+    wait_and_remove();
+  }
+
+  /**
+   * Cria handler do executor de backup e manda enviar logo
+   *
+   * @param file_ID identificação do ficheiro
+   * @param chunk_No numero do chunk
+   * @param chunk_data data do chunk
+   * @param chunk_path caminho do chunk
+   * @param replication_degree grau de replicação
+   */
+  private void create_handler(String file_ID, int chunk_No, byte[] chunk_data, String chunk_path,
+      int replication_degree) {
+    this.handler = scheduled_executor.schedule(
         () -> {
-          boolean success = saveChunk(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
+          boolean success = save_chunk(file_ID, chunk_No, chunk_data, chunk_path,
+              replication_degree);
           if (success) {
-            sendSTORED(request);
+            send_STORED(request);
           }
         },
         this.random.nextInt(MAX_DELAY + 1),
         TimeUnit.MILLISECONDS
     );
+  }
 
+  /**
+   * Remove o observador de backup
+   */
+  private void wait_and_remove() {
     try {
       this.handler.wait();
-      parentPeer.get_peer_data().remove_stored_observer(this);
+      parent_peer.get_peer_data().remove_stored_observer(this);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
   }
 
-  private boolean saveChunk(String fileID, int chunkNo, int replicationDegree, byte[] chunkData,
-      String chunkPath) {
+  /**
+   * Guarda o chunk no path fornecido
+   *
+   * @param file_ID identificação do ficheiro
+   * @param chunk_No numero do chunk
+   * @param chunk_data data do chunk
+   * @param chunk_path caminho do chunk
+   * @param replication_degree grau de replicação
+   * @return sucesso ou insucesso
+   */
+  private boolean save_chunk(String file_ID, int chunk_No, byte[] chunk_data,
+      String chunk_path, int replication_degree) {
     SAVE_STATE ret;
     try {
-      ret = parentPeer.get_system_manager().saveFile(
-          "chk"+chunkNo,
-          chunkPath,
-          chunkData
+      ret = parent_peer.get_system_manager().saveFile(
+          "chk"+ chunk_No,
+          chunk_path,
+          chunk_data
       );
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't save the chunk!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possivel guardar o chunk");
       return false;
     }
 
     if (ret == SAVE_STATE.SUCCESS) {
-      parentPeer.get_database().addChunk(
-          new ChunkInfo(fileID, chunkNo, replicationDegree, chunkData.length),
-          parentPeer.get_ID()
+      parent_peer.get_database().addChunk(
+          new ChunkInfo(file_ID, chunk_No, replication_degree, chunk_data.length),
+          parent_peer.get_ID()
       );
-    } else { // Don't send STORED if chunk already existed
-      utilitarios.Notificacoes_Terminal.printAviso("ChunkData Backup: " + ret);
+    } else { // Não enviia STORED se chunk já existe
+      utilitarios.Notificacoes_Terminal.printAviso("Backup de dados do chunk: " + ret);
       return false;
     }
 
     return true;
   }
 
-  private void sendSTORED(Message request) {
-    Message msg = makeSTORED(request);
+  /**
+   * Envia mensagem de guardado
+   *
+   * @param request pedido a que se refere a mensagem
+   */
+  private void send_STORED(Message request) {
+    Message msg = make_STORED(request);
 
     try {
-      parentPeer.send_message(msg, Channel.ChannelType.MC);
+      parent_peer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar para o canal multicast");
     }
   }
 
-  private void sendDelayedSTORED(Message request) {
-    Message msg = makeSTORED(request);
+  /**
+   * Envia mensagem de guardado quando possivel pelo canal multicast
+   *
+   * @param request
+   */
+  private void send_delayed_STORED(Message request) {
+    Message msg = make_STORED(request);
 
-    parentPeer.send_delayed_message(
+    parent_peer.send_delayed_message(
         msg, Channel.ChannelType.MC,
         random.nextInt(MAX_DELAY + 1),
         TimeUnit.MILLISECONDS
     );
   }
 
-  private Message makeSTORED(Message request) {
+  /**
+   * Compõe datagrama stored
+   *
+   * @param request pedido a que se refere o datagrama
+   * @return datagrama a enviar
+   */
+  private Message make_STORED(Message request) {
     String[] args = {
-        parentPeer.get_version(),
-        Integer.toString(parentPeer.get_ID()),
+        parent_peer.get_version(),
+        Integer.toString(parent_peer.get_ID()),
         request.getFileID(),
         Integer.toString(request.getChunkNo())
     };
@@ -153,19 +234,23 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
     return new Message(Message.MessageType.STORED, args);
   }
 
+  /**
+   * Actualização do estado da transmissão e cancelamento se necessário
+   *
+   * @param msg datagrama
+   */
   @Override
   public void update(Message msg) {
     if (this.handler == null) {
       return;
     }
-    if (msg.getChunkNo() != request.getChunkNo() || (!msg.getFileID()
-        .equals(request.getFileID()))) {
+    if ((!(msg.getFileID().equals(request.getFileID()))) || (!(msg.getChunkNo() == request.getChunkNo()))) {
       return;
     }
 
-    storedCount += 1;
-    if (storedCount >= request.getReplicationDegree()) {
-      // Cancel if chunk's perceived replication fulfills requirements
+    //stored_count += 1;
+    if (!(request.getReplicationDegree() > ++stored_count)) {
+      // Cancela se o grau de replicação já atingiu o definido
       this.handler.cancel(true);
     }
   }

@@ -194,6 +194,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
 
   /**
    * Actualização do estado da transmissão e cancelamento se necessário
+   *
    * @param msg datagrama
    */
   @Override
