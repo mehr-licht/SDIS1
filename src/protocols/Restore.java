@@ -1,86 +1,112 @@
 package protocols;
 
-import static protocols.Macros.ENHANCEMENT_RESTORE;
-import static protocols.Macros.isCompatibleWithEnhancement;
+import static utilitarios.Utils.enhancements_compatible;
+import static utilitarios.Utils.RESTORE_ENH;
 
-import channels.Channel;
-import filesystem.Database;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import filesystem.Database;
 import java.net.Socket;
+import channels.Channel;
+import network.Message;
+import service.Peer;
+import utilitarios.Utils;
 import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import network.Message;
-import service.Peer;
 
 public class Restore implements Runnable, PeerData.MessageObserver {
-
-  private Peer parentPeer;
+  private Peer parent_peer;
   private Message request;
   private Database database;
   private Random random;
   private Future handler = null;
 
   public Restore(Peer parentPeer, Message request) {
-    this.parentPeer = parentPeer;
+    this.parent_peer = parentPeer;
     this.request = request;
     this.database = parentPeer.get_database();
     this.random = new Random();
 
-    utilitarios.Notificacoes_Terminal.printAviso("Starting restore!");
+    utilitarios.Notificacoes_Terminal.printAviso("Início do RESTORE");
   }
 
+  /**
+   * Lançamento do restore
+   */
   @Override
   public void run() {
-    if (logIgnore()) {
+    if (is_owned()) {
+      utilitarios.Notificacoes_Terminal.printAviso("Não se liga a chunks de ficheiros nossos");
       return;
     }
 
-    String fileID = request.getFileID();
-    int chunkNo = request.getChunkNo();
-    if (chunkNotFound(fileID, chunkNo)) {
+    String file_ID = request.getFileID();
+    int chunk_No = request.getChunkNo();
+
+    if (!chunk_found(chunk_No, file_ID)) {
       return;
     }
 
-    byte[] chunkData = parentPeer.load_chunk(fileID, chunkNo);
+    byte[] chunk_data = parent_peer.load_chunk(file_ID, chunk_No);
 
-    compatWenh(chunkData);
+    send_message_by_channels(chunk_data);
 
-    utilitarios.Notificacoes_Terminal.printAviso("Finished restore!");
+    utilitarios.Notificacoes_Terminal.printAviso("RESTORE terminado");
   }
 
-  private void compatWenh(byte[] chunkData) {
-    if (isCompatibleWithEnhancement(ENHANCEMENT_RESTORE, request, parentPeer)) {
-      sendMessageToTCP(request, chunkData);
-      sendMessageToMDR(request, null);
+  /**
+   * Envia o datagrama
+   *
+   * @param chunkData dados do chunk
+   */
+  private void send_message_by_channels(byte[] chunkData) {
+    if (enhancements_compatible(parent_peer, request, RESTORE_ENH)) {
+      send_message_by_TCP(request, chunkData);
+      send_message_by_MDR(request, null);
     } else {
-      sendMessageToMDR(request, chunkData);
+      send_message_by_MDR(request, chunkData);
     }
   }
 
-  private boolean chunkNotFound(String fileID, int chunkNo) {
+  /**
+   * Verifica se o chunk existe
+   *
+   * @param chunkNo numero do chunk
+   * @param fileID identificação do ficheiro
+   * @return verdadeiro ou falso
+   */
+  private boolean chunk_found(int chunkNo, String fileID) {
     //Access database to get the ChunkData
     if (!database.hasChunk(fileID, chunkNo)) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("ChunkData not found locally: " + fileID + "/" + chunkNo);
+      utilitarios.Notificacoes_Terminal.printMensagemError("chunk " + chunkNo + " do ficheiro " + fileID +" não encontrado");
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Verifica se pedido é do próprio.
+   * @return verdadeiro ou falso
+   */
+  private boolean is_owned() {
+    if (request.getSenderID() == parent_peer.get_ID()) {
       return true;
     }
     return false;
   }
 
-  private boolean logIgnore() {
-    //Ignore Chunks of own files
-    if (request.getSenderID() == parentPeer.get_ID()) {
-      utilitarios.Notificacoes_Terminal.printAviso("Ignoring CHUNKs of own files");
-      return true;
-    }
-    return false;
-  }
-
-  private Message createMessage(Message request, byte[] chunkData) {
+  /**
+   * Cria datagrama
+   *
+   * @param request pedido de serviço
+   * @param chunkData dados do datagrama
+   * @return datagrama criado
+   */
+  private Message create_message(Message request, byte[] chunkData) {
     String[] args = {
-        parentPeer.get_version(),
-        Integer.toString(parentPeer.get_ID()),
+        parent_peer.get_version(),
+        Integer.toString(parent_peer.get_ID()),
         request.getFileID(),
         Integer.toString(request.getChunkNo())
     };
@@ -88,56 +114,92 @@ public class Restore implements Runnable, PeerData.MessageObserver {
     return new Message(Message.MessageType.CHUNK, args, chunkData);
   }
 
-  private void sendMessageToTCP(Message request, byte[] chunkData) {
-    Message msgToSend = createMessage(request, chunkData);
+  /**
+   * Envia datagrama por TCP
+   *
+   * @param request serviço pedido
+   * @param chunkData dados a enviar
+   */
+  private void send_message_by_TCP(Message request, byte[] chunkData) {
+    Message msg_to_send = create_message(request, chunkData);
 
-    String hostName = request.getTCPHost();
-    int portNumber = request.getTCPPort();
+    String host_name = request.getTCPHost();
+    int port_number = request.getTCPPort();
 
-    Socket serverSocket;
+    create_socket(host_name, port_number, msg_to_send);
 
-    server_socket(msgToSend, hostName, portNumber);
-
-    utilitarios.Notificacoes_Terminal.printAviso("S TCP: " + request.toString());
+    utilitarios.Notificacoes_Terminal.printAviso("Emissor (TCP): " + request.toString());
   }
 
-  private void server_socket(Message msgToSend, String hostName, int portNumber) {
-    Socket serverSocket;
+  /**
+   * Cria o socket TCP
+   *
+   * @param hostName
+   * @param portNumber
+   * @param msgToSend
+   */
+  private void create_socket(String hostName, int portNumber, Message msgToSend) {
     try {
-      serverSocket = new Socket(hostName, portNumber);
-      utilitarios.Notificacoes_Terminal.printNotificao("Connected to TCPServer");
-      ObjectOutputStream oos = new ObjectOutputStream(serverSocket.getOutputStream());
-      oos.writeObject(msgToSend);
-      oos.close();
-      serverSocket.close();
+      Socket server_socket;
+      server_socket = new Socket(hostName, portNumber);
+      tcp_socket_send(hostName, portNumber, msgToSend, server_socket);
+      server_socket.close();
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send CHUNK via TCP");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar chunk por TCP");
     }
   }
 
-  private void sendMessageToMDR(Message request, byte[] chunkData) {
-    Message msgToSend = createMessage(request, chunkData);
+  /**
+   * Envia o datagrama pelo socket TCP
+   *
+   * @param hostName nome do host
+   * @param portNumber porto do socket a criar
+   * @param msgToSend datagrama a enviar
+   * @throws IOException Exceção In/Out a ser lançado se acontecer um erro
+   */
+  private void tcp_socket_send(String hostName, int portNumber, Message msgToSend, Socket serverSocket)
+      throws IOException {
+    utilitarios.Notificacoes_Terminal.printNotificao("Ligado ao servidor TCP");
+    ObjectOutputStream obj_out_stream = new ObjectOutputStream(serverSocket.getOutputStream());
+    obj_out_stream.writeObject(msgToSend);
+    obj_out_stream.close();
+  }
 
-    parentPeer.get_peer_data().attachChunkObserver(this);
-    this.handler = parentPeer.send_delayed_message(
-        msgToSend, Channel.ChannelType.MDR,
-        random.nextInt(Macros.MAX_DELAY),
+  /**
+   * Envia datagrama pelo canal MDR
+   *
+   * @param request serviço pedido
+   * @param chunkData dados a enviar
+   */
+  private void send_message_by_MDR(Message request, byte[] chunkData) {
+    Message msg_to_send = create_message(request, chunkData);
+
+    parent_peer.get_peer_data().attachChunkObserver(this);
+    this.handler = parent_peer.send_delayed_message(
+        msg_to_send, Channel.ChannelType.MDR,
+        random.nextInt(Utils.MAX_DELAY),
         TimeUnit.MILLISECONDS
     );
 
-    handler_wait();
-
+    remove_chunk_observer();
   }
 
-  private void handler_wait() {
+  /**
+   * Remove da lista de observadores do chunk após espera
+   */
+  private void remove_chunk_observer() {
     try {
       this.handler.wait();
-      parentPeer.get_peer_data().detachChunkObserver(this);
+      parent_peer.get_peer_data().detachChunkObserver(this);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
   }
 
+  /**
+   * Actualização do estado da transmissão e cancelamento se necessário
+   * @param msg datagrama
+   */
   @Override
   public void update(Message msg) {
     if (this.handler == null) {
@@ -145,7 +207,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
     }
     if (msg.getFileID().equals(request.getFileID()) && msg.getChunkNo() == request.getChunkNo()) {
       this.handler.cancel(true);
-      utilitarios.Notificacoes_Terminal.printNotificao("Cancelled CHUNK message, to avoid flooding host");
+      utilitarios.Notificacoes_Terminal.printNotificao("datagrama cancelado para não assoberbar o host");
     }
   }
 }

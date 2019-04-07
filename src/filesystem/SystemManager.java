@@ -1,7 +1,7 @@
 package filesystem;
 
 import static java.util.Arrays.copyOfRange;
-import static protocols.Macros.MAX_CHUNK_SIZE;
+import static utilitarios.Utils.MAX_CHUNK_SIZE;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -65,6 +65,7 @@ public class SystemManager {
 
   public static long getFileSize(Path filepath) {
     BasicFileAttributes attr = null;
+    System.out.println(filepath);
     try {
       attr = Files.readAttributes(filepath, BasicFileAttributes.class);
     } catch (IOException e) {
@@ -163,7 +164,7 @@ public class SystemManager {
   }
 
   public String getChunkPath(String fileID, int chunkNo) {
-    return getChunksPath() + fileID + "/" + chunkNo;
+    return getChunksPath() + fileID + "/chk" + chunkNo;
   }
 
   public byte[] loadChunk(String fileID, int chunkNo) {

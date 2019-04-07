@@ -1,7 +1,7 @@
 package network;
 
 import static network.Message.MessageType.*;
-import static protocols.Macros.*;
+import static utilitarios.Utils.*;
 
 import filesystem.ChunkData;
 import filesystem.ChunkInfo;
@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.*;
 import protocols.*;
+import utilitarios.Utils;
 import protocols.initiators.helpers.DeleteEnhHelper;
 import protocols.initiators.helpers.RemovedChunkHelper;
 import service.Peer;
@@ -46,7 +47,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleUP(Message msg) {
-    if (isCompatibleWithEnhancement(ENHANCEMENT_DELETE, msg, parentPeer)) {
+    if (enhancements_compatible(parentPeer, msg, DELETE_ENH)) {
       executor.execute(new DeleteEnhHelper(msg, parentPeer));
     }
   }
@@ -54,7 +55,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   private void handleDELETED(Message msg) {
     Database database = parentPeer.get_database();
 
-    if (isCompatibleWithEnhancement(ENHANCEMENT_DELETE, msg, parentPeer)) {
+    if (enhancements_compatible(parentPeer, msg, DELETE_ENH)) {
       database.deleteFileMirror(msg.getFileID(), msg.getSenderID());
     }
   }
@@ -69,7 +70,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
       return;
     }
 
-    if (!isMessageCompatibleWithEnhancement(ENHANCEMENT_RESTORE, msg)) {
+    if (!enhancement_compatible_msg(msg, RESTORE_ENH)) {
       peerData.addChunkToRestore(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
     }
   }
@@ -108,7 +109,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     if (database.hasChunk(msg.getFileID(), msg.getChunkNo())) {
       database.addChunkMirror(msg.getFileID(), msg.getChunkNo(), msg.getSenderID());
     } else if (database.hasBackedUpFileById(msg.getFileID())) {
-      parentPeer.get_peer_data().addChunkReplication(msg.getFileID(), msg.getChunkNo());
+      parentPeer.get_peer_data().inc_chunk_replic(msg.getFileID(), msg.getChunkNo());
       database.addFileMirror(msg.getFileID(), msg.getSenderID());
     }
   }
@@ -133,7 +134,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
 
       Future handler = executor.schedule(
           new RemovedChunkHelper(parentPeer, chunkInfo, chunkData),
-          this.random.nextInt(Macros.MAX_DELAY + 1),
+          this.random.nextInt(Utils.MAX_DELAY + 1),
           TimeUnit.MILLISECONDS
       );
 

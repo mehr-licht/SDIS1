@@ -1,7 +1,7 @@
 package protocols.initiators;
 
 import static filesystem.SystemManager.fileMerge;
-import static protocols.Macros.*;
+import static utilitarios.Utils.*;
 
 import channels.Channel;
 import filesystem.ChunkData;
@@ -42,7 +42,7 @@ public class RestoreInitiator implements Runnable {
     parentPeer.set_restoring(true, fileInfo.getFileID());
 
     //Start TCPServer if enhancement
-   if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
+   if (enhancement_compatible_peer(parentPeer, RESTORE_ENH)) {
       initializeTCPServer();
     }
     getChunk();
@@ -51,7 +51,7 @@ public class RestoreInitiator implements Runnable {
       Thread.yield();
     }
 
-   if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
+   if (enhancement_compatible_peer(parentPeer, RESTORE_ENH)) {
       closeTCPServer();
     }
 
@@ -82,7 +82,7 @@ public class RestoreInitiator implements Runnable {
   private void getChunk() {
     // Send GETCHUNK to MC
     for (int i = 0; i < fileInfo.getNumChunks(); i++) {
-      if (isPeerCompatibleWithEnhancement(ENHANCEMENT_RESTORE, parentPeer)) {
+      if (enhancement_compatible_peer(parentPeer, RESTORE_ENH)) {
         sendMessageToMC(Message.MessageType.ENH_GETCHUNK, i);
       } else {
         sendMessageToMC(Message.MessageType.GETCHUNK, i);

@@ -1,7 +1,7 @@
 package protocols;
 
 import static filesystem.SystemManager.createFolder;
-import static protocols.Macros.*;
+import static utilitarios.Utils.*;
 
 import channels.Channel;
 import filesystem.ChunkInfo;
@@ -56,7 +56,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
     createFolder(parentPeer.get_path("backup") + "/" + fileID);
 
 
-    if (isCompatibleWithEnhancement(ENHANCEMENT_BACKUP, request, parentPeer)) {
+    if (enhancements_compatible(parentPeer, request, BACKUP_ENH)) {
       handleEnhancedRequest(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
     } else {
       handleStandardRequest(fileID, chunkNo, replicationDegree, chunkData, chunkPath);
