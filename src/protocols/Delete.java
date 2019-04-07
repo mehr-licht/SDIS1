@@ -11,6 +11,9 @@ import network.Message;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * classe Delete
+ */
 public class Delete implements Runnable {
 
   private Peer parent_peer;

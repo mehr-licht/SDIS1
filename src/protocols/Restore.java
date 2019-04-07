@@ -22,6 +22,9 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
   private Random random;
   private Future handler = null;
 
+  /**
+   * classe Restore
+   */
   public Restore(Peer parentPeer, Message request) {
     this.parent_peer = parentPeer;
     this.request = request;

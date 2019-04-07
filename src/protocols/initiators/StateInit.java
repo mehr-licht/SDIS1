@@ -16,6 +16,9 @@ public class StateInit implements Runnable {
   private Peer parent_peer;
   private Database database;
 
+  /**
+   * classe StateInit
+   */
   public StateInit(Peer parent_peer, String version) {
     this.version = version;
     this.parent_peer = parent_peer;
@@ -24,7 +27,9 @@ public class StateInit implements Runnable {
     utilitarios.Notificacoes_Terminal.printAviso("A começar o pedido de Estado na fonte");
   }
 
-  /** Lançamento do stateInit */
+  /**
+   * Lançamento do stateInit
+   */
   @Override
   public void run() {
     // Obtain info of the files from Database

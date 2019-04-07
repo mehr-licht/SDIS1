@@ -1,7 +1,9 @@
 package protocols.initiators;
 
 import static filesystem.SystemManager.fileMerge;
-import static utilitarios.Utils.*;
+import static utilitarios.Utils.RESTORE_ENH;
+import static utilitarios.Utils.TCPSERVER_PORT;
+import static utilitarios.Utils.enhancement_compatible_peer;
 
 import channels.Channel;
 import filesystem.ChunkData;
@@ -10,116 +12,145 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentMap;
 import network.Message;
+import network.Message.MessageType;
 import protocols.initiators.helpers.TCPServer;
 import service.Peer;
 
 public class RestoreInit implements Runnable {
 
-  private FileInfo fileInfo;
-  private String filePath;
+  private FileInfo file_info;
+  private String file_path;
   private String version;
 
-  private Peer parentPeer;
-  private TCPServer tcpServer;
+  private Peer parent_peer;
+  private TCPServer tcp_server;
 
-  public RestoreInit(String version, String filePath, Peer parentPeer) {
+  /** classe RestoreInit */
+  public RestoreInit(String version, String file_path, Peer parent_peer) {
     this.version = version;
-    this.filePath = filePath;
-    this.parentPeer = parentPeer;
-    fileInfo = parentPeer.get_database().getFileInfoByPath(filePath);
+    this.file_path = file_path;
+    this.parent_peer = parent_peer;
+    file_info = parent_peer.get_database().getFileInfoByPath(file_path);
 
-    utilitarios.Notificacoes_Terminal.printAviso("Starting restoreInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("A começar o restore na fonte");
   }
 
+  /** Lançamento do stateInit */
   @Override
   public void run() {
-    if (fileInfo == null) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("File not found for RESTORE");
+    if (file_info == null) {
+      utilitarios.Notificacoes_Terminal.printMensagemError(
+          "Ficheiro para restaurar não encontrado");
       return;
     }
 
-    // Activate restore flag
-    parentPeer.set_restoring(true, fileInfo.getFileID());
+    parent_peer.set_restoring(true, file_info.getFileID());
 
-    //Start TCPServer if enhancement
-   if (enhancement_compatible_peer(parentPeer, RESTORE_ENH)) {
-      initializeTCPServer();
+    if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
+      initialize_TCP_server();
     }
-    getChunk();
 
-    while (!parentPeer.has_restore_finished(filePath, fileInfo.getFileID())) {
+    send_getchunk();
+
+    while (!parent_peer.has_restore_finished(file_path, file_info.getFileID())) {
       Thread.yield();
     }
 
-   if (enhancement_compatible_peer(parentPeer, RESTORE_ENH)) {
-      closeTCPServer();
+    if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
+      close_TCP_server();
     }
 
-    utilitarios.Notificacoes_Terminal.printAviso("Received all chunks");
-    ConcurrentMap<Integer, ChunkData> chunksRestored = parentPeer.get_peer_data()
-        .get_restored_chunk_id(fileInfo.getFileID());
-    String pathToSave = parentPeer.get_path("restored");
+    utilitarios.Notificacoes_Terminal.printAviso("Todos os chunks recebidos");
+    ConcurrentMap<Integer, ChunkData> chunksRestored =
+        parent_peer.get_peer_data().get_restored_chunk_id(file_info.getFileID());
+    String pathToSave = parent_peer.get_path("restored");
 
-    getSystemMgr(chunksRestored, pathToSave);
+    save_restores(pathToSave, chunksRestored);
 
-    // File no longer restoring
-    parentPeer.set_restoring(false, fileInfo.getFileID());
-    utilitarios.Notificacoes_Terminal.printAviso("Finished restoreInitiator!");
+    parent_peer.set_restoring(false, file_info.getFileID());
+    utilitarios.Notificacoes_Terminal.printAviso("Acabou o restauro na fonte");
   }
 
-  private void getSystemMgr(ConcurrentMap<Integer, ChunkData> chunksRestored, String pathToSave) {
+  /**
+   * Guarda os chunks restaurados
+   *
+   * @param path_to_save caminho onde guardar
+   * @param restored_chunks os chunks a guardar
+   */
+  private void save_restores(
+      String path_to_save, ConcurrentMap<Integer, ChunkData> restored_chunks) {
     try {
-      parentPeer.get_system_manager().saveFile(
-          fileInfo.getFileName(),
-          pathToSave,
-          fileMerge(new ArrayList<>(chunksRestored.values()))
-      );
+      parent_peer
+          .get_system_manager()
+          .saveFile(
+              file_info.getFileName(),
+              path_to_save,
+              fileMerge(new ArrayList<>(restored_chunks.values())));
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Failed saving file at " + fileInfo.getPath());
+      utilitarios.Notificacoes_Terminal.printMensagemError(
+          "Erro ao gravar ficheiro em " + file_info.getPath());
     }
   }
 
-  private void getChunk() {
-    // Send GETCHUNK to MC
-    for (int i = 0; i < fileInfo.getNumChunks(); i++) {
-      if (enhancement_compatible_peer(parentPeer, RESTORE_ENH)) {
-        sendMessageToMC(Message.MessageType.ENH_GETCHUNK, i);
+  /**
+   * Envia GETCHUNK para o canal multicast
+   */
+  private void send_getchunk() {
+    for (int i = 0; i < file_info.getNumChunks(); i++) {
+      if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
+        send_message(Message.MessageType.ENH_GETCHUNK, i);
       } else {
-        sendMessageToMC(Message.MessageType.GETCHUNK, i);
+        send_message(Message.MessageType.GETCHUNK, i);
       }
     }
   }
 
-  private void closeTCPServer() {
-    tcpServer.closeTCPServer();
+  /**
+   * Encerra o servidor TCP
+   */
+  private void close_TCP_server() {
+    tcp_server.closeTCPServer();
   }
 
-  private void initializeTCPServer() {
-    tcpServer = new TCPServer(parentPeer);
-    new Thread(tcpServer).start();
+  /**
+  * Inicia o servidor TCP
+  */
+  private void initialize_TCP_server() {
+    tcp_server = new TCPServer(parent_peer);
+    new Thread(tcp_server).start();
   }
 
-
-  private void sendMessageToMC(Message.MessageType type, int chunkNo) {
+  /**
+   * Envia datagrama
+   *
+   * @param type tipo de mensagem
+   * @param chunk_No numero do chunk
+   */
+  private void send_message(MessageType type, int chunk_No) {
     String[] args = {
-        version,
-        Integer.toString(parentPeer.get_ID()),
-        fileInfo.getFileID(),
-        "chk"+chunkNo,
-        Integer.toString(parentPeer.get_ID() + TCPSERVER_PORT)
+      version,
+      Integer.toString(parent_peer.get_ID()),
+      file_info.getFileID(),
+      "chk" + chunk_No,
+      Integer.toString(parent_peer.get_ID() + TCPSERVER_PORT)
     };
 
     Message msg = new Message(type, args);
 
-    sendMsg(msg);
+    send_msg_MC(msg);
   }
 
-  private void sendMsg(Message msg) {
+  /**
+   * Envia datagrama para o canal multicast
+   *
+   * @param msg datagrama
+   */
+  private void send_msg_MC(Message msg) {
     try {
-      parentPeer.send_message(msg, Channel.ChannelType.MC);
+      parent_peer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError(
+          "Não foi possível enviar para o canal multicast");
     }
   }
-
 }

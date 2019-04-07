@@ -9,6 +9,9 @@ import java.util.Collections;
 import network.Message;
 import filesystem.ChunkData;
 
+/**
+ * classe Peer_Info
+ */
 public class Peer_Info {
 
   /**

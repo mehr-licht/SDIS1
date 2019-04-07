@@ -15,6 +15,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * classe Backup
+ */
 public class Backup implements Runnable, Peer_Info.MessageObserver {
 
   private Peer parent_peer;

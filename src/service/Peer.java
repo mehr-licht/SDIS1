@@ -360,7 +360,7 @@ public class Peer implements My_Interface_Remote {
   /**
    * Altera o estado de restore de um ficheiro
    *
-   * @param flag true, quando se inicia o restauro e false quando se elimina
+   * @param flag true, quando se inicia o restauro e false quando termina
    * @param fileID identificação do ficheiro
    */
   public void set_restoring(boolean flag, String fileID) {
