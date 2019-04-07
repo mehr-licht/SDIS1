@@ -235,7 +235,7 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void backup(String pathname, int replication_degree) {
-    executor.execute(new BackupInit(protocol_version, pathname, replication_degree, this));
+    executor.execute(new BackupInit(this, pathname, replication_degree, protocol_version));
   }
 
   /**
