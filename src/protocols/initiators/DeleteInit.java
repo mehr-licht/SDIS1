@@ -1,28 +1,41 @@
 package protocols.initiators;
 
-import channels.Channel;
 import filesystem.Database;
 import filesystem.FileInfo;
+import channels.Channel;
+import network.Message;
+import service.Peer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import network.Message;
-import service.Peer;
 
+/**
+ * class DeleteInit
+ */
 public class DeleteInit implements Runnable {
 
   private String version;
   private String path;
   private Peer parentPeer;
 
-  public DeleteInit(String version, String path, Peer parentPeer) {
+  /**
+   * Construtor do DeleteInit
+   *
+   * @param version
+   * @param path
+   * @param parent_peer
+   */
+  public DeleteInit(String version, String path, Peer parent_peer) {
     this.version = version;
     this.path = path;
-    this.parentPeer = parentPeer;
+    this.parentPeer = parent_peer;
 
     utilitarios.Notificacoes_Terminal.printAviso("A começar a apagar o ficheiro");
   }
 
+  /**
+   * lança o deleteInit
+   */
   @Override
   public void run() {
     Database database = parentPeer.get_database();
@@ -36,17 +49,17 @@ public class DeleteInit implements Runnable {
 
     database.addToFilesToDelete(fileInfo.getFileID());
 
-    //Send Delete message to MC channel
-    sendMessageToMC(fileInfo);
-    deleteFile();
+    send_message_MC(fileInfo);
+    delete_file();
 
-    //Delete file from database
     database.removeRestorableFile(fileInfo);
     utilitarios.Notificacoes_Terminal.printAviso("Acabei de apagar o ficheiro");
   }
 
-  private void deleteFile() {
-    //Delete the file from fileSystem
+  /**
+   * Apaga o ficheiro no sistema de ficheiros
+   */
+  private void delete_file() {
     try {
       Files.delete(Paths.get(path));
     } catch (IOException e) {
@@ -54,8 +67,13 @@ public class DeleteInit implements Runnable {
     }
   }
 
-  private void sendMessageToMC(FileInfo fileInfo) {
-    Message msg = makeDELETE(fileInfo);
+  /**
+   * Envia mensagem para o canal multicast
+   *
+   * @param file_info informações do ficheiro a apagar
+   */
+  private void send_message_MC(FileInfo file_info) {
+    Message msg = make_delete(file_info);
 
     try {
       parentPeer.send_message(msg, Channel.ChannelType.MC);
@@ -64,11 +82,17 @@ public class DeleteInit implements Runnable {
     }
   }
 
-  private Message makeDELETE(FileInfo fileInfo) {
+  /**
+   * Cria o datagrama de delete
+   *
+   * @param file_info informações do ficheiro a apagar
+   * @return datagrama de delete já construido
+   */
+  private Message make_delete(FileInfo file_info) {
     String[] args = {
         version,
         Integer.toString(parentPeer.get_ID()),
-        fileInfo.getFileID()
+        file_info.getFileID()
     };
 
     return new Message(Message.MessageType.DELETE, args);

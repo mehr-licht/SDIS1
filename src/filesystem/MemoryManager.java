@@ -14,11 +14,7 @@ public class MemoryManager extends PermanentStateClass {
     this.setUp(savePath);
   }
 
-  public long getMaxMemory() {
-    return maxMemory;
-  }
-
-  public void setMaxMemory(int maxMemory) {
+    public void setMaxMemory(int maxMemory) {
     this.maxMemory = maxMemory;
   }
 

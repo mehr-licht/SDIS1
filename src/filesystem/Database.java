@@ -89,6 +89,7 @@ public class Database extends PermanentStateClass {
     filesByPath.put(fileInfo.getPath(), fileInfo);
   }
 
+  //Delete file from database
   public void removeRestorableFile(FileInfo fileInfo) {
     filesBackedUp.remove(fileInfo.getFileID());
     filesByPath.remove(fileInfo.getPath());

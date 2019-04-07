@@ -14,60 +14,75 @@ public class ReclaimInit implements Runnable {
   private SystemManager systemManager;
   private String version;
 
+
+  /** classe ReclaimInit */
   public ReclaimInit(String version, Peer parentPeer) {
     this.parentPeer = parentPeer;
     this.systemManager = parentPeer.get_system_manager();
     this.version = version;
 
-    utilitarios.Notificacoes_Terminal.printNotificao("Starting reclaimInitiator!");
+    utilitarios.Notificacoes_Terminal.printNotificao("A começar a recuperar na fonte");
   }
 
+  /** Lançamento do reclaimInit */
   @Override
   public void run() {
-    MemoryManager memoryManager = systemManager.getMemoryManager();
-    whileMemory(memoryManager);
+    MemoryManager memory_mgr = systemManager.getMemoryManager();
+    remove_chunks(memory_mgr);
 
-    utilitarios.Notificacoes_Terminal.printNotificao("Available memory: " + memoryManager.getAvailableMemory());
-    utilitarios.Notificacoes_Terminal.printNotificao("Finished reclaimInitiator!");
+    utilitarios.Notificacoes_Terminal.printNotificao("Memória disponível: " + memory_mgr.getAvailableMemory());
+    utilitarios.Notificacoes_Terminal.printNotificao("Terminou de recuperar na fonte");
   }
 
-  private void whileMemory(MemoryManager memoryManager) {
-    while (memoryManager.getAvailableMemory() < 0) {
-      utilitarios.Notificacoes_Terminal.printNotificao("Available memory: " + memoryManager.getAvailableMemory());
-      ChunkInfo chunkInfo = systemManager.getDatabase().getChunkForRemoval();
+  /**
+   * Apaga chunks para recuperar espaço em memória
+   *
+   * @param mem_mgr gerenciador de memória
+   */
+  private void remove_chunks(MemoryManager mem_mgr) {
+    while (mem_mgr.getAvailableMemory() < 0) {
+      utilitarios.Notificacoes_Terminal.printNotificao("Memória disponível: " + mem_mgr.getAvailableMemory());
+      ChunkInfo chunk_info = systemManager.getDatabase().getChunkForRemoval();
 
-      byte[] chunkData = systemManager.loadChunk(chunkInfo.getFileID(), chunkInfo.getChunkNo());
-      if (chunkData == null) { // Confirm chunk exists
-        utilitarios.Notificacoes_Terminal.printAviso("ChunkData selected for reclaim doesn't exist");
+      byte[] chunkData = systemManager.loadChunk(chunk_info.getFileID(), chunk_info.getChunkNo());
+      if (chunkData == null) {
+        utilitarios.Notificacoes_Terminal.printAviso("Não existe a ChunkData seleccionada para recuperar");
         continue;
       }
 
-      systemManager.deleteChunk(chunkInfo.getFileID(), chunkInfo.getChunkNo());
-      sendREMOVED(chunkInfo);
+      systemManager.deleteChunk(chunk_info.getFileID(), chunk_info.getChunkNo());
+      send_removed(chunk_info.getFileID(), chunk_info.getChunkNo());
     }
   }
 
-  private void sendREMOVED(ChunkInfo chunkInfo) {
-    sendREMOVED(chunkInfo.getFileID(), chunkInfo.getChunkNo());
-  }
-
-  private void sendREMOVED(String fileID, int chunkNo) {
+  /**
+   * Cria mensagem de chunk apagado
+   *
+   * @param file_ID identificação do ficheiro
+   * @param chunk_No número do chunk
+   */
+  private void send_removed(String file_ID, int chunk_No) {
     String args[] = {
         version,
         Integer.toString(parentPeer.get_ID()),
-        fileID,
-        "chk"+chunkNo
+        file_ID,
+        "chk"+chunk_No
     };
 
     Message msg = new Message(Message.MessageType.REMOVED, args);
-    sendMsg(msg);
+    send_msg(msg);
   }
 
-  private void sendMsg(Message msg) {
+  /**
+   * Envia mensagem para o canal multicast
+   *
+   * @param msg mensagem a enviar
+   */
+  private void send_msg(Message msg) {
     try {
       parentPeer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviarr para o canal multicast");
     }
   }
 
