@@ -13,7 +13,7 @@ import network.Message;
 import protocols.initiators.helpers.TCPServer;
 import service.Peer;
 
-public class RestoreInitiator implements Runnable {
+public class RestoreInit implements Runnable {
 
   private FileInfo fileInfo;
   private String filePath;
@@ -22,7 +22,7 @@ public class RestoreInitiator implements Runnable {
   private Peer parentPeer;
   private TCPServer tcpServer;
 
-  public RestoreInitiator(String version, String filePath, Peer parentPeer) {
+  public RestoreInit(String version, String filePath, Peer parentPeer) {
     this.version = version;
     this.filePath = filePath;
     this.parentPeer = parentPeer;

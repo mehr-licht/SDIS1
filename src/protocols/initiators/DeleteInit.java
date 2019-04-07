@@ -9,13 +9,13 @@ import java.nio.file.Paths;
 import network.Message;
 import service.Peer;
 
-public class DeleteInitiator implements Runnable {
+public class DeleteInit implements Runnable {
 
   private String version;
   private String path;
   private Peer parentPeer;
 
-  public DeleteInitiator(String version, String path, Peer parentPeer) {
+  public DeleteInit(String version, String path, Peer parentPeer) {
     this.version = version;
     this.path = path;
     this.parentPeer = parentPeer;

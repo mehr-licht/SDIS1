@@ -235,7 +235,7 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void backup(String pathname, int replication_degree) {
-    executor.execute(new BackupInitiator(protocol_version, pathname, replication_degree, this));
+    executor.execute(new BackupInit(protocol_version, pathname, replication_degree, this));
   }
 
   /**
@@ -247,7 +247,7 @@ public class Peer implements My_Interface_Remote {
   public void restore(String pathname) {
     
     final Future handler;
-    handler = executor.submit(new RestoreInitiator(protocol_version, pathname, this));
+    handler = executor.submit(new RestoreInit(protocol_version, pathname, this));
 
     executor.schedule(
         () -> {
@@ -266,7 +266,7 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void delete(String pathname) {
-    executor.execute(new DeleteInitiator(protocol_version, pathname, this));
+    executor.execute(new DeleteInit(protocol_version, pathname, this));
   }
 
   /**
@@ -277,7 +277,7 @@ public class Peer implements My_Interface_Remote {
   @Override
   public void reclaim(int space) {
     system_manager.getMemoryManager().setMaxMemory(space);
-    executor.execute(new ReclaimInitiator(protocol_version, this));
+    executor.execute(new ReclaimInit(protocol_version, this));
   }
 
   /**
@@ -285,7 +285,7 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void state() {
-    executor.execute(new RetrieveStateInitiator(protocol_version, this));
+    executor.execute(new StateInit(this, protocol_version));
   }
 
   /**

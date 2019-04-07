@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import network.Message;
 import utilitarios.Utils;
-import protocols.initiators.BackupInitiator;
+import protocols.initiators.BackupInit;
 import service.Peer;
 
 public class BackupChunkHelper implements Runnable {
@@ -16,10 +16,10 @@ public class BackupChunkHelper implements Runnable {
   private ChunkData chunk;
   private AtomicIntegerArray chunkReplication;
 
-  public BackupChunkHelper(BackupInitiator backupInitiator, ChunkData chunk) {
+  public BackupChunkHelper(BackupInit backup_init, ChunkData chunk) {
     this.chunk = chunk;
-    this.parentPeer = backupInitiator.getParentPeer();
-    this.protocolVersion = backupInitiator.getProtocolVersion();
+    this.parentPeer = backup_init.getParentPeer();
+    this.protocolVersion = backup_init.getProtocolVersion();
     this.chunkReplication = parentPeer.get_peer_data().get_replic(chunk.getFileID());
   }
 

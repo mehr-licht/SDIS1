@@ -8,13 +8,13 @@ import java.io.IOException;
 import network.Message;
 import service.Peer;
 
-public class ReclaimInitiator implements Runnable {
+public class ReclaimInit implements Runnable {
 
   private Peer parentPeer;
   private SystemManager systemManager;
   private String version;
 
-  public ReclaimInitiator(String version, Peer parentPeer) {
+  public ReclaimInit(String version, Peer parentPeer) {
     this.parentPeer = parentPeer;
     this.systemManager = parentPeer.get_system_manager();
     this.version = version;
