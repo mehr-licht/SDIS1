@@ -25,6 +25,8 @@ public class PeerData {
    */
   private Collection<MessageObserver> chunkObservers;
   private Collection<MessageObserver> storedObservers;
+
+
   public PeerData() {
     chunkReplication = new ConcurrentHashMap<>();
     chunksRestored = new ConcurrentHashMap<>();

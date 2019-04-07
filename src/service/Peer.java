@@ -84,7 +84,7 @@ public class Peer implements My_Interface_Remote {
     String protocol_version = args[0];
     int server_ID = Integer.parseInt(args[1]);
 
-    // host/     ou   //host:port/
+    // host/     ou   //host:port/ Subscreve o MRI
     String[] service_access_point = parse_RMI(args[2], true);
     if (service_access_point == null) {
       return;
@@ -114,6 +114,7 @@ public class Peer implements My_Interface_Remote {
 
       // Get own registry, to rebind to correct stub
       Registry registry = LocateRegistry.getRegistry();
+      //Subscriçaõ do RMI
       registry.rebind(arg, stub);
 
       utilitarios.Notificacoes_Terminal.printNotificao("Servidor "+arg+ " pronto");
@@ -148,7 +149,7 @@ public class Peer implements My_Interface_Remote {
   }
 
   /**
-   * Cria os canais de comunicação e inicia as suas threads
+   * Cria os canais de comunicação e inicia as suas threads -> Um protocolo por cada thread
    * @param mc_address endereço do canal de controle
    * @param mdb_address endereço do canal do backup de dados
    * @param mdr_address endereço do canal do restore de dados
@@ -253,7 +254,8 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void delete(String pathname) {
-    executor.execute(new DeleteInitiator(protocol_version, pathname, this));
+
+      executor.execute(new DeleteInitiator(protocol_version, pathname, this));
   }
 
   /**
@@ -271,7 +273,8 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void state() {
-    executor.execute(new RetrieveStateInitiator(protocol_version, this));
+
+      executor.execute(new RetrieveStateInitiator(protocol_version, this));
   }
 
   /**
@@ -279,7 +282,8 @@ public class Peer implements My_Interface_Remote {
    * @return id do peer
    */
   public int get_ID() {
-    return id;
+
+      return id;
   }
 
   /**

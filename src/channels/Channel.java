@@ -6,6 +6,9 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import service.Peer;
 
+/**
+ * Por cada objecto vamos lançar 3 canais MC, MDB, MDR
+ * */
 public abstract class Channel implements Runnable {
 
   private static final int MAX_MESSAGE_SIZE = 65000;
@@ -13,6 +16,10 @@ public abstract class Channel implements Runnable {
   private InetAddress mcastAddr;
   private int mcastPort;
   private Peer parentPeer;
+
+
+
+
   public Channel(Peer parentPeer, String mcastAddr, String mcastPort) {
     this.parentPeer = parentPeer;
 
