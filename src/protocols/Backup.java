@@ -146,7 +146,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
    */
   private void wait_and_remove() {
     try {
-      this.handler.wait();
+      this.handler.wait();//espera pela notificação
       parent_peer.get_peer_data().remove_stored_observer(this);
     } catch (InterruptedException e) {
       e.printStackTrace();

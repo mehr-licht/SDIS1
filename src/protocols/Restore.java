@@ -188,7 +188,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
    */
   private void remove_chunk_observer() {
     try {
-      this.handler.wait();
+      this.handler.wait();//espera pela notificação
       parent_peer.get_peer_data().remove_chunk_observer(this);
     } catch (InterruptedException e) {
       e.printStackTrace();
