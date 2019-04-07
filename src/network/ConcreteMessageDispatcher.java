@@ -28,7 +28,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     super(parentPeer);
 
     this.parentPeer = parentPeer;
-    this.executor = Executors.newScheduledThreadPool(5);
+    this.executor = Executors.newScheduledThreadPool(MSG_CORE_POOL_SIZE);
 
     this.backUpHandlers = new HashMap<>();
     this.random = new Random();
@@ -61,17 +61,16 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleCHUNK(Message msg) {
-    PeerData peerData = parentPeer.get_peer_data();
+    Peer_Info peerData = parentPeer.get_peer_data();
 
-    // Notify RESTORE observers of new CHUNK message
-    peerData.notifyChunkObservers(msg);
+    peerData.notify_chunk_observers(msg);
 
-    if (!peerData.getFlagRestored(msg.getFileID())) { // Restoring File
+    if (!peerData.get_restored_flag(msg.getFileID())) { // Restoring File
       return;
     }
 
     if (!enhancement_compatible_msg(msg, RESTORE_ENH)) {
-      peerData.addChunkToRestore(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
+      peerData.get_restored_chunk_data(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
     }
   }
 
@@ -102,8 +101,8 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleSTORED(Message msg) {
-    // Notify BACKUP observers of new STORED message
-    parentPeer.get_peer_data().notifyStoredObservers(msg);
+
+    parentPeer.get_peer_data().notify_stored_observers(msg);
 
     Database database = parentPeer.get_database();
     if (database.hasChunk(msg.getFileID(), msg.getChunkNo())) {

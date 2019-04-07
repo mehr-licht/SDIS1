@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import protocols.PeerData;
+import protocols.Peer_Info;
 import protocols.initiators.*;
 import network.AbstractMessageDispatcher;
 import network.ConcreteMessageDispatcher;
@@ -43,7 +43,7 @@ public class Peer implements My_Interface_Remote {
 
   private SystemManager system_manager;
   private Database database;
-  private PeerData peer_data;
+  private Peer_Info peer_info;
 
   /**
    * Construtor de um Peer
@@ -66,7 +66,7 @@ public class Peer implements My_Interface_Remote {
     setup_channels(mc_address, mdb_address, mdr_address);
     setup_message_handler();
 
-    executor = new ScheduledThreadPoolExecutor(10);
+    executor = new ScheduledThreadPoolExecutor(PEER_CORE_POOL_SIZE);
 
     send_UP_message();
 
@@ -146,7 +146,7 @@ public class Peer implements My_Interface_Remote {
    * Cria o handler da mensagem
    */
   private void setup_message_handler() {
-    peer_data = new PeerData();
+    peer_info = new Peer_Info();
     message_dispatcher = new ConcreteMessageDispatcher(this);
     new Thread(message_dispatcher).start();
   }
@@ -349,37 +349,36 @@ public class Peer implements My_Interface_Remote {
   /**
    * Vai buscar um chunk para restaurar ficheiro ou para garantir o grau de replicação
    *
-   * @param fileID identificação do ficheiro
-   * @param chunkNo número do chunk
+   * @param file_ID identificação do ficheiro
+   * @param chunk_No número do chunk
    * @return
    */
-  public byte[] load_chunk(String fileID, int chunkNo) {
-    return system_manager.loadChunk(fileID, chunkNo);
+  public byte[] load_chunk(String file_ID, int chunk_No) {
+    return system_manager.loadChunk(file_ID, chunk_No);
   }
 
   /**
    * Altera o estado de restore de um ficheiro
-   * Enquanto está a ser restaurado o estado do ficheiro em relação ao restore é true
    *
-   * @param flag true, quando se inicia o restauro e false quando se termina
+   * @param flag true, quando se inicia o restauro e false quando se elimina
    * @param fileID identificação do ficheiro
    */
   public void set_restoring(boolean flag, String fileID) {
-    peer_data.setFlagRestored(flag, fileID);
+    peer_info.set_restored_flag(fileID, flag);
   }
 
   /**
    * Verifica se processo de restore do ficheiro terminou
    *
-   * @param pathName caminho do ficherio a restaurar
-   * @param fileID identificação do ficheiro a restaurar
+   * @param path_name caminho do ficherio a restaurar
+   * @param file_ID identificação do ficheiro a restaurar
    * @return verdadeiro ou falso
    */
-  public boolean has_restore_finished(String pathName, String fileID) {
-    int numChunks = database.getNumChunksByFilePath(pathName);
-    int chunksRestored = peer_data.getChunksRestoredSize(fileID);
+  public boolean has_restore_finished(String path_name, String file_ID) {
+    int num_chunks = database.getNumChunksByFilePath(path_name);
+    int chunks_restored = peer_info.get_number_restored_chunks(file_ID);
 
-    return numChunks == chunksRestored;
+    return num_chunks == chunks_restored;
   }
 
   /**
@@ -387,8 +386,8 @@ public class Peer implements My_Interface_Remote {
    *
    * @return dados do peer
    */
-  public PeerData get_peer_data() {
-    return peer_data;
+  public Peer_Info get_peer_data() {
+    return peer_info;
   }
 
   /**

@@ -20,7 +20,7 @@ public class DeleteInitiator implements Runnable {
     this.path = path;
     this.parentPeer = parentPeer;
 
-    utilitarios.Notificacoes_Terminal.printAviso("Starting deleteInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("A começar a apagar o ficheiro");
   }
 
   @Override
@@ -30,7 +30,7 @@ public class DeleteInitiator implements Runnable {
 
     FileInfo fileInfo = database.getFileInfoByPath(path);
     if (fileInfo == null) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("File didn't exist! Aborting Delete!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Ficheiro não existe -  A abortar");
       return;
     }
 
@@ -42,7 +42,7 @@ public class DeleteInitiator implements Runnable {
 
     //Delete file from database
     database.removeRestorableFile(fileInfo);
-    utilitarios.Notificacoes_Terminal.printAviso("Finished deleteInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Acabei de apagar o ficheiro");
   }
 
   private void deleteFile() {
@@ -50,7 +50,7 @@ public class DeleteInitiator implements Runnable {
     try {
       Files.delete(Paths.get(path));
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't delete a file!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível apagar o ficheiro");
     }
   }
 
@@ -60,7 +60,7 @@ public class DeleteInitiator implements Runnable {
     try {
       parentPeer.send_message(msg, Channel.ChannelType.MC);
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar para o canal multicast");
     }
   }
 

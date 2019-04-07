@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import network.Message;
 import service.Peer;
 
-public class Backup implements Runnable, PeerData.MessageObserver {
+public class Backup implements Runnable, Peer_Info.MessageObserver {
 
   private Peer parentPeer;
   private Message request;
@@ -74,7 +74,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
 
   private void handleEnhancedRequest(String fileID, int chunkNo, int replicationDegree,
       byte[] chunkData, String chunkPath) {
-    parentPeer.get_peer_data().attachStoredObserver(this);
+    parentPeer.get_peer_data().add_stored_observer(this);
 
     this.handler = scheduledExecutor.schedule(
         () -> {
@@ -89,7 +89,7 @@ public class Backup implements Runnable, PeerData.MessageObserver {
 
     try {
       this.handler.wait();
-      parentPeer.get_peer_data().detachStoredObserver(this);
+      parentPeer.get_peer_data().remove_stored_observer(this);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

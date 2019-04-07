@@ -22,7 +22,7 @@ public class Delete implements Runnable {
     this.request = request;
     this.database = parent_peer.get_database();
 
-    utilitarios.Notificacoes_Terminal.printAviso("A começar a apagar");
+    utilitarios.Notificacoes_Terminal.printAviso("A começar a apagar os chunks");
   }
 
   /**
@@ -40,7 +40,7 @@ public class Delete implements Runnable {
 
     enhancement_compatibility();
 
-    utilitarios.Notificacoes_Terminal.printAviso("acabei de apagar");
+    utilitarios.Notificacoes_Terminal.printAviso("acabei de apagar os chunks");
   }
 
   /**

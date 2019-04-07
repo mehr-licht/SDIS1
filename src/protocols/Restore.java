@@ -15,7 +15,7 @@ import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class Restore implements Runnable, PeerData.MessageObserver {
+public class Restore implements Runnable, Peer_Info.MessageObserver {
   private Peer parent_peer;
   private Message request;
   private Database database;
@@ -72,14 +72,15 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   /**
    * Verifica se o chunk existe
    *
-   * @param chunkNo numero do chunk
-   * @param fileID identificação do ficheiro
+   * @param chunk_No numero do chunk
+   * @param file_ID identificação do ficheiro
    * @return verdadeiro ou falso
    */
-  private boolean chunk_found(int chunkNo, String fileID) {
-    //Access database to get the ChunkData
-    if (!database.hasChunk(fileID, chunkNo)) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("chunk " + chunkNo + " do ficheiro " + fileID +" não encontrado");
+  private boolean chunk_found(int chunk_No, String file_ID) {
+
+    if (!database.hasChunk(file_ID, chunk_No)) {
+      utilitarios.Notificacoes_Terminal.printMensagemError("chunk " + chunk_No
+          + " do ficheiro " + file_ID +" não encontrado");
       return false;
     }
     return true;
@@ -100,10 +101,10 @@ public class Restore implements Runnable, PeerData.MessageObserver {
    * Cria datagrama
    *
    * @param request pedido de serviço
-   * @param chunkData dados do datagrama
+   * @param chunk_data dados do datagrama
    * @return datagrama criado
    */
-  private Message create_message(Message request, byte[] chunkData) {
+  private Message create_message(Message request, byte[] chunk_data) {
     String[] args = {
         parent_peer.get_version(),
         Integer.toString(parent_peer.get_ID()),
@@ -111,17 +112,16 @@ public class Restore implements Runnable, PeerData.MessageObserver {
         Integer.toString(request.getChunkNo())
     };
 
-    return new Message(Message.MessageType.CHUNK, args, chunkData);
+    return new Message(Message.MessageType.CHUNK, args, chunk_data);
   }
 
   /**
    * Envia datagrama por TCP
-   *
-   * @param request serviço pedido
-   * @param chunkData dados a enviar
+   *  @param request serviço pedido
+   * @param chunk_data dados a enviar
    */
-  private void send_message_by_TCP(Message request, byte[] chunkData) {
-    Message msg_to_send = create_message(request, chunkData);
+  private void send_message_by_TCP(Message request, byte[] chunk_data) {
+    Message msg_to_send = create_message(request, chunk_data);
 
     String host_name = request.getTCPHost();
     int port_number = request.getTCPPort();
@@ -133,16 +133,15 @@ public class Restore implements Runnable, PeerData.MessageObserver {
 
   /**
    * Cria o socket TCP
-   *
-   * @param hostName
-   * @param portNumber
-   * @param msgToSend
+   *  @param host_name
+   * @param port_number
+   * @param msg_to_send
    */
-  private void create_socket(String hostName, int portNumber, Message msgToSend) {
+  private void create_socket(String host_name, int port_number, Message msg_to_send) {
     try {
       Socket server_socket;
-      server_socket = new Socket(hostName, portNumber);
-      tcp_socket_send(hostName, portNumber, msgToSend, server_socket);
+      server_socket = new Socket(host_name, port_number);
+      tcp_socket_send(msg_to_send, server_socket);
       server_socket.close();
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar chunk por TCP");
@@ -152,29 +151,26 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   /**
    * Envia o datagrama pelo socket TCP
    *
-   * @param hostName nome do host
-   * @param portNumber porto do socket a criar
-   * @param msgToSend datagrama a enviar
+   * @param msg_to_send datagrama a enviar
+   * @param server_socket
    * @throws IOException Exceção In/Out a ser lançado se acontecer um erro
    */
-  private void tcp_socket_send(String hostName, int portNumber, Message msgToSend, Socket serverSocket)
-      throws IOException {
+  private void tcp_socket_send(Message msg_to_send, Socket server_socket) throws IOException {
     utilitarios.Notificacoes_Terminal.printNotificao("Ligado ao servidor TCP");
-    ObjectOutputStream obj_out_stream = new ObjectOutputStream(serverSocket.getOutputStream());
-    obj_out_stream.writeObject(msgToSend);
+    ObjectOutputStream obj_out_stream = new ObjectOutputStream(server_socket.getOutputStream());
+    obj_out_stream.writeObject(msg_to_send);
     obj_out_stream.close();
   }
 
   /**
    * Envia datagrama pelo canal MDR
-   *
-   * @param request serviço pedido
-   * @param chunkData dados a enviar
+   *  @param request serviço pedido
+   * @param chunk_data dados a enviar
    */
-  private void send_message_by_MDR(Message request, byte[] chunkData) {
-    Message msg_to_send = create_message(request, chunkData);
+  private void send_message_by_MDR(Message request, byte[] chunk_data) {
+    Message msg_to_send = create_message(request, chunk_data);
 
-    parent_peer.get_peer_data().attachChunkObserver(this);
+    parent_peer.get_peer_data().add_chunk_observer(this);
     this.handler = parent_peer.send_delayed_message(
         msg_to_send, Channel.ChannelType.MDR,
         random.nextInt(Utils.MAX_DELAY),
@@ -190,7 +186,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   private void remove_chunk_observer() {
     try {
       this.handler.wait();
-      parent_peer.get_peer_data().detachChunkObserver(this);
+      parent_peer.get_peer_data().remove_chunk_observer(this);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
