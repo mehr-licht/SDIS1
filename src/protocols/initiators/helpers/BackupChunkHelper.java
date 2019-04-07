@@ -5,7 +5,7 @@ import filesystem.ChunkData;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import network.Message;
-import protocols.Macros;
+import utilitarios.Utils;
 import protocols.initiators.BackupInitiator;
 import service.Peer;
 
@@ -20,7 +20,7 @@ public class BackupChunkHelper implements Runnable {
     this.chunk = chunk;
     this.parentPeer = backupInitiator.getParentPeer();
     this.protocolVersion = backupInitiator.getProtocolVersion();
-    this.chunkReplication = parentPeer.get_peer_data().getChunkReplication(chunk.getFileID());
+    this.chunkReplication = parentPeer.get_peer_data().get_replic(chunk.getFileID());
   }
 
   BackupChunkHelper(Peer parentPeer, ChunkData chunk) {
@@ -36,7 +36,7 @@ public class BackupChunkHelper implements Runnable {
     int waitTime = 1000; // wait time, in milliseconds
     Message msg = generatePutChunkMsg(chunk, protocolVersion);
 
-    for (int i = 0; i < Macros.PUTCHUNK_RETRIES; i++) {
+    for (int i = 0; i < Utils.PUTCHUNK_RETRIES; i++) {
       if (isDesiredReplicationDegree()) {
         utilitarios.Notificacoes_Terminal.printNotificao("Achieved desired replication at i=" + i);
         break;

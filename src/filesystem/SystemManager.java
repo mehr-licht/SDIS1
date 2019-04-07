@@ -1,7 +1,7 @@
 package filesystem;
 
 import static java.util.Arrays.copyOfRange;
-import static protocols.Macros.MAX_CHUNK_SIZE;
+import static utilitarios.Utils.MAX_CHUNK_SIZE;
 
 import java.io.*;
 import java.nio.file.Files;

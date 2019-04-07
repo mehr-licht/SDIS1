@@ -1,21 +1,55 @@
 package utilitarios;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import network.Message;
+import service.Peer;
 
 public class Utils {
 
   public static final String bi_CRLF = "" + (char) 0x0D + (char) 0x0A + (char) 0x0D + (char) 0x0A;
   private static final char[] hex_digits_usados_no_nome = "0123456789ABCDEF".toCharArray();
+
+  /** Número de tentativas de envio de PUTCHUNK (enunciado) * */
+  public static final int PUTCHUNK_RETRIES = 5;
+
+  /** Tamanho máximo de cada chunk (64KB enunciado) * */
+  public static final int MAX_CHUNK_SIZE = 64000;
+
+  /** versão do melhoramento pedido para o sub-protocolo BACKUP * */
+  public static final String BACKUP_ENH = "1.1";
+
+  /** versão do melhoramento pedido para o sub-protocolo RESTORE * */
+  public static final String RESTORE_ENH = "1.2";
+
+  /** versão do melhoramento pedido para o sub-protocolo DELETE * */
+  public static final String DELETE_ENH = "1.3";
+
+  /** versão com todos os melhoramentos pedidos para todos os sub-protocolos * */
+  public static final String ENHANCEMENTS = "2.0";
+
+  /** Atraso máximo para o tempo de espera aleatório da resposta STORED */
+  public static final int MAX_DELAY = 400;
+
+  /** Memória máxima do sistema (8MB) * */
+  public static final int MAX_SYSTEM_MEMORY = (int) Math.pow(10, 6) * 8;
+
+  /** Grau de replicação máximo * */
+  public static final int MAX_REPLICATION_DEGREE = 9;
+
+  /** Número máximo de chunks * */
+  public static final int MAX_NUM_CHUNKS = (int) Math.pow(10, 6);
+
+  /** Porto do servidor TCP * */
+  public static final int TCPSERVER_PORT = 4444;
 
   /**
    * Conversor de Bytes para Hexadecimal
@@ -82,6 +116,7 @@ public class Utils {
 
   /**
    * Obtem ponto de acesso do peer. Verificacao do nome do RMI
+   *
    * @param accessPoint ponto de acesso
    * @param Server se é server ou não
    * @return ponto de acesso do peer
@@ -100,6 +135,7 @@ public class Utils {
 
   /**
    * Obtem ponto de acesso do peer e verificação da sua validade
+   *
    * @param peer_ap ponto de acesso
    * @param m padrao a encontrar
    * @return ponto de acesso do peer
@@ -146,6 +182,7 @@ public class Utils {
 
   /**
    * Obtem o ponto de acesso do registo RMI ou por localHost ou por endereço
+   *
    * @param serviceAccessPoint pontos de acesso do RMIservice
    * @return registo RMI
    */
@@ -165,7 +202,6 @@ public class Utils {
     return registry;
   }
 
-
   /**
    * Localiza o ponto de acesso do serviço
    *
@@ -184,5 +220,54 @@ public class Utils {
       e.printStackTrace();
     }
     return registry;
+  }
+
+  /**
+   * Verifica se a versão do pedido é compativel com a versão do peer
+   *
+   * @param peer
+   * @param request
+   * @param enhancedVersion
+   * @return
+   */
+  public static boolean enhancements_compatible(
+      Peer peer, Message request, String enhancedVersion) {
+    if ((peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhancedVersion))
+        && (request.getVersion().equals(ENHANCEMENTS)
+            || request.getVersion().equals(enhancedVersion))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Verifica se o peer é compativel com todos os melhoramentos
+   *
+   * @param peer um peer
+   * @param enhancedVersion versão melhorada
+   * @return verdadeiro ou falso
+   */
+  public static boolean enhancement_compatible_peer(Peer peer, String enhancedVersion) {
+    if (peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhancedVersion)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Verifica se a mensagem é compativel com todos os melhoramentos
+   *
+   * @param msg mensagem
+   * @param enhancedVersion versão melhorada
+   * @return verdadeiro ou falso
+   */
+  public static boolean enhancement_compatible_msg(Message msg, String enhancedVersion) {
+    if (msg.getVersion().equals(ENHANCEMENTS) || msg.getVersion().equals(enhancedVersion)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

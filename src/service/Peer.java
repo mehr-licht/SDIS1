@@ -1,6 +1,6 @@
 package service;
 
-import static protocols.Macros.*;
+import static utilitarios.Utils.*;
 import static utilitarios.Utils.parse_RMI;
 
 import java.util.HashMap;
@@ -321,7 +321,7 @@ public class Peer implements My_Interface_Remote {
    * Envia mensagem a dizer que está ativo. Fundamental para versão 1.3
    */
   private void send_UP_message() {
-    if (isPeerCompatibleWithEnhancement(ENHANCEMENT_DELETE, this)) {
+    if (enhancement_compatible_peer(this, DELETE_ENH)) {
       String[] args = {
           get_version(), Integer.toString(get_ID()),
       };

@@ -1,6 +1,6 @@
 package protocols.initiators.helpers;
 
-import static protocols.Macros.TCPSERVER_PORT;
+import static utilitarios.Utils.TCPSERVER_PORT;
 
 import java.io.IOException;
 import java.net.ServerSocket;

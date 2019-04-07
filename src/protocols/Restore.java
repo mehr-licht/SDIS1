@@ -1,7 +1,7 @@
 package protocols;
 
-import static protocols.Macros.isCompatibleWithEnhancement;
-import static protocols.Macros.ENHANCEMENT_RESTORE;
+import static utilitarios.Utils.enhancements_compatible;
+import static utilitarios.Utils.RESTORE_ENH;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -10,19 +10,20 @@ import java.net.Socket;
 import channels.Channel;
 import network.Message;
 import service.Peer;
+import utilitarios.Utils;
 import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class Restore implements Runnable, PeerData.MessageObserver {
-  private Peer parentPeer;
+  private Peer parent_peer;
   private Message request;
   private Database database;
   private Random random;
   private Future handler = null;
 
   public Restore(Peer parentPeer, Message request) {
-    this.parentPeer = parentPeer;
+    this.parent_peer = parentPeer;
     this.request = request;
     this.database = parentPeer.get_database();
     this.random = new Random();
@@ -40,16 +41,16 @@ public class Restore implements Runnable, PeerData.MessageObserver {
       return;
     }
 
-    String fileID = request.getFileID();
-    int chunkNo = request.getChunkNo();
+    String file_ID = request.getFileID();
+    int chunk_No = request.getChunkNo();
 
-    if (!chunk_found(chunkNo, fileID)) {
+    if (!chunk_found(chunk_No, file_ID)) {
       return;
     }
 
-    byte[] chunkData = parentPeer.load_chunk(fileID, chunkNo);
+    byte[] chunk_data = parent_peer.load_chunk(file_ID, chunk_No);
 
-    send_message_by_channels(chunkData);
+    send_message_by_channels(chunk_data);
 
     utilitarios.Notificacoes_Terminal.printAviso("RESTORE terminado");
   }
@@ -60,7 +61,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
    * @param chunkData dados do chunk
    */
   private void send_message_by_channels(byte[] chunkData) {
-    if (isCompatibleWithEnhancement(ENHANCEMENT_RESTORE, request, parentPeer)) {
+    if (enhancements_compatible(parent_peer, request, RESTORE_ENH)) {
       send_message_by_TCP(request, chunkData);
       send_message_by_MDR(request, null);
     } else {
@@ -89,7 +90,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
    * @return verdadeiro ou falso
    */
   private boolean is_owned() {
-    if (request.getSenderID() == parentPeer.get_ID()) {
+    if (request.getSenderID() == parent_peer.get_ID()) {
       return true;
     }
     return false;
@@ -104,8 +105,8 @@ public class Restore implements Runnable, PeerData.MessageObserver {
    */
   private Message create_message(Message request, byte[] chunkData) {
     String[] args = {
-        parentPeer.get_version(),
-        Integer.toString(parentPeer.get_ID()),
+        parent_peer.get_version(),
+        Integer.toString(parent_peer.get_ID()),
         request.getFileID(),
         Integer.toString(request.getChunkNo())
     };
@@ -120,12 +121,12 @@ public class Restore implements Runnable, PeerData.MessageObserver {
    * @param chunkData dados a enviar
    */
   private void send_message_by_TCP(Message request, byte[] chunkData) {
-    Message msgToSend = create_message(request, chunkData);
+    Message msg_to_send = create_message(request, chunkData);
 
-    String hostName = request.getTCPHost();
-    int portNumber = request.getTCPPort();
+    String host_name = request.getTCPHost();
+    int port_number = request.getTCPPort();
 
-    create_socket(hostName, portNumber, msgToSend);
+    create_socket(host_name, port_number, msg_to_send);
 
     utilitarios.Notificacoes_Terminal.printAviso("Emissor (TCP): " + request.toString());
   }
@@ -139,10 +140,10 @@ public class Restore implements Runnable, PeerData.MessageObserver {
    */
   private void create_socket(String hostName, int portNumber, Message msgToSend) {
     try {
-      Socket serverSocket;
-      serverSocket = new Socket(hostName, portNumber);
-      tcp_socket_send(hostName, portNumber, msgToSend, serverSocket);
-      serverSocket.close();
+      Socket server_socket;
+      server_socket = new Socket(hostName, portNumber);
+      tcp_socket_send(hostName, portNumber, msgToSend, server_socket);
+      server_socket.close();
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar chunk por TCP");
     }
@@ -159,9 +160,9 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   private void tcp_socket_send(String hostName, int portNumber, Message msgToSend, Socket serverSocket)
       throws IOException {
     utilitarios.Notificacoes_Terminal.printNotificao("Ligado ao servidor TCP");
-    ObjectOutputStream oos = new ObjectOutputStream(serverSocket.getOutputStream());
-    oos.writeObject(msgToSend);
-    oos.close();
+    ObjectOutputStream obj_out_stream = new ObjectOutputStream(serverSocket.getOutputStream());
+    obj_out_stream.writeObject(msgToSend);
+    obj_out_stream.close();
   }
 
   /**
@@ -171,12 +172,12 @@ public class Restore implements Runnable, PeerData.MessageObserver {
    * @param chunkData dados a enviar
    */
   private void send_message_by_MDR(Message request, byte[] chunkData) {
-    Message msgToSend = create_message(request, chunkData);
+    Message msg_to_send = create_message(request, chunkData);
 
-    parentPeer.get_peer_data().attachChunkObserver(this);
-    this.handler = parentPeer.send_delayed_message(
-        msgToSend, Channel.ChannelType.MDR,
-        random.nextInt(Macros.MAX_DELAY),
+    parent_peer.get_peer_data().attachChunkObserver(this);
+    this.handler = parent_peer.send_delayed_message(
+        msg_to_send, Channel.ChannelType.MDR,
+        random.nextInt(Utils.MAX_DELAY),
         TimeUnit.MILLISECONDS
     );
 
@@ -189,7 +190,7 @@ public class Restore implements Runnable, PeerData.MessageObserver {
   private void remove_chunk_observer() {
     try {
       this.handler.wait();
-      parentPeer.get_peer_data().detachChunkObserver(this);
+      parent_peer.get_peer_data().detachChunkObserver(this);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

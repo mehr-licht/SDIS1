@@ -1,8 +1,8 @@
 package protocols.initiators;
 
 import static filesystem.SystemManager.splitFileInChunks;
-import static protocols.Macros.MAX_NUM_CHUNKS;
-import static protocols.Macros.MAX_REPLICATION_DEGREE;
+import static utilitarios.Utils.MAX_NUM_CHUNKS;
+import static utilitarios.Utils.MAX_REPLICATION_DEGREE;
 
 import filesystem.ChunkData;
 import filesystem.ChunkInfo;
@@ -48,7 +48,7 @@ public class BackupInitiator implements Runnable {
     }
 
     addRestorableFile(chunks, fileID);
-    parentPeer.get_peer_data().startChunkReplication(fileID, chunks.size());
+    parentPeer.get_peer_data().start_chunk_replic(fileID, chunks.size());
 
     ArrayList<Thread> helperThreads = getThreadArrayList(chunks);
 
@@ -70,7 +70,7 @@ public class BackupInitiator implements Runnable {
   private void resetReplic(String fileID, ArrayList<Thread> helperThreads) {
     try {
       joinWithThreads(helperThreads);
-      parentPeer.get_peer_data().resetChunkReplication(fileID);
+      parentPeer.get_peer_data().reset_replic(fileID);
     } catch (InterruptedException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Backup: Failed join with helper threads");
     }
