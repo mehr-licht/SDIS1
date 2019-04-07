@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import filesystem.Database;
 import java.net.Socket;
-import channels.Channel;
+import canais.Canal;
 import network.Message;
 import service.Peer;
 import utilitarios.Utils;
@@ -44,8 +44,8 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
       return;
     }
 
-    String file_ID = request.getFileID();
-    int chunk_No = request.getChunkNo();
+    String file_ID = request.get_file_ID();
+    int chunk_No = request.get_Chunk_Numero();
 
     if (!chunk_found(chunk_No, file_ID)) {
       return;
@@ -94,7 +94,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
    * @return verdadeiro ou falso
    */
   private boolean is_owned() {
-    if (request.getSenderID() == parent_peer.get_ID()) {
+    if (request.get_Sender_ID() == parent_peer.get_ID()) {
       return true;
     }
     return false;
@@ -111,11 +111,11 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
     String[] args = {
         parent_peer.get_version(),
         Integer.toString(parent_peer.get_ID()),
-        request.getFileID(),
-        Integer.toString(request.getChunkNo())
+        request.get_file_ID(),
+        Integer.toString(request.get_Chunk_Numero())
     };
 
-    return new Message(Message.MessageType.CHUNK, args, chunk_data);
+    return new Message(Message.Categoria_Mensagem.CHUNK, args, chunk_data);
   }
 
   /**
@@ -126,8 +126,8 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
   private void send_message_by_TCP(Message request, byte[] chunk_data) {
     Message msg_to_send = create_message(request, chunk_data);
 
-    String host_name = request.getTCPHost();
-    int port_number = request.getTCPPort();
+    String host_name = request.get_TCP_hostname();
+    int port_number = request.get_TCP_porta();
 
     create_socket(host_name, port_number, msg_to_send);
 
@@ -175,7 +175,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
 
     parent_peer.get_peer_data().add_chunk_observer(this);
     this.handler = parent_peer.send_delayed_message(
-        msg_to_send, Channel.ChannelType.MDR,
+        msg_to_send, Canal.ChannelType.MDR,
         random.nextInt(Utils.MAX_DELAY),
         TimeUnit.MILLISECONDS
     );
@@ -205,7 +205,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
     if (this.handler == null) {
       return;
     }
-    if (msg.getFileID().equals(request.getFileID()) && msg.getChunkNo() == request.getChunkNo()) {
+    if (msg.get_file_ID().equals(request.get_file_ID()) && msg.get_Chunk_Numero() == request.get_Chunk_Numero()) {
       this.handler.cancel(true);
       utilitarios.Notificacoes_Terminal.printNotificao("datagrama cancelado para não assoberbar o host");
     }

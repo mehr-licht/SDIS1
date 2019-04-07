@@ -5,14 +5,14 @@ import static utilitarios.Utils.RESTORE_ENH;
 import static utilitarios.Utils.TCPSERVER_PORT;
 import static utilitarios.Utils.enhancement_compatible_peer;
 
-import channels.Channel;
+import canais.Canal;
 import filesystem.ChunkData;
 import filesystem.FileInfo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentMap;
 import network.Message;
-import network.Message.MessageType;
+import network.Message.Categoria_Mensagem;
 import protocols.initiators.helpers.TCPServer;
 import service.Peer;
 
@@ -98,9 +98,9 @@ public class RestoreInit implements Runnable {
   private void send_getchunk() {
     for (int i = 0; i < file_info.getNumChunks(); i++) {
       if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
-        send_message(Message.MessageType.ENH_GETCHUNK, i);
+        send_message(Categoria_Mensagem.ENH_GETCHUNK, i);
       } else {
-        send_message(Message.MessageType.GETCHUNK, i);
+        send_message(Categoria_Mensagem.GETCHUNK, i);
       }
     }
   }
@@ -126,7 +126,7 @@ public class RestoreInit implements Runnable {
    * @param type tipo de mensagem
    * @param chunk_No numero do chunk
    */
-  private void send_message(MessageType type, int chunk_No) {
+  private void send_message(Categoria_Mensagem type, int chunk_No) {
     String[] args = {
       version,
       Integer.toString(parent_peer.get_ID()),
@@ -147,7 +147,7 @@ public class RestoreInit implements Runnable {
    */
   private void send_msg_MC(Message msg) {
     try {
-      parent_peer.send_message(msg, Channel.ChannelType.MC);
+      parent_peer.send_message(msg, Canal.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError(
           "Não foi possível enviar para o canal multicast");

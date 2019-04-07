@@ -1,6 +1,6 @@
 package protocols.initiators.helpers;
 
-import channels.Channel;
+import canais.Canal;
 import filesystem.Database;
 import java.io.IOException;
 import java.util.Set;
@@ -22,10 +22,10 @@ public class DeleteEnhHelper implements Runnable {
   @Override
   public void run() {
     Database database = parentPeer.get_database();
-    Set<String> filesToDelete = database.getFilesToDelete(request.getSenderID());
+    Set<String> filesToDelete = database.getFilesToDelete(request.get_Sender_ID());
 
     if (filesToDelete.isEmpty()) {
-      utilitarios.Notificacoes_Terminal.printNotificao("No files to delete for peer " + request.getSenderID());
+      utilitarios.Notificacoes_Terminal.printNotificao("No files to delete for peer " + request.get_Sender_ID());
       return;
     }
 
@@ -42,10 +42,10 @@ public class DeleteEnhHelper implements Runnable {
         fileID
     };
 
-    Message msg = new Message(Message.MessageType.DELETE, args);
+    Message msg = new Message(Message.Categoria_Mensagem.DELETE, args);
 
     try {
-      parentPeer.send_message(msg, Channel.ChannelType.MC);
+      parentPeer.send_message(msg, Canal.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
     }

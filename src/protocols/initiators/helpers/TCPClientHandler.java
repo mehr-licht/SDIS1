@@ -42,11 +42,11 @@ public class TCPClientHandler implements Runnable {
     //Handle the CHUNK
     Peer_Info peerData = parentPeer.get_peer_data();
 
-    if (!peerData.get_restored_flag(msg.getFileID())) {
+    if (!peerData.get_restored_flag(msg.get_file_ID())) {
       utilitarios.Notificacoes_Terminal.printNotificao("Discarded ChunkData!");
       return;
     }
 
-    peerData.get_restored_chunk_data(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
+    peerData.get_restored_chunk_data(new ChunkData(msg.get_file_ID(), msg.get_Chunk_Numero(), msg.get_Corpo_Mensagem()));
   }
 }

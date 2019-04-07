@@ -18,6 +18,14 @@ public class Utils {
   public static final String bi_CRLF = "" + (char) 0x0D + (char) 0x0A + (char) 0x0D + (char) 0x0A;
   private static final char[] hex_digits_usados_no_nome = "0123456789ABCDEF".toCharArray();
 
+
+  /**  Set the default time-to-live for multicast packets sent out on this
+   * MulticastSocket in order to control the scope of the multicasts.
+   */
+  public static final int TTL = 1;
+   /**Tamanho maximo da mensagem envia no canal*/
+  public static final int MAXIMO_TAMANHO_MESSAGE_CANAL = 65000;
+
   /** Número de tentativas de envio de PUTCHUNK (enunciado) * */
   public static final int PUTCHUNK_RETRIES = 5;
 
@@ -237,8 +245,8 @@ public class Utils {
   public static boolean enhancements_compatible(
       Peer peer, Message request, String enhanced_version) {
     if ((peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhanced_version))
-        && (request.getVersion().equals(ENHANCEMENTS)
-            || request.getVersion().equals(enhanced_version))) {
+        && (request.get_version().equals(ENHANCEMENTS)
+            || request.get_version().equals(enhanced_version))) {
       return true;
     } else {
       return false;
@@ -268,7 +276,7 @@ public class Utils {
    * @return verdadeiro ou falso
    */
   public static boolean enhancement_compatible_msg(Message msg, String enhanced_version) {
-    if (msg.getVersion().equals(ENHANCEMENTS) || msg.getVersion().equals(enhanced_version)) {
+    if (msg.get_version().equals(ENHANCEMENTS) || msg.get_version().equals(enhanced_version)) {
       return true;
     } else {
       return false;

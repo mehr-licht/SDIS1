@@ -2,7 +2,7 @@ package protocols.initiators;
 
 import filesystem.Database;
 import filesystem.FileInfo;
-import channels.Channel;
+import canais.Canal;
 import network.Message;
 import service.Peer;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class DeleteInit implements Runnable {
     Message msg = make_delete(file_info);
 
     try {
-      parentPeer.send_message(msg, Channel.ChannelType.MC);
+      parentPeer.send_message(msg, Canal.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar para o canal multicast");
     }
@@ -95,7 +95,7 @@ public class DeleteInit implements Runnable {
         file_info.getFileID()
     };
 
-    return new Message(Message.MessageType.DELETE, args);
+    return new Message(Message.Categoria_Mensagem.DELETE, args);
   }
 
 }

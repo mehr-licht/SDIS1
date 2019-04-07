@@ -10,7 +10,7 @@ public abstract class AbstractMessageDispatcher implements Runnable {
 
   protected Peer parentPeer;
   private BlockingQueue<Message> msgQueue;
-  private Map<Message.MessageType, MessageHandler> messageHandlers;
+  private Map<Message.Categoria_Mensagem, MessageHandler> messageHandlers;
 
   AbstractMessageDispatcher(Peer parentPeer) {
     this.parentPeer = parentPeer;
@@ -24,17 +24,17 @@ public abstract class AbstractMessageDispatcher implements Runnable {
   // Template Method
   protected abstract void setupMessageHandlers();
 
-  protected void addMessageHandler(Message.MessageType msgType, MessageHandler handler) {
+  protected void addMessageHandler(Message.Categoria_Mensagem msgType, MessageHandler handler) {
     messageHandlers.put(msgType, handler);
   }
 
-  protected void removeMessageHandler(Message.MessageType msgType) {
+  protected void removeMessageHandler(Message.Categoria_Mensagem msgType) {
     messageHandlers.remove(msgType);
   }
 
   private void dispatchMessage(Message msg) {
     //Ignoring invalid messages
-    if (msg == null || msg.getSenderID() == parentPeer.get_ID()) {
+    if (msg == null || msg.get_Sender_ID() == parentPeer.get_ID()) {
       return;
     }
 
@@ -64,14 +64,15 @@ public abstract class AbstractMessageDispatcher implements Runnable {
 
   public void pushMessage(byte[] data, int length) {
     Message msgParsed; // create and parse the message
+
     try {
       msgParsed = new Message(data, length);
     } catch (Exception e) {
       utilitarios.Notificacoes_Terminal.printMensagemError(e.getMessage());
       return;
     }
-
     msgQueue.add(msgParsed);
+
   }
 
   interface MessageHandler {
