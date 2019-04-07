@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import network.Message;
-import protocols.PeerData;
+import protocols.Peer_Info;
 import service.Peer;
 
 public class TCPClientHandler implements Runnable {
@@ -40,13 +40,13 @@ public class TCPClientHandler implements Runnable {
     }
 
     //Handle the CHUNK
-    PeerData peerData = parentPeer.get_peer_data();
+    Peer_Info peerData = parentPeer.get_peer_data();
 
-    if (!peerData.getFlagRestored(msg.getFileID())) {
+    if (!peerData.get_restored_flag(msg.getFileID())) {
       utilitarios.Notificacoes_Terminal.printNotificao("Discarded ChunkData!");
       return;
     }
 
-    peerData.addChunkToRestore(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
+    peerData.get_restored_chunk_data(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
   }
 }

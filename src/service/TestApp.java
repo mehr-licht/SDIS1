@@ -113,9 +113,9 @@ public class TestApp implements Runnable {
      */
     private static boolean confirmacao_numero_args(String[] args) {
         if (args.length >= 2 && args.length < 5) {
-            utilitarios.Notificacoes_Terminal.printAviso("Correr no formato: java TestApp <peer_ap> <operation> <opnd_1> <opnd_2>");
             return true;
         }
+        utilitarios.Notificacoes_Terminal.printAviso("Correr no formato: java TestApp <peer_ap> <operation> <opnd_1> <opnd_2>");
         return false;
     }
 

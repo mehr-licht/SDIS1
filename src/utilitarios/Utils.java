@@ -51,6 +51,10 @@ public class Utils {
   /** Porto do servidor TCP * */
   public static final int TCPSERVER_PORT = 4444;
 
+  /** Numero de threads a manter na pool * */
+  public static final int PEER_CORE_POOL_SIZE = 10;
+  public static final int MSG_CORE_POOL_SIZE = 5;
+
   /**
    * Conversor de Bytes para Hexadecimal
    *
@@ -117,15 +121,15 @@ public class Utils {
   /**
    * Obtem ponto de acesso do peer. Verificacao do nome do RMI
    *
-   * @param accessPoint ponto de acesso
+   * @param access_point ponto de acesso
    * @param Server se é server ou não
    * @return ponto de acesso do peer
    */
-  public static String[] parse_RMI(String accessPoint, boolean Server) {
-    Pattern rmiPattern;
-    rmiPattern = get_pattern(Server);
+  public static String[] parse_RMI(String access_point, boolean Server) {
+    Pattern rmi_pattern;
+    rmi_pattern = get_pattern(Server);
 
-    Matcher m = rmiPattern.matcher(accessPoint);
+    Matcher m = rmi_pattern.matcher(access_point);
     String[] peer_ap = null;
 
     peer_ap = get_ap_strings_from_groups(peer_ap, m);
@@ -166,16 +170,16 @@ public class Utils {
   /**
    * Obtem o registo RMI
    *
-   * @param serviceAccessPoint pontos de acesso para o RMIservice
+   * @param service_access_point pontos de acesso para o RMIservice
    * @return localização do registo RMI
    */
-  public static Registry get_registry(String[] serviceAccessPoint) {
+  public static Registry get_registry(String[] service_access_point) {
     Registry registry = null;
     // Bind the remote object's stub in the registry
-    if (serviceAccessPoint[1] == null) {
-      registry = locate_registry(serviceAccessPoint[0]);
+    if (service_access_point[1] == null) {
+      registry = locate_registry(service_access_point[0]);
     } else {
-      registry = locate_registryAP(serviceAccessPoint);
+      registry = locate_registryAP(service_access_point);
     }
     return registry;
   }
@@ -183,18 +187,18 @@ public class Utils {
   /**
    * Obtem o ponto de acesso do registo RMI ou por localHost ou por endereço
    *
-   * @param serviceAccessPoint pontos de acesso do RMIservice
+   * @param service_access_point pontos de acesso do RMIservice
    * @return registo RMI
    */
-  private static Registry locate_registryAP(String[] serviceAccessPoint) {
+  private static Registry locate_registryAP(String[] service_access_point) {
     Registry registry = null;
     try {
-      if (serviceAccessPoint[0] == "localhost") {
-        registry = LocateRegistry.getRegistry(serviceAccessPoint[1]);
+      if (service_access_point[0] == "localhost") {
+        registry = LocateRegistry.getRegistry(service_access_point[1]);
       } else {
         registry =
             LocateRegistry.getRegistry(
-                serviceAccessPoint[0], Integer.parseInt(serviceAccessPoint[1]));
+                service_access_point[0], Integer.parseInt(service_access_point[1]));
       }
     } catch (RemoteException e) {
       e.printStackTrace();
@@ -227,14 +231,14 @@ public class Utils {
    *
    * @param peer
    * @param request
-   * @param enhancedVersion
+   * @param enhanced_version
    * @return
    */
   public static boolean enhancements_compatible(
-      Peer peer, Message request, String enhancedVersion) {
-    if ((peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhancedVersion))
+      Peer peer, Message request, String enhanced_version) {
+    if ((peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhanced_version))
         && (request.getVersion().equals(ENHANCEMENTS)
-            || request.getVersion().equals(enhancedVersion))) {
+            || request.getVersion().equals(enhanced_version))) {
       return true;
     } else {
       return false;
@@ -245,11 +249,11 @@ public class Utils {
    * Verifica se o peer é compativel com todos os melhoramentos
    *
    * @param peer um peer
-   * @param enhancedVersion versão melhorada
+   * @param enhanced_version versão melhorada
    * @return verdadeiro ou falso
    */
-  public static boolean enhancement_compatible_peer(Peer peer, String enhancedVersion) {
-    if (peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhancedVersion)) {
+  public static boolean enhancement_compatible_peer(Peer peer, String enhanced_version) {
+    if (peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhanced_version)) {
       return true;
     } else {
       return false;
@@ -260,11 +264,11 @@ public class Utils {
    * Verifica se a mensagem é compativel com todos os melhoramentos
    *
    * @param msg mensagem
-   * @param enhancedVersion versão melhorada
+   * @param enhanced_version versão melhorada
    * @return verdadeiro ou falso
    */
-  public static boolean enhancement_compatible_msg(Message msg, String enhancedVersion) {
-    if (msg.getVersion().equals(ENHANCEMENTS) || msg.getVersion().equals(enhancedVersion)) {
+  public static boolean enhancement_compatible_msg(Message msg, String enhanced_version) {
+    if (msg.getVersion().equals(ENHANCEMENTS) || msg.getVersion().equals(enhanced_version)) {
       return true;
     } else {
       return false;

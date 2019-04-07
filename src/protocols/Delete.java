@@ -11,6 +11,9 @@ import network.Message;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * classe Delete
+ */
 public class Delete implements Runnable {
 
   private Peer parent_peer;
@@ -25,7 +28,7 @@ public class Delete implements Runnable {
     this.request = request;
     this.database = parent_peer.get_database();
 
-    utilitarios.Notificacoes_Terminal.printAviso("A começar a apagar");
+    utilitarios.Notificacoes_Terminal.printAviso("A começar a apagar os chunks");
   }
 
   /**
@@ -41,9 +44,9 @@ public class Delete implements Runnable {
 
     delete_loop(file_ID);
 
-    enhancement_compatibility();
+    enhancement_compatibility_send();
 
-    utilitarios.Notificacoes_Terminal.printAviso("acabei de apagar");
+    utilitarios.Notificacoes_Terminal.printAviso("acabei de apagar os chunks");
   }
 
   /**
@@ -76,7 +79,7 @@ public class Delete implements Runnable {
   /**
    * Verifica a compatibilidade e envia o datagrama para o canal multicast
    */
-  private void enhancement_compatibility() {
+  private void enhancement_compatibility_send() {
     if (enhancements_compatible(parent_peer, request, DELETE_ENH)) {
       send_to_multicast(request);
     }

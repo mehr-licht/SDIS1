@@ -19,7 +19,7 @@ import protocols.initiators.helpers.BackupChunkHelper;
 import service.Peer;
 import utilitarios.Utils;
 
-public class BackupInitiator implements Runnable {
+public class BackupInit implements Runnable {
 
   private byte[] fileData;
   private int replicationDegree;
@@ -27,13 +27,13 @@ public class BackupInitiator implements Runnable {
   private Peer parentPeer;
   private String version;
 
-  public BackupInitiator(String version, String pathname, int replicationDegree, Peer parentPeer) {
+  public BackupInit(String version, String pathname, int replicationDegree, Peer parentPeer) {
     this.version = version;
     this.pathname = pathname;
     this.replicationDegree = replicationDegree;
     this.parentPeer = parentPeer;
 
-    utilitarios.Notificacoes_Terminal.printAviso("Starting backupInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("A começar o backup na fonte");
   }
 
   @Override
@@ -54,7 +54,7 @@ public class BackupInitiator implements Runnable {
 
     resetReplic(fileID, helperThreads);
 
-    utilitarios.Notificacoes_Terminal.printAviso("Finished BackupInitiator!");
+    utilitarios.Notificacoes_Terminal.printAviso("Terminou o backup na fonte");
   }
 
   private ArrayList<Thread> getThreadArrayList(ArrayList<ChunkData> chunks) {
