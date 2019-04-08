@@ -56,11 +56,11 @@ public class Message implements Serializable {
         String linha_do_Buffer = "";
 
         //Tratamento de erro se linha vazia
-        if (linha_do_Buffer.equals("")) {
+        if (header.equals("")   ){
             throw new Exception("Mensagem Invalida Ignorada!");
         }
         //Tratamento de erro se nao for formato protocolo
-        if(!parse_identificar_protocolo(linha_do_Buffer)){
+        if(!parse_identificar_protocolo( header  )){
             throw new Exception("Mensagem Invalida Ignorada!");
         }
 
@@ -141,10 +141,12 @@ public class Message implements Serializable {
                 numberArgs = 5;
                 break;
             case "GETCHUNK":
+          //      System.out.println("recebeu GETCHUNK do restore");
                 type = Categoria_Mensagem.GETCHUNK;
                 numberArgs = 5;
                 break;
             case "CHUNK":
+              //  System.out.println("recebeu CHUNK do restore");
                 type = Categoria_Mensagem.CHUNK;
                 numberArgs = 5;
                 break;

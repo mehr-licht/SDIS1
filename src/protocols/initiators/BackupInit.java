@@ -125,10 +125,10 @@ public class BackupInit implements Runnable {
    */
   private boolean replic_degree_high(int replic_degree){
     if (MAX_REPLICATION_DEGREE >= replic_degree) {
-      utilitarios.Notificacoes_Terminal.printMensagemError(
-          "Backup: grau de replicacao maior que o máximo definido(" + MAX_REPLICATION_DEGREE + ")");
       return false;
       }
+    utilitarios.Notificacoes_Terminal.printMensagemError(
+        "Backup: grau de replicacao maior que o máximo definido(" + MAX_REPLICATION_DEGREE + ")");
     return true;
   }
 

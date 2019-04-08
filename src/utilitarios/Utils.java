@@ -44,7 +44,7 @@ public class Utils {
   /** versão com todos os melhoramentos pedidos para todos os sub-protocolos * */
   public static final String ENHANCEMENTS = "2.0";
 
-  /** Atraso máximo para o tempo de espera aleatório da resposta STORED */
+  /** Atraso máximo para o tempo de espera aleatório da resposta STORED (enunciado 400ms)*/
   public static final int MAX_DELAY = 400;
 
   /** Memória máxima do sistema (8MB) * */

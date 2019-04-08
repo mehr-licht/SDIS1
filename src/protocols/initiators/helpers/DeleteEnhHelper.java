@@ -34,10 +34,10 @@ public class DeleteEnhHelper implements Runnable {
   @Override
   public void run() {
     Database database = parent_peer.get_database();
-    Set<String> files_to_delete = database.getFilesToDelete(request.getSenderID());
+    Set<String> files_to_delete = database.getFilesToDelete(request.get_Sender_ID());
 
     if (files_to_delete.isEmpty()) {
-      utilitarios.Notificacoes_Terminal.printNotificao("O peer " + request.getSenderID() + " não tem ficheiros para apagar");
+      utilitarios.Notificacoes_Terminal.printNotificao("O peer " + request.get_Sender_ID() + " não tem ficheiros para apagar");
       return;
     }
 
@@ -73,6 +73,6 @@ public class DeleteEnhHelper implements Runnable {
         file_ID
     };
 
-    return new Message(Message.MessageType.DELETE, args);
+    return new Message(Message.Categoria_Mensagem.DELETE, args);
   }
 }

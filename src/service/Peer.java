@@ -62,12 +62,9 @@ public class Peer implements My_Interface_Remote {
 
     system_manager = new SystemManager(this, MAX_SYSTEM_MEMORY);
     database = system_manager.getDatabase();
-
     setup_channels(mc_address, mdb_address, mdr_address);
     setup_message_handler();
-
     executor = new ScheduledThreadPoolExecutor(PEER_CORE_POOL_SIZE);
-
     send_UP_message();
 
     utilitarios.Notificacoes_Terminal.printAviso("peer " + id + " activo");
@@ -247,16 +244,15 @@ public class Peer implements My_Interface_Remote {
   public void restore(String pathname) {
     
     final Future handler;
-    handler = executor.submit(new RestoreInit(protocol_version, pathname, this));
 
-    executor.schedule(
-        () -> {
+    handler = executor.submit(new RestoreInit(protocol_version, pathname, this));
+//System.out.println("restore do restore");
+    executor.schedule(() -> {
           if (handler.cancel(true)) {
             utilitarios.Notificacoes_Terminal.printAviso("o restore_initiator foi terminado devido a falta de chunks.");
           }
         },
-        20,
-        TimeUnit.SECONDS);
+        20,TimeUnit.SECONDS);
   }
 
   /**
@@ -339,7 +335,7 @@ public class Peer implements My_Interface_Remote {
 
   /**
    * Mete o datagrama no message_dispatcher
-   * O canal fica ah escuta de mensagens que sao processadas por este peear
+   * O canal fica ah escuta de mensagens que sao processadas por este peer
    * @param data dados do datagrama
    * @param length tamanho do datagrama
    */

@@ -151,7 +151,7 @@ public class TestApp implements Runnable {
      */
     private void handle_backup() {
         utilitarios.Notificacoes_Terminal.printNotificao("A fazer backup do ficheiro de \"" + Paths.get(this.opnd_1) + "\""
-                + "GrauReplicacao: " + this.opnd_2);
+                + " com GrauReplicacao: " + this.opnd_2);
         try {
             stub.backup(this.opnd_1, Integer.parseInt(this.opnd_2));
         } catch (RemoteException e) {

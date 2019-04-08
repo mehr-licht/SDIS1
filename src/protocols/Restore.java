@@ -15,6 +15,10 @@ import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+
+/**
+ * classe Restore
+ */
 public class Restore implements Runnable, Peer_Info.MessageObserver {
   private Peer parent_peer;
   private Message request;
@@ -23,9 +27,10 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
   private Future handler = null;
 
   /**
-   * classe Restore
+   * construtor de Restore
    */
   public Restore(Peer parentPeer, Message request) {
+  //  System.out.println("construct do restore");
     this.parent_peer = parentPeer;
     this.request = request;
     this.database = parentPeer.get_database();

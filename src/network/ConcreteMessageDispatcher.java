@@ -35,8 +35,11 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleGETCHUNK(Message msg) {
+ //   System.out.println("do restore handleGETCHUNK 00");
     Restore restore_enh = new Restore(parentPeer, msg);
+   // System.out.println("do restore handleGETCHUNK 01");
     executor.execute(restore_enh);
+    //System.out.println("do restore handleGETCHUNK 02");
   }
 
   private void handleDELETE(Message msg) {

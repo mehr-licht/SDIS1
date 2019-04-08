@@ -16,6 +16,8 @@ import network.Message.Categoria_Mensagem;
 import protocols.initiators.helpers.TCPServer;
 import service.Peer;
 
+
+/** classe RestoreInit */
 public class RestoreInit implements Runnable {
 
   private FileInfo file_info;
@@ -25,8 +27,15 @@ public class RestoreInit implements Runnable {
   private Peer parent_peer;
   private TCPServer tcp_server;
 
-  /** classe RestoreInit */
+  /**
+   * construtor do RestoreInit
+   *
+   * @param version
+   * @param file_path
+   * @param parent_peer
+   */
   public RestoreInit(String version, String file_path, Peer parent_peer) {
+//System.out.println("construtor do restoreInit");
     this.version = version;
     this.file_path = file_path;
     this.parent_peer = parent_peer;
@@ -38,6 +47,7 @@ public class RestoreInit implements Runnable {
   /** Lançamento do stateInit */
   @Override
   public void run() {
+   // System.out.println("run do restoreInit");
     if (file_info == null) {
       utilitarios.Notificacoes_Terminal.printMensagemError(
           "Ficheiro para restaurar não encontrado");

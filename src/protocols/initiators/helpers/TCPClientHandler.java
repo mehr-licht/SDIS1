@@ -46,7 +46,7 @@ public class TCPClientHandler implements Runnable {
       return;
     }
 
-    peer_data.get_restored_chunk_data(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
+    peer_data.get_restored_chunk_data(new ChunkData(msg.get_file_ID(), msg.get_Chunk_Numero(), msg.get_Corpo_Mensagem()));
   }
 
   /**
@@ -77,7 +77,7 @@ public class TCPClientHandler implements Runnable {
 
     Peer_Info peer_data = parent_peer.get_peer_data();
 
-    if (!peer_data.get_restored_flag(msg.getFileID())) {
+    if (!peer_data.get_restored_flag(msg.get_file_ID())) {
       utilitarios.Notificacoes_Terminal.printNotificao("Os dados do Chunk foram eliminados");
       return null;
     }
