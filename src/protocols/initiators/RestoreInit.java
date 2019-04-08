@@ -109,7 +109,7 @@ public class RestoreInit implements Runnable {
    * Encerra o servidor TCP
    */
   private void close_TCP_server() {
-    tcp_server.closeTCPServer();
+    tcp_server.close_TCP_server();
   }
 
   /**

@@ -1,53 +1,78 @@
 package protocols.initiators.helpers;
 
-import channels.Channel;
-import filesystem.Database;
 import java.io.IOException;
 import java.util.Set;
 import network.Message;
 import service.Peer;
+import channels.Channel;
+import filesystem.Database;
 
+/**
+ * classe DeleteEnhHelper
+ */
 public class DeleteEnhHelper implements Runnable {
 
   private final Message request;
-  private Peer parentPeer;
+  private Peer parent_peer;
 
-  public DeleteEnhHelper(Message request, Peer parentPeer) {
+  /**
+   * construtor de DeleteEnhHelper
+   *
+   * @param request
+   * @param parent_peer
+   */
+  public DeleteEnhHelper(Message request, Peer parent_peer) {
     this.request = request;
-    this.parentPeer = parentPeer;
+    this.parent_peer = parent_peer;
 
-    utilitarios.Notificacoes_Terminal.printNotificao("Starting DeleteEnhHelper");
+    utilitarios.Notificacoes_Terminal.printNotificao("A começar o DeleteEnhHelper");
   }
 
+  /**
+   * lança o DeleteEnhHelper
+   */
   @Override
   public void run() {
-    Database database = parentPeer.get_database();
-    Set<String> filesToDelete = database.getFilesToDelete(request.getSenderID());
+    Database database = parent_peer.get_database();
+    Set<String> files_to_delete = database.getFilesToDelete(request.getSenderID());
 
-    if (filesToDelete.isEmpty()) {
-      utilitarios.Notificacoes_Terminal.printNotificao("No files to delete for peer " + request.getSenderID());
+    if (files_to_delete.isEmpty()) {
+      utilitarios.Notificacoes_Terminal.printNotificao("O peer " + request.getSenderID() + " não tem ficheiros para apagar");
       return;
     }
 
-    for (String fileID : filesToDelete) {
-      sendDELETE(fileID);
+    for (String file_ID : files_to_delete) {
+      send_delete(file_ID);
     }
 
   }
 
-  private void sendDELETE(String fileID) {
+  /**
+   * Envia o datagrama de delete
+   *
+   * @param file_ID identificador do ficheiro
+   */
+  private void send_delete(String file_ID) {
+    try {
+      parent_peer.send_message(generate_message(file_ID), Channel.ChannelType.MC);
+    } catch (IOException e) {
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar para o canal multicast");
+    }
+  }
+
+  /**
+   * Compõe o datagrama de delete
+   *
+   * @param file_ID identificador do ficheiro
+   * @return datagrama de delete
+   */
+  private Message generate_message(String file_ID) {
     String[] args = {
-        parentPeer.get_version(),
-        Integer.toString(parentPeer.get_ID()),
-        fileID
+        parent_peer.get_version(),
+        Integer.toString(parent_peer.get_ID()),
+        file_ID
     };
 
-    Message msg = new Message(Message.MessageType.DELETE, args);
-
-    try {
-      parentPeer.send_message(msg, Channel.ChannelType.MC);
-    } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
-    }
+    return new Message(Message.MessageType.DELETE, args);
   }
 }

@@ -1,21 +1,33 @@
 package protocols.initiators.helpers;
 
+import service.Peer;
 import filesystem.ChunkData;
 import filesystem.ChunkInfo;
-import service.Peer;
 
+/**
+ * classe RemovedChunkHelper
+ */
 public class RemovedChunkHelper extends BackupChunkHelper {
 
   private ChunkInfo chunkInfo;
 
-  public RemovedChunkHelper(Peer parentPeer, ChunkInfo chunkInfo, byte[] chunkData) {
-    super(parentPeer, new ChunkData(chunkInfo, chunkData));
+  /**
+   * construtor de RemovedChunkHelper
+   * @param parent_peer peer que iniciou o serviço
+   * @param chunk_info informação do chunk
+   * @param chunk_data data do chunk
+   */
+  public RemovedChunkHelper(Peer parent_peer, ChunkInfo chunk_info, byte[] chunk_data) {
+    super(parent_peer, new ChunkData(chunk_info, chunk_data));
 
-    this.chunkInfo = chunkInfo;
+    this.chunkInfo = chunk_info;
   }
 
+  /**
+   * Verifica se já atingiu o nivel de replicação desejado
+   */
   @Override
-  protected boolean isDesiredReplicationDegree() {
+  protected boolean achieved_replication_degree() {
     return chunkInfo.getNumMirrors() >= chunkInfo.getReplicationDegree();
   }
 }

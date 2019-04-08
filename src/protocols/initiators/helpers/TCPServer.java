@@ -2,22 +2,33 @@ package protocols.initiators.helpers;
 
 import static utilitarios.Utils.TCPSERVER_PORT;
 
-import java.io.IOException;
+import service.Peer;
 import java.net.ServerSocket;
 import java.net.Socket;
-import service.Peer;
+import java.io.IOException;
 
+/**
+ * classe TCPServer
+ */
 public class TCPServer implements Runnable {
 
-  private ServerSocket serverSocket;
-  private Peer parentPeer;
+  private ServerSocket server_socket;
+  private Peer parent_peer;
   private boolean run;
 
-  public TCPServer(Peer parentPeer) {
-    this.parentPeer = parentPeer;
-    initializeTCPServer();
+  /**
+   * construtor do servidor TCP
+   *
+   * @param parent_peer peer que iniciou o serviço
+   */
+  public TCPServer(Peer parent_peer) {
+    this.parent_peer = parent_peer;
+    initialize_TCP_server();
   }
 
+  /**
+   * lança o servidor TCP
+   */
   @Override
   public void run() {
     while (run) {
@@ -25,33 +36,42 @@ public class TCPServer implements Runnable {
     }
   }
 
-  public void closeTCPServer() {
+  /**
+   * Fecha o servidor TCP
+   */
+  public void close_TCP_server() {
     try {
       run = false;
-      serverSocket.close();
+      server_socket.close();
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't close TCPServer!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível fecharar o servidor TCP");
     }
   }
 
-  private void initializeTCPServer() {
+  /**
+   * Inicializa o servidor TCP
+   */
+  private void initialize_TCP_server() {
     try {
-      serverSocket = new ServerSocket(TCPSERVER_PORT + parentPeer.get_ID());
-      utilitarios.Notificacoes_Terminal.printAviso("Started TCPServer!");
+      server_socket = new ServerSocket(TCPSERVER_PORT + parent_peer.get_ID());
+      utilitarios.Notificacoes_Terminal.printAviso("servidor TCP inicializado");
       run = true;
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't initialize TCPServer!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível iniciar o servidor TCP");
     }
 
   }
 
+  /**
+   * cria thread auxiliar para o cliente TCP
+   */
   private void handleTCPClient() {
     try {
-      Socket clientSocket = serverSocket.accept();
-      utilitarios.Notificacoes_Terminal.printNotificao("Received a TCPClient");
-      new Thread(new TCPClientHandler(parentPeer, clientSocket)).start();
+      Socket client_socket = server_socket.accept();
+      utilitarios.Notificacoes_Terminal.printNotificao("cliente TCP");
+      new Thread(new TCPClientHandler(parent_peer, client_socket)).start();
     } catch (IOException e) {
-      //e.printStackTrace();
+      e.printStackTrace();
     }
   }
 }
