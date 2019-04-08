@@ -21,7 +21,7 @@ public class Delete implements Runnable {
 
 
   public Delete(Peer parentPeer, Message request) {
-    this.parentPeer = parentPeer;
+    this.parent_peer = parentPeer;
     this.request = request;
     this.database = parent_peer.get_database();
 
