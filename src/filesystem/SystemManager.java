@@ -20,6 +20,7 @@ public class SystemManager {
   private String rootPath;
   private Database database;
   private MemoryManager memoryManager;
+
   public SystemManager(Peer parentPeer, long maxMemory) {
     this.parentPeer = parentPeer;
     this.rootPath = "fileSystem/peer" + parentPeer.get_ID() + "/";

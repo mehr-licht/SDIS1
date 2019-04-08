@@ -5,7 +5,7 @@ import static utilitarios.Utils.*;
 
 import java.io.IOException;
 import java.util.Random;
-import channels.Channel;
+import canais.Canal;
 import service.Peer;
 import filesystem.ChunkInfo;
 import filesystem.SystemManager.SAVE_STATE;
@@ -45,16 +45,16 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
    */
   @Override
   public void run() {
-    int sender_ID = request.getSenderID();
-    String file_ID = request.getFileID();
-    int chunk_No = request.getChunkNo();
-    int replication_degree = request.getReplicationDegree();
+    int sender_ID = request.get_Sender_ID();
+    String file_ID = request.get_file_ID();
+    int chunk_No = request.get_Chunk_Numero();
+    int replication_degree = request.get_File_Replication_Degree();
 
     if (sender_ID == parent_peer.get_ID()) { // a peer never stores the chunks of its own files
       return;
     }
 
-    byte[] chunk_data = request.getBody();
+    byte[] chunk_data = request.get_Corpo_Mensagem();
 
     String chunk_path = parent_peer.get_path("backup") + "/" + file_ID;
     createFolder(parent_peer.get_path("backup") + "/" + file_ID);
@@ -199,7 +199,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
     Message msg = make_STORED(request);
 
     try {
-      parent_peer.send_message(msg, Channel.ChannelType.MC);
+      parent_peer.send_message(msg, Canal.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar para o canal multicast");
     }
@@ -214,7 +214,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
     Message msg = make_STORED(request);
 
     parent_peer.send_delayed_message(
-        msg, Channel.ChannelType.MC,
+        msg, Canal.ChannelType.MC,
         random.nextInt(MAX_DELAY + 1),
         TimeUnit.MILLISECONDS
     );
@@ -230,11 +230,11 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
     String[] args = {
         parent_peer.get_version(),
         Integer.toString(parent_peer.get_ID()),
-        request.getFileID(),
-        Integer.toString(request.getChunkNo())
+        request.get_file_ID(),
+        Integer.toString(request.get_Chunk_Numero())
     };
 
-    return new Message(Message.MessageType.STORED, args);
+    return new Message(Message.Categoria_Mensagem.STORED, args);
   }
 
   /**
@@ -247,12 +247,12 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
     if (this.handler == null) {
       return;
     }
-    if ((!(msg.getFileID().equals(request.getFileID()))) || (!(msg.getChunkNo() == request.getChunkNo()))) {
+    if ((!(msg.get_file_ID().equals(request.get_file_ID()))) || (!(msg.get_Chunk_Numero() == request.get_Chunk_Numero()))) {
       return;
     }
 
     //stored_count += 1;
-    if (!(request.getReplicationDegree() > ++stored_count)) {
+    if (!(request.get_File_Replication_Degree() > ++stored_count)) {
       // Cancela se o grau de replicação já atingiu o definido
       this.handler.cancel(true);
     }

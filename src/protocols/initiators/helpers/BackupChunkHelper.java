@@ -4,7 +4,7 @@ import network.Message;
 import utilitarios.Utils;
 import protocols.initiators.BackupInit;
 import service.Peer;
-import channels.Channel;
+import canais.Canal;
 import filesystem.ChunkData;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicIntegerArray;
@@ -74,7 +74,7 @@ public class BackupChunkHelper implements Runnable {
    */
   private void send_msg_MDB(Message msg) {
     try {
-      parent_peer.send_message(msg, Channel.ChannelType.MDB);
+      parent_peer.send_message(msg, Canal.ChannelType.MDB);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar para o canal multicast");
     }
@@ -121,7 +121,7 @@ public class BackupChunkHelper implements Runnable {
         Integer.toString(chunk.getReplicationDegree())
     };
 
-    return new Message(Message.MessageType.PUTCHUNK, args, chunk.getData());
+    return new Message(Message.Categoria_Mensagem.PUTCHUNK, args, chunk.getData());
   }
 
 }

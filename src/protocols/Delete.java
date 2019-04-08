@@ -2,7 +2,7 @@ package protocols;
 
 import static utilitarios.Utils.*;
 
-import channels.Channel;
+import canais.Canal;
 import service.Peer;
 import java.io.IOException;
 import filesystem.ChunkInfo;
@@ -20,8 +20,11 @@ public class Delete implements Runnable {
   private Message request;
   private Database database;
 
-  public Delete(Peer parent_peer, Message request) {
-    this.parent_peer = parent_peer;
+
+
+
+  public Delete(Peer parentPeer, Message request) {
+    this.parentPeer = parentPeer;
     this.request = request;
     this.database = parent_peer.get_database();
 
@@ -33,7 +36,7 @@ public class Delete implements Runnable {
    */
   @Override
   public void run() {
-    String file_ID = request.getFileID();
+    String file_ID = request.get_file_ID();
 
     if (chunks_in_database(file_ID)) {
       return;
@@ -91,7 +94,7 @@ public class Delete implements Runnable {
     Message msg = compose_delete_datagram(request);
 
     try {
-      parent_peer.send_message(msg, Channel.ChannelType.MC);
+      parent_peer.send_message(msg, Canal.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar para o canal multicast");
     }
@@ -107,10 +110,10 @@ public class Delete implements Runnable {
     String[] args = {
         parent_peer.get_version(),
         Integer.toString(parent_peer.get_ID()),
-        request.getFileID()
+        request.get_file_ID()
     };
 
-    return new Message(Message.MessageType.DELETED, args);
+    return new Message(Message.Categoria_Mensagem.DELETED, args);
   }
 
 }

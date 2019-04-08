@@ -1,10 +1,10 @@
 package protocols.initiators.helpers;
 
+import canais.Canal;
 import java.io.IOException;
 import java.util.Set;
 import network.Message;
 import service.Peer;
-import channels.Channel;
 import filesystem.Database;
 
 /**
@@ -54,7 +54,7 @@ public class DeleteEnhHelper implements Runnable {
    */
   private void send_delete(String file_ID) {
     try {
-      parent_peer.send_message(generate_message(file_ID), Channel.ChannelType.MC);
+      parent_peer.send_message(generate_message(file_ID), Canal.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviar para o canal multicast");
     }

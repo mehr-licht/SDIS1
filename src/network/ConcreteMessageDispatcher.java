@@ -1,6 +1,6 @@
 package network;
 
-import static network.Message.MessageType.*;
+import static network.Message.Categoria_Mensagem.*;
 import static utilitarios.Utils.*;
 
 import filesystem.ChunkData;
@@ -40,7 +40,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleDELETE(Message msg) {
-    parentPeer.get_database().addToFilesToDelete(msg.getFileID());
+    parentPeer.get_database().addToFilesToDelete(msg.get_file_ID());
 
     Delete delete = new Delete(parentPeer, msg);
     executor.execute(delete);
@@ -56,7 +56,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     Database database = parentPeer.get_database();
 
     if (enhancements_compatible(parentPeer, msg, DELETE_ENH)) {
-      database.deleteFileMirror(msg.getFileID(), msg.getSenderID());
+      database.deleteFileMirror(msg.get_file_ID(), msg.get_Sender_ID());
     }
   }
 
@@ -65,33 +65,33 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
 
     peerData.notify_chunk_observers(msg);
 
-    if (!peerData.get_restored_flag(msg.getFileID())) { // Restoring File
+    if (!peerData.get_restored_flag(msg.get_file_ID())) { // Restoring File
       return;
     }
 
     if (!enhancement_compatible_msg(msg, RESTORE_ENH)) {
-      peerData.get_restored_chunk_data(new ChunkData(msg.getFileID(), msg.getChunkNo(), msg.getBody()));
+      peerData.get_restored_chunk_data(new ChunkData(msg.get_file_ID(), msg.get_Chunk_Numero(), msg.get_Corpo_Mensagem()));
     }
   }
 
   private void handlePUTCHUNK(Message msg) {
     Database database = parentPeer.get_database();
-    database.removeFromFilesToDelete(msg.getFileID());
+    database.removeFromFilesToDelete(msg.get_file_ID());
 
-    if (database.hasChunk(msg.getFileID(), msg.getChunkNo())) {
+    if (database.hasChunk(msg.get_file_ID(), msg.get_Chunk_Numero())) {
       // If chunk is backed up by parentPeer, notify
-      Map<Integer, Future> fileBackUpHandlers = backUpHandlers.get(msg.getFileID());
+      Map<Integer, Future> fileBackUpHandlers = backUpHandlers.get(msg.get_file_ID());
       if (fileBackUpHandlers == null) {
         return;
       }
 
-      final Future handler = fileBackUpHandlers.remove(msg.getChunkNo());
+      final Future handler = fileBackUpHandlers.remove(msg.get_Chunk_Numero());
       if (handler == null) {
         return;
       }
       handler.cancel(true);
       utilitarios.Notificacoes_Terminal.printNotificao("Stopping chunk back up, due to received PUTCHUNK");
-    } else if (!database.hasBackedUpFileById(msg.getFileID())) {
+    } else if (!database.hasBackedUpFileById(msg.get_file_ID())) {
       // If file is not a local file, Mirror/Backup ChunkData
       Backup backup = new Backup(parentPeer, msg);
       executor.execute(backup);
@@ -105,20 +105,20 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     parentPeer.get_peer_data().notify_stored_observers(msg);
 
     Database database = parentPeer.get_database();
-    if (database.hasChunk(msg.getFileID(), msg.getChunkNo())) {
-      database.addChunkMirror(msg.getFileID(), msg.getChunkNo(), msg.getSenderID());
-    } else if (database.hasBackedUpFileById(msg.getFileID())) {
-      parentPeer.get_peer_data().inc_chunk_replic(msg.getFileID(), msg.getChunkNo());
-      database.addFileMirror(msg.getFileID(), msg.getSenderID());
+    if (database.hasChunk(msg.get_file_ID(), msg.get_Chunk_Numero())) {
+      database.addChunkMirror(msg.get_file_ID(), msg.get_Chunk_Numero(), msg.get_Sender_ID());
+    } else if (database.hasBackedUpFileById(msg.get_file_ID())) {
+      parentPeer.get_peer_data().inc_chunk_replic(msg.get_file_ID(), msg.get_Chunk_Numero());
+      database.addFileMirror(msg.get_file_ID(), msg.get_Sender_ID());
     }
   }
 
   private void handleREMOVED(Message msg) {
     Database database = parentPeer.get_database();
-    String fileID = msg.getFileID();
-    int chunkNo = msg.getChunkNo();
+    String fileID = msg.get_file_ID();
+    int chunkNo = msg.get_Chunk_Numero();
 
-    if (database.removeChunkMirror(fileID, chunkNo, msg.getSenderID()) == null) {
+    if (database.removeChunkMirror(fileID, chunkNo, msg.get_Sender_ID()) == null) {
       utilitarios.Notificacoes_Terminal.printNotificao("Ignoring REMOVED of non-local ChunkData");
       return;
     }
@@ -137,8 +137,8 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
           TimeUnit.MILLISECONDS
       );
 
-      backUpHandlers.putIfAbsent(msg.getFileID(), new HashMap<>());
-      backUpHandlers.get(msg.getFileID()).put(msg.getChunkNo(), handler);
+      backUpHandlers.putIfAbsent(msg.get_file_ID(), new HashMap<>());
+      backUpHandlers.get(msg.get_file_ID()).put(msg.get_Chunk_Numero(), handler);
     }
   }
 

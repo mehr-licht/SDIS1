@@ -38,6 +38,7 @@ public class TestApp implements Runnable {
         this.opnd_2 = opnd_2;
 
 
+
         service_handlers = new HashMap<>();
         service_handlers.put("BACKUP", this::handle_backup);
         service_handlers.put("STATE", this::handle_state);
@@ -122,6 +123,7 @@ public class TestApp implements Runnable {
     /**
      * The Runnable interface should be implemented by any class whose instances
      * are intended to be executed by a thread. The class must define a method of no arguments called run
+     * Subscreve a RMI e chama o run() de cada classe BACKUP STATE DELETE RESTORE RECLAIM
      */
     @Override
     public void run() {

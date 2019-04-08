@@ -1,6 +1,6 @@
 package protocols.initiators;
 
-import channels.Channel;
+import canais.Canal;
 import filesystem.ChunkInfo;
 import filesystem.MemoryManager;
 import filesystem.SystemManager;
@@ -69,7 +69,7 @@ public class ReclaimInit implements Runnable {
         "chk"+chunk_No
     };
 
-    Message msg = new Message(Message.MessageType.REMOVED, args);
+    Message msg = new Message(Message.Categoria_Mensagem.REMOVED, args);
     send_msg(msg);
   }
 
@@ -80,7 +80,7 @@ public class ReclaimInit implements Runnable {
    */
   private void send_msg(Message msg) {
     try {
-      parentPeer.send_message(msg, Channel.ChannelType.MC);
+      parentPeer.send_message(msg, Canal.ChannelType.MC);
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possível enviarr para o canal multicast");
     }

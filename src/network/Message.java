@@ -8,7 +8,7 @@ import static utilitarios.Utils.get_IPv4_address;
 
 public class Message implements Serializable {
 
-    public enum MessageType {
+    public enum Categoria_Mensagem {
         PUTCHUNK,
         STORED,
         GETCHUNK,
@@ -22,7 +22,7 @@ public class Message implements Serializable {
 
     private int numberArgs;
     //    Header
-    private MessageType type;
+    private Categoria_Mensagem type;
     private String version;
     private int senderID;
     private String fileID;
@@ -33,64 +33,83 @@ public class Message implements Serializable {
     private String mTCPHost;
     private int mTCPPort;
 
-    //Constructor that handle received messages
+    /**
+     * Constructor 1/3 das mensagens recebidas
+     * @param data data do datagram
+     * @param length tamanho do datagram
+     * */
     public Message(byte[] data, int length) throws Exception {
-        String header = extractHeader(data);
 
-        if (header.equals("") || !parseHeader(header)) {
-            throw new Exception("Invalid message...Ignoring it!");
+        //Retira uma linha do buufer
+        ByteArrayInputStream stream = new ByteArrayInputStream(data);
+        InputStreamReader istr = new InputStreamReader(stream);
+        BufferedReader buffer_read = new BufferedReader(istr);
+
+        String header = "";
+
+        try {
+            header = buffer_read.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        if (type == MessageType.PUTCHUNK || type == MessageType.CHUNK) {
-            this.body = extractBody(data, header.length(), length);
+        String linha_do_Buffer = "";
+
+        //Tratamento de erro se linha vazia
+        if (linha_do_Buffer.equals("")) {
+            throw new Exception("Mensagem Invalida Ignorada!");
+        }
+        //Tratamento de erro se nao for formato protocolo
+        if(!parse_identificar_protocolo(linha_do_Buffer)){
+            throw new Exception("Mensagem Invalida Ignorada!");
+        }
+
+        //processamento da mensagem recebida
+            //PUTCHUNK
+        if (type == Categoria_Mensagem.PUTCHUNK) {
+            this.body = extractBody(data, linha_do_Buffer.length(), length);
+        }
+            //CHUNK
+        if(type == Categoria_Mensagem.CHUNK){
+            this.body = extractBody(data, linha_do_Buffer.length(), length);
         }
     }
 
-    //Constructor that handle send messages without body
-    public Message(MessageType type, String[] args) {
+    /**
+     * Constructor 2/3 para enviar mensagens sem corpo
+     * */
+    public Message(Categoria_Mensagem type, String[] args) {
         this.type = type;
         version = args[0];
         senderID = Integer.parseInt(args[1]);
 
-        if (type == MessageType.UP)
+        if (type == Categoria_Mensagem.UP)
             return;
 
         fileID = args[2];
 
-        if (type != MessageType.DELETE && type != MessageType.DELETED)
+        if (type != Categoria_Mensagem.DELETE && type != Categoria_Mensagem.DELETED)
             chunkNo = Integer.parseInt(args[3]);
 
-        if (type == MessageType.PUTCHUNK) {
+        if (type == Categoria_Mensagem.PUTCHUNK) {
             replicationDegree = Integer.parseInt(args[4]);
         }
 
-        if (type == MessageType.ENH_GETCHUNK) {
+        if (type == Categoria_Mensagem.ENH_GETCHUNK) {
             mTCPPort = Integer.parseInt(args[4]);
             mTCPHost = get_IPv4_address();
         }
     }
 
-    //Constructor that handle send messages with body
-    public Message(MessageType type, String[] args, byte[] data) {
+    /**
+     * Constructor pra enviar mensagens com corpo
+     * */
+    public Message(Categoria_Mensagem type, String[] args, byte[] data) {
         this(type, args);
         body = data;
     }
 
-    private String extractHeader(byte[] data) {
-        ByteArrayInputStream stream = new ByteArrayInputStream(data);
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(stream));
 
-        String header = "";
-
-        try {
-            header = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return header;
-    }
 
     private byte[] extractBody(byte[] data, int headerLength, int dataLength) {
         int length = dataLength;
@@ -103,81 +122,87 @@ public class Message implements Serializable {
         return bodyContent;
     }
 
-    private boolean parseHeader(String header) {
+    /**
+     * Define os tipos de mensagens recebidas segundo as categorias definidas
+     *
+     * */
+    private boolean parse_identificar_protocolo(String header) {
 
         String headerCleaned = header.trim().replaceAll("\\s+", " "); //More than one space between fields
-        String[] headerSplit = headerCleaned.split("\\s+"); //Split by space the header elements
+        String[] mensagem_em_array = headerCleaned.split("\\s+"); //Split by space the header elements
 
-        switch (headerSplit[0]) {
+        switch (mensagem_em_array[0]) {
             case "PUTCHUNK":
-                type = MessageType.PUTCHUNK;
+                type = Categoria_Mensagem.PUTCHUNK;
                 numberArgs = 6;
                 break;
             case "STORED":
-                type = MessageType.STORED;
+                type = Categoria_Mensagem.STORED;
                 numberArgs = 5;
                 break;
             case "GETCHUNK":
-                type = MessageType.GETCHUNK;
+                type = Categoria_Mensagem.GETCHUNK;
                 numberArgs = 5;
                 break;
             case "CHUNK":
-                type = MessageType.CHUNK;
+                type = Categoria_Mensagem.CHUNK;
                 numberArgs = 5;
                 break;
             case "DELETE":
-                type = MessageType.DELETE;
+                type = Categoria_Mensagem.DELETE;
                 numberArgs = 4;
                 break;
             case "DELETED":
-                type = MessageType.DELETED;
+                type = Categoria_Mensagem.DELETED;
                 numberArgs = 4;
                 break;
             case "REMOVED":
-                type = MessageType.REMOVED;
+                type = Categoria_Mensagem.REMOVED;
                 numberArgs = 5;
                 break;
             case "ENH_GETCHUNK":
-                type = MessageType.ENH_GETCHUNK;
+                type = Categoria_Mensagem.ENH_GETCHUNK;
                 numberArgs = 6;
                 break;
             case "UP":
-                type = MessageType.UP;
+                type = Categoria_Mensagem.UP;
                 numberArgs = 3;
                 break;
             default:
                 return false;
         }
 
-        if (headerSplit.length != numberArgs)
+        if (mensagem_em_array.length != numberArgs)
             return false;
 
-        version = headerSplit[1];
-        senderID = Integer.parseInt(headerSplit[2]);
+        //<Version>
+        version = mensagem_em_array[1];
 
-        if (type == MessageType.UP)
+        //<Sender ID>
+        senderID = Integer.parseInt(mensagem_em_array[2]);
+
+        if (type == Categoria_Mensagem.UP)
             return true;
 
-        fileID = headerSplit[3];
+        //<FileId>
+        fileID = mensagem_em_array[3];
 
+        //<ChunkNumero>
         if (numberArgs > 4)
-            chunkNo = Integer.parseInt(headerSplit[4]);
+            chunkNo = Integer.parseInt(mensagem_em_array[4]);
 
-        if (type == MessageType.PUTCHUNK)
-            replicationDegree = Integer.parseInt(headerSplit[5]);
+        //<ReplicationDeg>
+        if (type == Categoria_Mensagem.PUTCHUNK)
+            replicationDegree = Integer.parseInt(mensagem_em_array[5]);
 
-        if (type == MessageType.ENH_GETCHUNK) {
-            String[] tcpAddress = headerSplit[5].split(":");
+        if (type == Categoria_Mensagem.ENH_GETCHUNK) {
+            String[] tcpAddress = mensagem_em_array[5].split(":");
             mTCPHost = tcpAddress[0];
             mTCPPort = Integer.parseInt(tcpAddress[1]);
         }
-
         return true;
     }
 
-    public MessageType getType() {
-        return type;
-    }
 
     public String getHeaderAsString() {
         String str;
@@ -223,29 +248,6 @@ public class Message implements Serializable {
             return header;
     }
 
-    public String getVersion() {
-        return version;
-    }
-
-    public int getSenderID() {
-        return senderID;
-    }
-
-    public String getFileID() {
-        return fileID;
-    }
-
-    public int getChunkNo() {
-        return chunkNo;
-    }
-
-    public int getReplicationDegree() {
-        return replicationDegree;
-    }
-
-    public byte[] getBody() {
-        return body;
-    }
 
     @Override
     public String toString() {
@@ -270,16 +272,43 @@ public class Message implements Serializable {
                 str = type + " " + version + " " + senderID + " " + fileID + " " + chunkNo;
                 break;
         }
-
         return str;
     }
 
-    public String getTCPHost() {
+    /**
+     * GETS METODOS
+     * */
+    public String get_TCP_hostname() {
         return mTCPHost;
     }
 
-    public int getTCPPort() {
+    public int get_TCP_porta() {
         return mTCPPort;
+    }
+
+    public Categoria_Mensagem getType() {
+        return type;
+    }
+
+    public int get_Chunk_Numero() {
+        return chunkNo;
+    }
+
+    public int get_Sender_ID() {
+        return senderID;
+    }
+    public int get_File_Replication_Degree() {
+        return replicationDegree;
+    }
+    public byte[] get_Corpo_Mensagem() {
+        return body;
+    }
+    public String get_version() {
+        return version;
+    }
+
+    public String get_file_ID() {
+        return fileID;
     }
 
 }

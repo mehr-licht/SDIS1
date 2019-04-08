@@ -20,11 +20,11 @@ import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import channels.Channel;
-import channels.Channel.ChannelType;
-import channels.MChannel;
-import channels.MDBChannel;
-import channels.MDRChannel;
+import canais.Canal;
+import canais.Canal.ChannelType;
+import canais.MC;
+import canais.MDB;
+import canais.MDR;
 
 /**
  * classe Peer
@@ -36,7 +36,7 @@ public class Peer implements My_Interface_Remote {
   private final int id;
 
   private AbstractMessageDispatcher message_dispatcher;
-  private Map<ChannelType, Channel> channels;
+  private Map<ChannelType, Canal> channels;
 
   //serviço Executor service responsável pelo escalonamento das respostas e fazer todas as tarefas dos sub-protocolos RMI.
   private ScheduledExecutorService executor;
@@ -86,7 +86,7 @@ public class Peer implements My_Interface_Remote {
     String protocol_version = args[0];
     int server_ID = Integer.parseInt(args[1]);
 
-    // host/     ou   //host:port/
+    // host/     ou   //host:port/ Subscreve o MRI
     String[] service_access_point = parse_RMI(args[2], true);
     if (service_access_point == null) {
       return;
@@ -117,6 +117,7 @@ public class Peer implements My_Interface_Remote {
 
       // Get own registry, to rebind to correct stub
       Registry registry = LocateRegistry.getRegistry();
+      //Subscriçaõ do RMI
       registry.rebind(arg, stub);
 
       utilitarios.Notificacoes_Terminal.printNotificao("Servidor "+arg+ " pronto");
@@ -152,16 +153,15 @@ public class Peer implements My_Interface_Remote {
   }
 
   /**
-   * Cria os canais de comunicação e inicia as suas threads
-   *
+   * Cria os canais de comunicação e inicia as suas threads -> Um protocolo por cada thread
    * @param mc_address endereço do canal de controle
    * @param mdb_address endereço do canal do backup de dados
    * @param mdr_address endereço do canal do restore de dados
    */
   private void setup_channels(String[] mc_address, String[] mdb_address, String[] mdr_address) {
-    Channel mc = new MChannel(this, mc_address[0], mc_address[1]);
-    Channel mdb = new MDBChannel(this, mdb_address[0], mdb_address[1]);
-    Channel mdr = new MDRChannel(this, mdr_address[0], mdr_address[1]);
+    Canal mc = new MC(this, mc_address[0], mc_address[1]);
+    Canal mdb = new MDB(this, mdb_address[0], mdb_address[1]);
+    Canal mdr = new MDR(this, mdr_address[0], mdr_address[1]);
 
     new Thread(mc).start();
     new Thread(mdb).start();
@@ -223,7 +223,7 @@ public class Peer implements My_Interface_Remote {
    * @param channel_type tipo do canal
    * @return
    */
-  public Channel get_channel(ChannelType channel_type) {
+  public Canal get_channel(ChannelType channel_type) {
     return channels.get(channel_type);
   }
 
@@ -294,7 +294,8 @@ public class Peer implements My_Interface_Remote {
    * @return id do peer
    */
   public int get_ID() {
-    return id;
+
+      return id;
   }
 
   /**
@@ -326,10 +327,10 @@ public class Peer implements My_Interface_Remote {
           get_version(), Integer.toString(get_ID()),
       };
 
-      Message msg = new Message(Message.MessageType.UP, args);
+      Message msg = new Message(Message.Categoria_Mensagem.UP, args);
 
       try {
-        send_message(msg, Channel.ChannelType.MC);
+        send_message(msg, Canal.ChannelType.MC);
       } catch (IOException e) {
         utilitarios.Notificacoes_Terminal.printMensagemError("Não foi possivel enviar a mensagem para o canal multicast");
       }
@@ -338,7 +339,7 @@ public class Peer implements My_Interface_Remote {
 
   /**
    * Mete o datagrama no message_dispatcher
-   *
+   * O canal fica ah escuta de mensagens que sao processadas por este peear
    * @param data dados do datagrama
    * @param length tamanho do datagrama
    */
