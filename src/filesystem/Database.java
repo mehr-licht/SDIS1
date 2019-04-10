@@ -244,6 +244,12 @@ public class Database extends PermanentStateClass {
 
     return mostBackedUpChunk;
   }
-  
+
+  @SuppressWarnings("deprecation")
+   @Override
+  protected void finalize() throws Throwable {
+    savePermanentState();
+    super.finalize();
+  } 
 
 }

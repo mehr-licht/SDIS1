@@ -1,5 +1,6 @@
 package network;
 
+import java.util.Arrays;
 import utilitarios.Utils;
 
 import java.io.*;
@@ -40,38 +41,14 @@ public class Message implements Serializable {
      * */
     public Message(byte[] data, int length) throws Exception {
 
-        //Retira uma linha do buufer
-        ByteArrayInputStream stream = new ByteArrayInputStream(data);
-        InputStreamReader istr = new InputStreamReader(stream);
-        BufferedReader buffer_read = new BufferedReader(istr);
+        String header = extractHeader(data);
 
-        String header = "";
-
-        try {
-            header = buffer_read.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (header.equals("") || ! parse_identificar_protocolo(header)) {
+            throw new Exception("Invalid message...Ignoring it!");
         }
 
-        String linha_do_Buffer = "";
-
-        //Tratamento de erro se linha vazia
-        if (header.equals("")   ){
-            throw new Exception("Mensagem Invalida Ignorada!");
-        }
-        //Tratamento de erro se nao for formato protocolo
-        if(!parse_identificar_protocolo( header  )){
-            throw new Exception("Mensagem Invalida Ignorada!");
-        }
-
-        //processamento da mensagem recebida
-            //PUTCHUNK
-        if (type == Categoria_Mensagem.PUTCHUNK) {
-            this.body = extractBody(data, linha_do_Buffer.length(), length);
-        }
-            //CHUNK
-        if(type == Categoria_Mensagem.CHUNK){
-            this.body = extractBody(data, linha_do_Buffer.length(), length);
+        if (type == Categoria_Mensagem.PUTCHUNK || type == Categoria_Mensagem.CHUNK) {
+            this.body = extractBody(data, header.length(), length);
         }
     }
 
@@ -109,16 +86,28 @@ public class Message implements Serializable {
         body = data;
     }
 
+    private String extractHeader(byte[] data) {
+        ByteArrayInputStream stream = new ByteArrayInputStream(data);
+        BufferedReader reader = new BufferedReader(
+            new InputStreamReader(stream));
 
+        String header = "";
+
+        try {
+            header = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return header;
+    }
 
     private byte[] extractBody(byte[] data, int headerLength, int dataLength) {
         int length = dataLength;
         int readBytes = length - headerLength - 4;
         ByteArrayInputStream message = new ByteArrayInputStream(data, headerLength + 4, readBytes);
         byte[] bodyContent = new byte[readBytes];
-
         message.read(bodyContent, 0, readBytes);
-
         return bodyContent;
     }
 
