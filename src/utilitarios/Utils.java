@@ -244,13 +244,16 @@ public class Utils {
    */
   public static boolean enhancements_compatible(
       Peer peer, Message request, String enhanced_version) {
-    if ((peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhanced_version))
-        && (request.get_version().equals(ENHANCEMENTS)
-            || request.get_version().equals(enhanced_version))) {
-      return true;
-    } else {
-      return false;
-    }
+
+      return ((request.get_version().equals(enhanced_version)
+          || request.get_version().equals(ENHANCEMENTS))
+          && (peer.get_version().equals(enhanced_version)
+          || peer.get_version().equals(ENHANCEMENTS)));
+
+  }
+
+  public static boolean isPeerCompatibleWithEnhancement(String enhancedVersion, Peer peer) {
+    return (peer.get_version().equals(enhancedVersion) || peer.get_version().equals(ENHANCEMENTS));
   }
 
   /**
@@ -261,11 +264,15 @@ public class Utils {
    * @return verdadeiro ou falso
    */
   public static boolean enhancement_compatible_peer(Peer peer, String enhanced_version) {
+    System.out.println("enh_compat do restore 00");
     if (peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhanced_version)) {
+      System.out.println("enh_compat do restore 01");
       return true;
     } else {
+      System.out.println("enh_compat do restore 02");
       return false;
     }
+
   }
 
   /**

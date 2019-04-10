@@ -164,11 +164,14 @@ public class SystemManager {
   }
 
   public String getChunkPath(String fileID, int chunkNo) {
+    System.out.println("BackupInit getChunkPath do restore : pathBackups: "+getChunksPath() + fileID + "/chk" + chunkNo);
     return getChunksPath() + fileID + "/chk" + chunkNo;
+
   }
 
   public byte[] loadChunk(String fileID, int chunkNo) {
     String chunkPath = getChunkPath(fileID, chunkNo);
+    System.out.println("BackupInit getChunkPath do restore : pathLoad: "+chunkPath);
     return loadFile(chunkPath);
   }
 

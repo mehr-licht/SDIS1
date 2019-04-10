@@ -30,12 +30,15 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
    * construtor de Restore
    */
   public Restore(Peer parentPeer, Message request) {
-  //  System.out.println("construct do restore");
+   System.out.println("construct do restore 00");
     this.parent_peer = parentPeer;
+    System.out.println("construct do restore 01");
     this.request = request;
+    System.out.println("construct do restore 02");
     this.database = parentPeer.get_database();
+    System.out.println("construct do restore 03");
     this.random = new Random();
-
+    System.out.println("construct do restore 04");
     utilitarios.Notificacoes_Terminal.printAviso("Início do RESTORE");
   }
 
@@ -44,22 +47,24 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
    */
   @Override
   public void run() {
+    System.out.println("run do restore 00");
     if (is_owned()) {
       utilitarios.Notificacoes_Terminal.printAviso("Não se liga a chunks de ficheiros nossos");
       return;
     }
-
+    System.out.println("run do restore 01");
     String file_ID = request.get_file_ID();
     int chunk_No = request.get_Chunk_Numero();
-
+    System.out.println("run do restore 02 chunkNo"+chunk_No);
     if (!chunk_found(chunk_No, file_ID)) {
+      System.out.println("run do restore 03 not found"+chunk_No);
       return;
     }
-
+    System.out.println("run do restore 04");
     byte[] chunk_data = parent_peer.load_chunk(file_ID, chunk_No);
-
+    System.out.println("run do restore 05");
     send_message_by_channels(chunk_data);
-
+    System.out.println("run do restore 06");
     utilitarios.Notificacoes_Terminal.printAviso("RESTORE terminado");
   }
 
