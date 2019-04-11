@@ -16,7 +16,7 @@ import protocols.initiators.helpers.DeleteEnhHelper;
 import protocols.initiators.helpers.RemovedChunkHelper;
 import service.Peer;
 
-public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
+public class CaixaCorreio extends CTTpostBox {
 
   private ScheduledExecutorService executor;
 
@@ -24,10 +24,13 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
 
   private Random random;
 
-  public ConcreteMessageDispatcher(Peer parentPeer) {
+  /**
+   * Inicia as threads da caixa de correio
+   * */
+  public CaixaCorreio(Peer parentPeer) {
     super(parentPeer);
 
-    this.parentPeer = parentPeer;
+    this.parent_peer = parentPeer;
     this.executor = Executors.newScheduledThreadPool(MSG_CORE_POOL_SIZE);
 
     this.backUpHandlers = new HashMap<>();
@@ -35,33 +38,33 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handleGETCHUNK(Message msg) {
-    Restore restore_enh = new Restore(parentPeer, msg);
+    Restore restore_enh = new Restore(parent_peer, msg);
     executor.execute(restore_enh);
   }
 
   private void handleDELETE(Message msg) {
-    parentPeer.get_database().addToFilesToDelete(msg.get_file_ID());
+    parent_peer.get_database().addToFilesToDelete(msg.get_file_ID());
 
-    Delete delete = new Delete(parentPeer, msg);
+    Delete delete = new Delete(parent_peer, msg);
     executor.execute(delete);
   }
 
   private void handleUP(Message msg) {
-    if (enhancements_compatible(parentPeer, msg, DELETE_ENH)) {
-      executor.execute(new DeleteEnhHelper(msg, parentPeer));
+    if (enhancements_compatible(parent_peer, msg, DELETE_ENH)) {
+      executor.execute(new DeleteEnhHelper(msg, parent_peer));
     }
   }
 
   private void handleDELETED(Message msg) {
-    Database database = parentPeer.get_database();
+    Database database = parent_peer.get_database();
 
-    if (enhancements_compatible(parentPeer, msg, DELETE_ENH)) {
+    if (enhancements_compatible(parent_peer, msg, DELETE_ENH)) {
       database.deleteFileMirror(msg.get_file_ID(), msg.get_Sender_ID());
     }
   }
 
   private void handleCHUNK(Message msg) {
-    Peer_Info peerData = parentPeer.get_peer_data();
+    Peer_Info peerData = parent_peer.get_peer_data();
 
     peerData.notify_chunk_observers(msg);
 
@@ -75,11 +78,11 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private void handlePUTCHUNK(Message msg) {
-    Database database = parentPeer.get_database();
+    Database database = parent_peer.get_database();
     database.removeFromFilesToDelete(msg.get_file_ID());
 
     if (database.hasChunk(msg.get_file_ID(), msg.get_Chunk_Numero())) {
-      // If chunk is backed up by parentPeer, notify
+      // If chunk is backed up by parent_peer, notify
       Map<Integer, Future> fileBackUpHandlers = backUpHandlers.get(msg.get_file_ID());
       if (fileBackUpHandlers == null) {
         return;
@@ -93,7 +96,7 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
       utilitarios.Notificacoes_Terminal.printNotificao("Stopping chunk back up, due to received PUTCHUNK");
     } else if (!database.hasBackedUpFileById(msg.get_file_ID())) {
       // If file is not a local file, Mirror/Backup ChunkData
-      Backup backup = new Backup(parentPeer, msg);
+      Backup backup = new Backup(parent_peer, msg);
       executor.execute(backup);
     } else {
       utilitarios.Notificacoes_Terminal.printNotificao("Ignoring PUTCHUNK of own file");
@@ -102,19 +105,19 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
 
   private void handleSTORED(Message msg) {
 
-    parentPeer.get_peer_data().notify_stored_observers(msg);
+    parent_peer.get_peer_data().notify_stored_observers(msg);
 
-    Database database = parentPeer.get_database();
+    Database database = parent_peer.get_database();
     if (database.hasChunk(msg.get_file_ID(), msg.get_Chunk_Numero())) {
       database.addChunkMirror(msg.get_file_ID(), msg.get_Chunk_Numero(), msg.get_Sender_ID());
     } else if (database.hasBackedUpFileById(msg.get_file_ID())) {
-      parentPeer.get_peer_data().inc_chunk_replic(msg.get_file_ID(), msg.get_Chunk_Numero());
+      parent_peer.get_peer_data().inc_chunk_replic(msg.get_file_ID(), msg.get_Chunk_Numero());
       database.addFileMirror(msg.get_file_ID(), msg.get_Sender_ID());
     }
   }
 
   private void handleREMOVED(Message msg) {
-    Database database = parentPeer.get_database();
+    Database database = parent_peer.get_database();
     String fileID = msg.get_file_ID();
     int chunkNo = msg.get_Chunk_Numero();
 
@@ -129,10 +132,10 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     int desiredReplication = chunkInfo.getReplicationDegree();
 
     if (perceivedReplication < desiredReplication) {
-      byte[] chunkData = parentPeer.load_chunk(fileID, chunkNo);
+      byte[] chunkData = parent_peer.load_chunk(fileID, chunkNo);
 
       Future handler = executor.schedule(
-          new RemovedChunkHelper(parentPeer, chunkInfo, chunkData),
+          new RemovedChunkHelper(parent_peer, chunkInfo, chunkData),
           this.random.nextInt(Utils.MAX_DELAY + 1),
           TimeUnit.MILLISECONDS
       );
@@ -142,17 +145,21 @@ public class ConcreteMessageDispatcher extends AbstractMessageDispatcher {
     }
   }
 
+  /**
+   * Configuração da caixa de correio
+   * Adiciona accoes para cada tipo de mensagem recebida
+   * */
   @Override
-  protected void setupMessageHandlers() {
-    addMessageHandler(PUTCHUNK, this::handlePUTCHUNK);
-    addMessageHandler(STORED, this::handleSTORED);
-    addMessageHandler(GETCHUNK, this::handleGETCHUNK);
-    addMessageHandler(ENH_GETCHUNK, this::handleGETCHUNK);
-    addMessageHandler(CHUNK, this::handleCHUNK);
-    addMessageHandler(REMOVED, this::handleREMOVED);
-    addMessageHandler(DELETE, this::handleDELETE);
-    addMessageHandler(DELETED, this::handleDELETED);
-    addMessageHandler(UP, this::handleUP);
+  protected void configuracao_mensagem_handlers() {
+    adiciona_handle_mensagem(PUTCHUNK, this::handlePUTCHUNK);
+    adiciona_handle_mensagem(STORED, this::handleSTORED);
+    adiciona_handle_mensagem(GETCHUNK, this::handleGETCHUNK);
+    adiciona_handle_mensagem(ENH_GETCHUNK, this::handleGETCHUNK);
+    adiciona_handle_mensagem(CHUNK, this::handleCHUNK);
+    adiciona_handle_mensagem(REMOVED, this::handleREMOVED);
+    adiciona_handle_mensagem(DELETE, this::handleDELETE);
+    adiciona_handle_mensagem(DELETED, this::handleDELETED);
+    adiciona_handle_mensagem(UP, this::handleUP);
   }
 
 }

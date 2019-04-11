@@ -4,94 +4,142 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+
 import service.Peer;
 
 
 /**
  * Vai ser os nossos CTT
- * */
-public abstract class AbstractMessageDispatcher implements Runnable {
+ */
+public abstract class CTTpostBox implements Runnable {
 
-  protected Peer parentPeer;
-  private BlockingQueue<Message> fila_mensagens_recebendo;
-  private Map<Message.Categoria_Mensagem, MessageHandler> map_message_handlers;
+    protected Peer parent_peer;
+    private BlockingQueue<Message> fila_mensagens_recebendo;
+    private Map<Message.Categoria_Mensagem, MessageHandler> map_message_handlers;
 
-  AbstractMessageDispatcher(Peer parentPeer) {
-    this.parentPeer = parentPeer;
+    /**
+     * Inicializacao
+     */
+    CTTpostBox(Peer parentPeer) {
+        this.parent_peer = parentPeer;
 
-    fila_mensagens_recebendo = new LinkedBlockingDeque<>();
-    map_message_handlers = new HashMap<>();
+        fila_mensagens_recebendo = new LinkedBlockingDeque<>();
+        map_message_handlers = new HashMap<>();
 
-    setupMessageHandlers();
-  }
-
-  // Template Method
-  protected abstract void setupMessageHandlers();
-
-  protected void addMessageHandler(Message.Categoria_Mensagem msgType, MessageHandler handler) {
-    map_message_handlers.put(msgType, handler);
-  }
-
-  protected void removeMessageHandler(Message.Categoria_Mensagem msgType) {
-    map_message_handlers.remove(msgType);
-  }
-
-  /**
-   * Descarta as mensagens que foram enviadas para ele próprio
-   * */
-  private void processamento_msg_inicial(Message message) {
-    //Ignoring invalid messages
-    if (message == null || message.get_Sender_ID() == parentPeer.get_ID()) {
-      return;
+        /**
+         * Configuracao dos filtros da caixa de correio
+         * */
+        configuracao_mensagem_handlers();
     }
 
-    utilitarios.Notificacoes_Terminal.printNotificao("Recetor: " + message.toString());
+    /**
+     * Remocao de um protocolo
+     * */
+    protected void removeMessageHandler(Message.Categoria_Mensagem mensagem_type) {
 
-    MessageHandler messageHandler = map_message_handlers.get(message.getType());
-    if (messageHandler != null) {
-      messageHandler.handle(message);
-    } else {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Received unregistered message");
+        map_message_handlers.remove(mensagem_type);
     }
-  }
 
-  /**
-   * Implements Runnable, logo corre quando lançada em thread
-   * Corre preenchendo a BlockingQueue com as mensagens que estão a chegar
-   * */
-  @Override
-  public void run() {
-    Message message;
-
-    while (true) {
-      try { // BlockingQueue.take() yields CPU until a message is available
-        message = fila_mensagens_recebendo.take();
-        processamento_msg_inicial(message);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+    /**
+     * Adicona protocolo
+     * */
+    protected void adiciona_handle_mensagem(Message.Categoria_Mensagem categoria_mensagem, MessageHandler handler) {
+        map_message_handlers.put(categoria_mensagem, handler);
     }
-  }
 
-  public void pushMessage(byte[] data, int length) {
-    Message msgParsed; // create and parse the message
+    /**
+     * Para ser overiding in CaixaCorreio
+     */
+    protected abstract void configuracao_mensagem_handlers();
 
-    try {
-      msgParsed = new Message(data, length);
-    } catch (Exception e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError(e.getMessage());
-      return;
+    /**
+     * Descarta as mensagens que foram enviadas para ele próprio e as invalidas
+     * Processa todas as outras
+     * @param message a analisar
+     */
+    private void processamento_msg_inicial(Message message) {
+        //Ignoring invalid messages
+        if (message == null || message.get_Sender_ID() == parent_peer.get_ID()) {
+            return;
+        }else {
+
+            utilitarios.Notificacoes_Terminal.printNotificao("Recetor: " + message.toString());
+
+            MessageHandler messageHandler = map_message_handlers.get(message.getType());
+            if (messageHandler != null) {
+                messageHandler.handle(message);
+            } else {
+                utilitarios.Notificacoes_Terminal.printMensagemError("Received unregistered message");
+            }
+        }
     }
-    fila_mensagens_recebendo.add(msgParsed);
 
-  }
+    /**
+     * Implements Runnable, logo corre quando lançada em thread
+     * Corre preenchendo a BlockingQueue com as mensagens que estão a chegar
+     */
+    @Override
+    public void run() {
+        Message message;
 
-  /**
-   * Interface a
-   * */
-  interface MessageHandler {
+        while (true) {
+            try { // BlockingQueue.take() yields CPU until a message is available
+                message = fila_mensagens_recebendo.take();
+                processamento_msg_inicial(message);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-    void handle(Message msg);
-  }
+    /**
+     * Envia a mensagem para a central de processamento Mensagem
+     *
+     * */
+    public void pushMessage(byte[] data, int length) {
+        Message mensagem_processada; // create and parse the message
+
+        try {
+            mensagem_processada = new Message(data, length);
+        } catch (Exception e) {
+            utilitarios.Notificacoes_Terminal.printMensagemError(e.getMessage());
+            return;
+        }
+        fila_mensagens_recebendo.add(mensagem_processada);
+
+    }
+
+    /**
+     * Interface a
+     */
+    interface MessageHandler {
+
+        void handle(Message msg);
+    }
+
+
+    public Peer getParent_peer() {
+        return parent_peer;
+    }
+
+    public void setParent_peer(Peer parent_peer) {
+        this.parent_peer = parent_peer;
+    }
+
+    public BlockingQueue<Message> getFila_mensagens_recebendo() {
+        return fila_mensagens_recebendo;
+    }
+
+    public void setFila_mensagens_recebendo(BlockingQueue<Message> fila_mensagens_recebendo) {
+        this.fila_mensagens_recebendo = fila_mensagens_recebendo;
+    }
+
+    public Map<Message.Categoria_Mensagem, MessageHandler> getMap_message_handlers() {
+        return map_message_handlers;
+    }
+
+    public void setMap_message_handlers(Map<Message.Categoria_Mensagem, MessageHandler> map_message_handlers) {
+        this.map_message_handlers = map_message_handlers;
+    }
 
 }

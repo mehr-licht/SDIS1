@@ -11,8 +11,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import protocols.Peer_Info;
 import protocols.initiators.*;
-import network.AbstractMessageDispatcher;
-import network.ConcreteMessageDispatcher;
+import network.CTTpostBox;
+import network.CaixaCorreio;
 import network.Message;
 import filesystem.Database;
 import filesystem.SystemManager;
@@ -35,7 +35,7 @@ public class Peer implements My_Interface_Remote {
   private final String protocol_version;
   private final int id;
 
-  private AbstractMessageDispatcher message_dispatcher;
+  private CTTpostBox message_dispatcher;
   private Map<ChannelType, Canal> channels;
 
   //serviço Executor service responsável pelo escalonamento das respostas e fazer todas as tarefas dos sub-protocolos RMI.
@@ -62,9 +62,12 @@ public class Peer implements My_Interface_Remote {
 
     system_manager = new SystemManager(this, MAX_SYSTEM_MEMORY);
     database = system_manager.getDatabase();
+
     setup_channels(mc_address, mdb_address, mdr_address);
     setup_message_handler();
+
     executor = new ScheduledThreadPoolExecutor(PEER_CORE_POOL_SIZE);
+
     send_UP_message();
 
     utilitarios.Notificacoes_Terminal.printAviso("peer " + id + " activo");
@@ -145,11 +148,11 @@ public class Peer implements My_Interface_Remote {
    */
   private void setup_message_handler() {
     peer_info = new Peer_Info();
-    message_dispatcher = new ConcreteMessageDispatcher(this);
+    message_dispatcher = new CaixaCorreio(this);
     new Thread(message_dispatcher).start();
   }
 
-  /**
+  /** TODO SEPARA OS CANAIS
    * Cria os canais de comunicação e inicia as suas threads -> Um protocolo por cada thread
    * @param mc_address endereço do canal de controle
    * @param mdb_address endereço do canal do backup de dados
