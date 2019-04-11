@@ -6,17 +6,21 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import service.Peer;
 
+
+/**
+ * Vai ser os nossos CTT
+ * */
 public abstract class AbstractMessageDispatcher implements Runnable {
 
   protected Peer parentPeer;
-  private BlockingQueue<Message> msgQueue;
-  private Map<Message.Categoria_Mensagem, MessageHandler> messageHandlers;
+  private BlockingQueue<Message> fila_mensagens_recebendo;
+  private Map<Message.Categoria_Mensagem, MessageHandler> map_message_handlers;
 
   AbstractMessageDispatcher(Peer parentPeer) {
     this.parentPeer = parentPeer;
 
-    msgQueue = new LinkedBlockingDeque<>();
-    messageHandlers = new HashMap<>();
+    fila_mensagens_recebendo = new LinkedBlockingDeque<>();
+    map_message_handlers = new HashMap<>();
 
     setupMessageHandlers();
   }
@@ -25,37 +29,44 @@ public abstract class AbstractMessageDispatcher implements Runnable {
   protected abstract void setupMessageHandlers();
 
   protected void addMessageHandler(Message.Categoria_Mensagem msgType, MessageHandler handler) {
-    messageHandlers.put(msgType, handler);
+    map_message_handlers.put(msgType, handler);
   }
 
   protected void removeMessageHandler(Message.Categoria_Mensagem msgType) {
-    messageHandlers.remove(msgType);
+    map_message_handlers.remove(msgType);
   }
 
-  private void dispatchMessage(Message msg) {
+  /**
+   * Descarta as mensagens que foram enviadas para ele próprio
+   * */
+  private void processamento_msg_inicial(Message message) {
     //Ignoring invalid messages
-    if (msg == null || msg.get_Sender_ID() == parentPeer.get_ID()) {
+    if (message == null || message.get_Sender_ID() == parentPeer.get_ID()) {
       return;
     }
 
-    utilitarios.Notificacoes_Terminal.printNotificao("Recetor: " + msg.toString());
+    utilitarios.Notificacoes_Terminal.printNotificao("Recetor: " + message.toString());
 
-    MessageHandler handler = messageHandlers.get(msg.getType());
-    if (handler != null) {
-      handler.handle(msg);
+    MessageHandler messageHandler = map_message_handlers.get(message.getType());
+    if (messageHandler != null) {
+      messageHandler.handle(message);
     } else {
       utilitarios.Notificacoes_Terminal.printMensagemError("Received unregistered message");
     }
   }
 
+  /**
+   * Implements Runnable, logo corre quando lançada em thread
+   * Corre preenchendo a BlockingQueue com as mensagens que estão a chegar
+   * */
   @Override
   public void run() {
-    Message msg;
+    Message message;
 
     while (true) {
       try { // BlockingQueue.take() yields CPU until a message is available
-        msg = msgQueue.take();
-        dispatchMessage(msg);
+        message = fila_mensagens_recebendo.take();
+        processamento_msg_inicial(message);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -71,10 +82,13 @@ public abstract class AbstractMessageDispatcher implements Runnable {
       utilitarios.Notificacoes_Terminal.printMensagemError(e.getMessage());
       return;
     }
-    msgQueue.add(msgParsed);
+    fila_mensagens_recebendo.add(msgParsed);
 
   }
 
+  /**
+   * Interface a
+   * */
   interface MessageHandler {
 
     void handle(Message msg);
