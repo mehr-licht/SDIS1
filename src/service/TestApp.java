@@ -82,7 +82,7 @@ public class TestApp implements Runnable {
      * Inicia uma thread com o serviço pedido
      *
      * @param args    [1] (BACKUP | RESTORE | DELETE | RECLAIM | STATE)[ENH]
-     * @param args    [2]  pathname of the file case ou number Kbytes
+     * @param args    [2]  pathname of the file case ou number Bytes
      * @param peer_ap ponto de acesso do peer
      */
     private static void start_thread(String[] args, String[] peer_ap) {
@@ -189,24 +189,19 @@ public class TestApp implements Runnable {
      */
     private void handle_restore() {
         utilitarios.Notificacoes_Terminal.printNotificao("A restaurar o ficheiro \"" + opnd_1 + "\"");
-        System.out.println("handleRestore do restore 00");
         try {
-            System.out.println("handleRestore do restore 01");
             stub.restore(opnd_1);
-            System.out.println("handleRestore do restore 02");
         } catch (RemoteException e) {
             utilitarios.Notificacoes_Terminal.printMensagemError("Exceção de Cliente: " + e.toString());
         }
-        System.out.println("handleRestore do restore 03");
     }
 
     /**
      * handler do sub-protocolo RECLAIM
-     * Usa int em Kbytes
+     * Usa int em Bytes
      */
     private void handle_reclaim() {
         utilitarios.Notificacoes_Terminal.printNotificao("A recuperar espaço em disco: \"" + opnd_1 + "\"");
-
         try {
             stub.reclaim(Integer.parseInt(opnd_1));
         } catch (RemoteException e) {
