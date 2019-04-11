@@ -8,8 +8,8 @@ import service.Peer;
  * */
 public class MDB extends Canal {
 
-  public MDB(Peer parentPeer, String mcastAddr, String mcastPort) {
-    super(parentPeer, mcastAddr, mcastPort);
+  public MDB( String endereco_multicast, String porta_multicast, Peer peer) {
+    super( endereco_multicast, porta_multicast, peer);
     utilitarios.Notificacoes_Terminal.printNotificao("Canal de backup (MDB) activo");
   }
 }

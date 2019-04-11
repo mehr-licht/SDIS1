@@ -8,8 +8,8 @@ import service.Peer;
  * */
 public class MDR extends Canal {
 
-  public MDR(Peer parentPeer, String mcastAddr, String mcastPort) {
-    super(parentPeer, mcastAddr, mcastPort);
+  public MDR( String endereco_multicast, String porta_multicast, Peer peer) {
+    super( endereco_multicast, porta_multicast,peer);
     utilitarios.Notificacoes_Terminal.printNotificao("Canal MDR - restore activo");
   }
 }

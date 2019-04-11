@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-import jdk.jshell.execution.Util;
 import service.Peer;
 import utilitarios.Utils;
 
@@ -15,34 +14,34 @@ import utilitarios.Utils;
 public abstract class Canal implements Runnable {
 
 
-    private MulticastSocket socket;
-    private InetAddress mcastAddr;
-    private int mcastPort;
-    private Peer parentPeer;
+    private MulticastSocket multicast_socket;
+    private InetAddress multicast_address;
+    private int multicast_port;
+    private Peer parent_peer;
 
     /**
      * Criação dos canais de comunicação
-     * Join multicast group
-     * @param parentPeer peer criado dos 3 canais de comunicação
+     * Cria e Join multicast group
+     * @param peer peer criado dos 3 canais de comunicação
      * @param mcastAddr
      * @param mcastPort
-     * */
-    public Canal(Peer parentPeer, String mcastAddr, String mcastPort) {
-        this.parentPeer = parentPeer;
+     */
+    public Canal( String mcastAddr, String mcastPort, Peer peer) {
+        this.parent_peer = peer;
 
         try {
-            this.mcastAddr = InetAddress.getByName(mcastAddr);
-            this.mcastPort = Integer.parseInt(mcastPort);
+            this.multicast_address = InetAddress.getByName(mcastAddr);
+            this.multicast_port = Integer.parseInt(mcastPort);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         try {
             //Inicializacao do multicast
-            socket = new MulticastSocket(this.mcastPort);
-            socket.setTimeToLive(Utils.TTL);
+            multicast_socket = new MulticastSocket(this.multicast_port);
+            multicast_socket.setTimeToLive(Utils.TTL);
             //join do group como na LAB
-            socket.joinGroup(this.mcastAddr);
+            multicast_socket.joinGroup(this.multicast_address);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,7 +52,7 @@ public abstract class Canal implements Runnable {
     /**
      * Implementa a classe Runnable. Assim que a thread é lançada faz o run()
      * Os 3 canais de comunicação ficam à escuta por mensages que serão reenviadas para o peer
-     * */
+     */
     @Override
     public void run() {
 
@@ -64,8 +63,8 @@ public abstract class Canal implements Runnable {
         while (true) {
 
             try { // blocking method
-                this.socket.receive(packet);
-                this.parentPeer.add_msg_to_handler(packet.getData(), packet.getLength());
+                this.multicast_socket.receive(packet);
+                this.parent_peer.add_msg_to_handler(packet.getData(), packet.getLength());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -73,19 +72,62 @@ public abstract class Canal implements Runnable {
         }
     }
 
-
-    synchronized public void sendMessage(byte[] message) throws IOException {
-
-        DatagramPacket packet = new DatagramPacket(message, message.length, mcastAddr, mcastPort);
-        socket.send(packet);
-    }
-
-    public void close() {
-        socket.close();
-    }
-
+    /**
+     * Tipos de canais
+     * */
     public enum ChannelType {
         MC, MDB, MDR
     }
 
+
+    synchronized public void sendMessage(byte[] message) throws IOException {
+
+        DatagramPacket packet = new DatagramPacket(message, message.length, multicast_address, multicast_port);
+        multicast_socket.send(packet);
+    }
+
+
+    /**
+     * Fecha a multicast_socket do multicast
+     * */
+    public void close() {
+
+        multicast_socket.close();
+    }
+
+
+    /**
+     * Gets and Setters
+     */
+    public MulticastSocket getMulticast_socket() {
+        return multicast_socket;
+    }
+
+    public void setMulticast_socket(MulticastSocket multicast_socket) {
+        this.multicast_socket = multicast_socket;
+    }
+
+    public InetAddress getMulticast_address() {
+        return multicast_address;
+    }
+
+    public void setMulticast_address(InetAddress multicast_address) {
+        this.multicast_address = multicast_address;
+    }
+
+    public int getMulticast_port() {
+        return multicast_port;
+    }
+
+    public void setMulticast_port(int multicast_port) {
+        this.multicast_port = multicast_port;
+    }
+
+    public Peer getParent_peer() {
+        return parent_peer;
+    }
+
+    public void setParent_peer(Peer parent_peer) {
+        this.parent_peer = parent_peer;
+    }
 }

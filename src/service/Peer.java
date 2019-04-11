@@ -156,9 +156,9 @@ public class Peer implements My_Interface_Remote {
    * @param mdr_address endereço do canal do restore de dados
    */
   private void setup_channels(String[] mc_address, String[] mdb_address, String[] mdr_address) {
-    Canal mc = new MC(this, mc_address[0], mc_address[1]);
-    Canal mdb = new MDB(this, mdb_address[0], mdb_address[1]);
-    Canal mdr = new MDR(this, mdr_address[0], mdr_address[1]);
+    Canal mc = new MC( mc_address[0], mc_address[1], this);
+    Canal mdb = new MDB( mdb_address[0], mdb_address[1],this);
+    Canal mdr = new MDR( mdr_address[0], mdr_address[1],this);
 
     new Thread(mc).start();
     new Thread(mdb).start();
