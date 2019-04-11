@@ -36,52 +36,38 @@ public class RestoreInit implements Runnable {
    * @param parent_peer
    */
   public RestoreInit(String version, String file_path, Peer parent_peer) {
-System.out.println("construtor do restoreInit 00");
     this.version = version;
     this.file_path = file_path;
     this.parent_peer = parent_peer;
-    System.out.println("construtor do restoreInit 01");
     file_info = parent_peer.get_database().getFileInfoByPath(file_path);
-    System.out.println("construtor do restoreInit 02");
     utilitarios.Notificacoes_Terminal.printAviso("A começar o restore na fonte");
   }
 
   /** Lançamento do stateInit */
   @Override
   public void run() {
-    System.out.println("run do restoreInit 00");
     if (file_info == null) {
       utilitarios.Notificacoes_Terminal.printMensagemError(
           "Ficheiro para restaurar não encontrado");
       return;
     }
-    System.out.println("run do restoreInit 01");
     parent_peer.set_restoring(true, file_info.getFileID());
-    System.out.println("run do restoreInit 02");
     if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
       initialize_TCP_server();
     }
-    System.out.println("run do restoreInit 03");
     //send_getchunk();
     getChunk();
-    System.out.println("run do restoreInit 04");
     while (!parent_peer.has_restore_finished(file_path, file_info.getFileID())) {
       Thread.yield();
     }
-    System.out.println("run do restoreInit 05");
     if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
       close_TCP_server();
     }
-    System.out.println("run do restoreInit 06");
     utilitarios.Notificacoes_Terminal.printAviso("Todos os chunks recebidos");
-    System.out.println("run do restoreInit 07");
     ConcurrentMap<Integer, ChunkData> chunksRestored =
         parent_peer.get_peer_data().get_restored_chunk_id(file_info.getFileID());
-    System.out.println("run do restoreInit 08");
     String pathToSave = parent_peer.get_path("restored");
-    System.out.println("run do restoreInit 09");
     save_restores(pathToSave, chunksRestored);
-    System.out.println("run do restoreInit 10");
     parent_peer.set_restoring(false, file_info.getFileID());
     utilitarios.Notificacoes_Terminal.printAviso("Acabou o restauro na fonte");
   }
@@ -111,22 +97,14 @@ System.out.println("construtor do restoreInit 00");
    * Envia GETCHUNK para o canal multicast
    */
   private void getChunk() {
-    System.out.println("getchunk do restore 00");
     // Send GETCHUNK to MC
     for (int i = 0; i < file_info.getNumChunks(); i++) {
-      System.out.println("getchunk do restore 01");
       if (isPeerCompatibleWithEnhancement(RESTORE_ENH, parent_peer)) {
-        System.out.println("getchunk do restore 02");
         send_message(Message.Categoria_Mensagem.ENH_GETCHUNK, i);
-        System.out.println("getchunk do restore 03");
       } else {
-        System.out.println("getchunk do restore 04");
         send_message(Message.Categoria_Mensagem.GETCHUNK, i);
-        System.out.println("getchunk do restore 05");
       }
-      System.out.println("getchunk do restore 06");
     }
-    System.out.println("getchunk do restore 07");
   }
 
   private void sendMessageToMC(Message.Categoria_Mensagem type, int chunkNo) {
@@ -191,7 +169,6 @@ System.out.println("construtor do restoreInit 00");
    * @param chunk_No numero do chunk
    */
   private void send_message(Categoria_Mensagem type, int chunk_No) {
-    System.out.println("send_msg do restore 00");
     String[] args = {
       version,
       Integer.toString(parent_peer.get_ID()),
@@ -199,11 +176,8 @@ System.out.println("construtor do restoreInit 00");
       "chk" + chunk_No,
       Integer.toString(parent_peer.get_ID() + TCPSERVER_PORT)
     };
-    System.out.println("send_msg do restore 01");
     Message msg = new Message(type, args);
-    System.out.println("send_msg do restore 02");
     send_msg_MC(msg);
-    System.out.println("send_msg 03");
   }
 
   /**
@@ -212,16 +186,11 @@ System.out.println("construtor do restoreInit 00");
    * @param msg datagrama
    */
   private void send_msg_MC(Message msg) {
-    System.out.println("send_msg_MC do restore 00");
     try {
-      System.out.println("send_msg_MC do restore 01");
       parent_peer.send_message(msg, Canal.ChannelType.MC);
-      System.out.println("send_msg_MC do restore 02");
     } catch (IOException e) {
-      System.out.println("send_msg_MC do restore 03");
       utilitarios.Notificacoes_Terminal.printMensagemError(
           "Não foi possível enviar para o canal multicast");
     }
-    System.out.println("send_msg_MC do restore 04");
   }
 }

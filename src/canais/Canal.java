@@ -21,7 +21,11 @@ public abstract class Canal implements Runnable {
     private Peer parentPeer;
 
     /**
-     * Constructor dos canais
+     * Criação dos canais de comunicação
+     * Join multicast group
+     * @param parentPeer peer criado dos 3 canais de comunicação
+     * @param mcastAddr
+     * @param mcastPort
      * */
     public Canal(Peer parentPeer, String mcastAddr, String mcastPort) {
         this.parentPeer = parentPeer;
@@ -47,7 +51,8 @@ public abstract class Canal implements Runnable {
 
 
     /**
-     * Override do Runnable, Executada por thread
+     * Implementa a classe Runnable. Assim que a thread é lançada faz o run()
+     * Os 3 canais de comunicação ficam à escuta por mensages que serão reenviadas para o peer
      * */
     @Override
     public void run() {
@@ -67,6 +72,7 @@ public abstract class Canal implements Runnable {
 
         }
     }
+
 
     synchronized public void sendMessage(byte[] message) throws IOException {
 

@@ -58,52 +58,28 @@ public class Message implements Serializable {
 
   /** Constructor 2/3 para enviar mensagens sem corpo */
   public Message(Categoria_Mensagem type, String[] args) {
-    System.out.println("construtor mmsg do restore 00");
     this.type = type;
     version = args[0];
     senderID = Integer.parseInt(args[1]);
-    System.out.println("construtor mmsg do restore 01");
     if (type == Categoria_Mensagem.UP) {
-      System.out.println("construtor mmsg do restore 01111");
       return;
     }
-    System.out.println("construtor mmsg do restore 02");
     fileID = args[2];
-    System.out.println("construtor mmsg do restore 03_1");
-    System.out.println("construtor mmsg do restore 03: args " + args[3]);
-    System.out.println("construtor mmsg do restore 03_2");
-
-    System.out.println("construtor mmsg do restore 03_3");
     if (type != Categoria_Mensagem.DELETE && type != Categoria_Mensagem.DELETED) {
-      System.out.println("construtor mmsg do restore 03: args " + args[0]);
-      System.out.println("construtor mmsg do restore 03: args " + args[1]);
-      System.out.println("construtor mmsg do restore 03: args " + args[2]);
-      System.out.println("construtor mmsg do restore 03: args " + args[3]);
       if (type == Categoria_Mensagem.GETCHUNK || type == Categoria_Mensagem.ENH_GETCHUNK) {
           String tmp = (args[3]).substring(3);
-        System.out.println("construtor mmsg do restore 03: tmp " + tmp);
         chunkNo = Integer.parseInt(tmp);
-        System.out.println("construtor mmsg do restore 03: args[3] " + args[3]);
-        System.out.println("construtor mmsg do restore 03: chunkNo " + tmp);
       }else{
           chunkNo = Integer.parseInt(args[3]);
       }
-      System.out.println("construtor mmsg do restore 03333");
     }
     if (type == Categoria_Mensagem.PUTCHUNK) {
-      System.out.println("construtor mmsg do restore 04");
       replicationDegree = Integer.parseInt(args[4]);
-      System.out.println("construtor mmsg do restore 05");
     }
-    System.out.println("construtor mmsg do restore 06");
     if (type == Categoria_Mensagem.ENH_GETCHUNK) {
-      System.out.println("construtor mmsg do restore 07");
       mTCPPort = Integer.parseInt(args[4]);
-      System.out.println("construtor mmsg do restore 08");
       mTCPHost = get_IPv4_address();
-      System.out.println("construtor mmsg do restore 09");
     }
-    System.out.println("construtor mmsg do restore 10");
   }
 
   /** Constructor pra enviar mensagens com corpo */
