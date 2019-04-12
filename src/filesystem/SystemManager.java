@@ -48,7 +48,7 @@ public class SystemManager {
     try {
       Files.createDirectories(Paths.get(name));
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't create file directory!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Directorio nao criado");
     }
   }
 
@@ -67,7 +67,7 @@ public class SystemManager {
       input_stream = Files.newInputStream(Paths.get(pathname));
       file_size = get_file_size(Paths.get(pathname));
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("File not found!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Erro no File nao encontrado");
       return null;
     }
 
@@ -77,7 +77,7 @@ public class SystemManager {
       input_stream.read(data);
       input_stream.close();
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't read data of a file!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Erro ao ler data ");
     }
 
     return data;
@@ -95,7 +95,7 @@ public class SystemManager {
     try {
       attr = Files.readAttributes(filepath, BasicFileAttributes.class);
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't read attributes of a file!");
+      utilitarios.Notificacoes_Terminal.printMensagemError("Erro na leitura dos atributos");
     }
     return attr.size();
   }
@@ -345,7 +345,7 @@ public class SystemManager {
     try {
       Files.delete(path);
     } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't delete file: " + path);
+      utilitarios.Notificacoes_Terminal.printMensagemError("Erro na remocao do file: " + path);
     }
   }
 

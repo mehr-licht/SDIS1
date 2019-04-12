@@ -24,7 +24,7 @@ public abstract class AuxMemAdmin implements Serializable {
         inputStream.close();
         fileIn.close();
     }catch (Exception e){
-        utilitarios.Notificacoes_Terminal.printMensagemError("Erro AuxMemAdmin closing file");
+        utilitarios.Notificacoes_Terminal.printMensagemError("Erro AuxMemAdmin no close file");
 
     }
 

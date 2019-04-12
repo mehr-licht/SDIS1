@@ -26,7 +26,7 @@ public class ChunkData extends BaseChunk {
     this(file_ID, chunk_No, data);
     set_replication_degree(replication_degree);
 
-    utilitarios.Notificacoes_Terminal.printNotificao("Created CHUNK " + file_ID + " @" + chunk_No);
+    utilitarios.Notificacoes_Terminal.printNotificao("Criado CHUNK " + file_ID + " @" + chunk_No);
   }
 
   /**
