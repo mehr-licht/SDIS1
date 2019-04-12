@@ -104,7 +104,7 @@ public class SystemManager {
 
     for (int i = 0; i < chunks.size(); i++) {
       try {
-        outputStream.write(chunks.get(i).getData());
+        outputStream.write(chunks.get(i).get_data());
       } catch (IOException e) {
         utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't merge chunks of a file!");
       }

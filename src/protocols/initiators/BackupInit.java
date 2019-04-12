@@ -158,7 +158,7 @@ public class BackupInit implements Runnable {
     for (int i = 0; i < chunks.size(); i++) {
       ChunkData chunk = chunks.get(i);
       chunk_info_array[i] = new ChunkInfo(file_ID, chunk.get_chunk_No(), chunk.get_replication_degree(),
-          chunk.getSize());
+          chunk.get_size());
     }
     parent_peer.get_database()
         .addRestorableFile(new FileInfo(pathname, file_ID, replic_degree, chunk_info_array));
