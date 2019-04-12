@@ -40,12 +40,20 @@ public class StateInit implements Runnable {
 
     // Storage capacity
     MemoryManager mm = parent_peer.get_system_manager().getMemoryManager();
+   /* long available=  mm.getMaxMemory() - mm.getUsedMemory();
+    System.out.println("mem:"+mm.getMemory());
+    System.out.println("max:"+mm.getMaxMemory());
+    System.out.println("used:"+mm.getUsedMemory());
+    System.out.println("avail:"+mm.getAvailableMemory());
+*/
     out +=
         "\n\nStorage: "
-            + "\n Available memory: "
-            + mm.getAvailableMemory()
+            + "\n Total memory: "
+            + mm.getMaxMemory()
             + "\n Used memory: "
-            + mm.getUsedMemory();
+            + mm.getUsedMemory()
+            + "\n Available memory: "
+            + mm.getAvailableMemory();
 
     System.out.println(out); // TODO: enviar para o TestApp
     utilitarios.Notificacoes_Terminal.printAviso("Terminou o pedido de Estado na fonte");

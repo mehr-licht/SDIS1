@@ -70,6 +70,7 @@ public class ReclaimInit implements Runnable {
     };
 
     Message msg = new Message(Message.Categoria_Mensagem.REMOVED, args);
+
     send_msg(msg);
   }
 

@@ -58,6 +58,7 @@ public class Delete implements Runnable {
     Map<Integer, ChunkInfo> chunkMap = database.removeChunksBackedUpByFileID(file_ID);
     Collection<ChunkInfo> chunks = chunkMap.values();
     for (ChunkInfo chunk : chunks) {
+
       parent_peer.get_system_manager().deleteChunk(chunk.getFileID(), chunk.getChunkNo());
     }
   }

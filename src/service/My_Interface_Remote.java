@@ -28,7 +28,7 @@ public interface My_Interface_Remote extends Remote {
   void delete(String pathname) throws RemoteException;
 
   /**
-   * Space numeber in Kbytes
+   * Space numeber in bytes
    * */
   void reclaim(int space) throws RemoteException;
 

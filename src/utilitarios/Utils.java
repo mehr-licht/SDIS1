@@ -264,12 +264,9 @@ public class Utils {
    * @return verdadeiro ou falso
    */
   public static boolean enhancement_compatible_peer(Peer peer, String enhanced_version) {
-    System.out.println("enh_compat do restore 00");
     if (peer.get_version().equals(ENHANCEMENTS) || peer.get_version().equals(enhanced_version)) {
-      System.out.println("enh_compat do restore 01");
       return true;
     } else {
-      System.out.println("enh_compat do restore 02");
       return false;
     }
 

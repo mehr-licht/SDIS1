@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 ##mudar teste rmi para rebind [NAO SEI SE NO SCRIPT SE NO tESTApp
 
@@ -9,7 +9,7 @@ confirm(){
 #wait for yes to continue or exit to exit...
 read -p "Continue (y)es/(n)o/(e)exit?" choice
 
-while [ $choice != "y" ] || [ $choice != "Y" ]
+while [ $choice != "y" ] 
 do
 case "$choose" in
   [eE]) exit 0;;
@@ -134,8 +134,11 @@ echo " "
 echo " "
 $(state_confirm)
 echo " "
-exit 0
 ######################################delete test
+echo " "
+echo " "
+echo ">>>>>>>>>>>> SE CONFIRMAR QUE QUER CONTINUAR VAI APAGAR O FICHEIRO stf.txt - É APENAS UM Olá Mundo - é facilmente refeito <<<<<<<<<<<<<<"
+$(confirm)
 echo " "
 echo " "
 echo "%%%%%%%%%%%%%%%%%%%%%% delete "files/stf.txt" from 1 %%%%%%%%%%%%%%%%%%%%%%"

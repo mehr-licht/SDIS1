@@ -113,6 +113,7 @@ public class Database extends PermanentStateClass {
 
   // chunksBackedUp
   public boolean hasChunk(String fileID, int chunkNo) {
+
     Map<Integer, ChunkInfo> fileChunks = chunksBackedUp.get(fileID);
 
     return fileChunks != null && fileChunks.containsKey(chunkNo);
@@ -138,6 +139,7 @@ public class Database extends PermanentStateClass {
   }
 
   public void removeChunk(String fileID, int chunkNo) {
+
     if (!chunksBackedUp.containsKey(fileID)) {
       return;
     }
@@ -194,6 +196,7 @@ public class Database extends PermanentStateClass {
   }
 
   public Integer getChunkPerceivedReplication(String fileID, int chunkNo) {
+
     int ret;
     try {
       ret = chunksBackedUp.get(fileID).get(chunkNo).getNumMirrors();
@@ -244,12 +247,5 @@ public class Database extends PermanentStateClass {
 
     return mostBackedUpChunk;
   }
-
-  @SuppressWarnings("deprecation")
-   @Override
-  protected void finalize() throws Throwable {
-    savePermanentState();
-    super.finalize();
-  } 
 
 }

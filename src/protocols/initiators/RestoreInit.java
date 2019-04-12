@@ -130,21 +130,13 @@ public class RestoreInit implements Runnable {
   }
   /*
   private void send_getchunk() {
-    System.out.println("get_chunk do restore 00");
     for (int i = 0; i < file_info.getNumChunks(); i++) {
-      System.out.println("get_chunk do restore 01");
       if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
-        System.out.println("get_chunk do restore 02");
         send_message(Categoria_Mensagem.ENH_GETCHUNK, i);
-        System.out.println("get_chunk do restore 03");
       } else {
-        System.out.println("get_chunk do restore 04");
         send_message(Categoria_Mensagem.GETCHUNK, i);
-        System.out.println("get_chunk do restore 05");
       }
-      System.out.println("get_chunk do restore 06");
     }
-    System.out.println("get_chunk do restore 07");
   }*/
 
   /**

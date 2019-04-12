@@ -110,6 +110,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
    */
   private void handle_enhanced_request(String file_ID, int chunk_No, byte[] chunk_data,
       String chunk_path, int replication_degree) {
+
     parent_peer.get_peer_data().add_stored_observer(this);
 
     create_handler(file_ID, chunk_No, chunk_data, chunk_path, replication_degree);

@@ -245,25 +245,18 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void restore(String pathname) {
-    System.out.println("peer do restore 00");
     final Future handler;
 
     handler = executor.submit(new RestoreInit(protocol_version, pathname, this));
 
-System.out.println("peer do restore 01");
     executor.schedule(() -> {
-          System.out.println("peer do restore 02");//Não faz nada cá dentro
           if (handler.cancel(true)) {
-            System.out.println("peer do restore 03");
             utilitarios.Notificacoes_Terminal.printAviso("o restore_initiator foi terminado devido a falta de chunks.");
           }else{
-            System.out.println("peer restore 04");
-            System.out.println("pathname="+pathname);
           }
 
         },
         20,TimeUnit.SECONDS);
-    System.out.println("peer do restore 05");
   }
 
   /**
@@ -279,7 +272,7 @@ System.out.println("peer do restore 01");
   /**
    * Recupera espaço em disco
    *
-   * @param space espaço a ser recuperado
+   * @param space espaço que se quer libertar
    */
   @Override
   public void reclaim(int space) {
@@ -422,7 +415,6 @@ System.out.println("peer do restore 01");
    * @return versão do protocolo
    */
   public String get_version() {
-    System.out.println("get_version do restore 00");
     return protocol_version;
   }
 }

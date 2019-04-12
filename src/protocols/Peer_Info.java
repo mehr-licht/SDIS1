@@ -186,6 +186,7 @@ public class Peer_Info {
    * @return grau de replicação após o incremento
    */
   public Integer inc_chunk_replic(String file_ID, int chunk_No) {
+
     if (!received_stores.containsKey(file_ID)) {
       utilitarios.Notificacoes_Terminal.printAviso("inc_chunk_replic não encontrou: " + file_ID);
       return null;

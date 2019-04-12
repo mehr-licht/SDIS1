@@ -32,23 +32,16 @@ public class TestApp implements Runnable {
      * @param opnd_2    operando 2 do serviço a executar
      */
     public TestApp(String[] peer_ap, String operation, String opnd_1, String opnd_2) {
-        System.out.println("construtor testApp do restore 00");
         this.peer_ap = peer_ap;
         this.operation = operation;
         this.opnd_1 = opnd_1;
         this.opnd_2 = opnd_2;
 
-
-
         service_handlers = new HashMap<>();
         service_handlers.put("BACKUP", this::handle_backup);
-        System.out.println("testApp do restore --00");
         service_handlers.put("STATE", this::handle_state);
-        System.out.println("testApp do restore -00");
         service_handlers.put("DELETE", this::handle_delete);
-        System.out.println("testApp do restore 00");
         service_handlers.put("RESTORE", this::handle_restore);
-        System.out.println("testApp do restore 01");
         service_handlers.put("RECLAIM", this::handle_reclaim);
     }
 
@@ -73,9 +66,7 @@ public class TestApp implements Runnable {
         if (peer_ap == null) {
             return;
         }
-        System.out.println("main testApp do restore 00");
         start_thread(args, peer_ap);
-        System.out.println("main testApp do restore 99");
     }
 
     /**
@@ -91,9 +82,7 @@ public class TestApp implements Runnable {
         String operand2 = get_operand(args, 2);
 
         TestApp app = new TestApp(peer_ap, operation_, operand1, operand2);
-        System.out.println("main testApp do restore 01");
         new Thread(app).start();
-        System.out.println("main testApp do restore 02");
     }
 
     /**
@@ -136,9 +125,7 @@ public class TestApp implements Runnable {
     @Override
     public void run() {
         initiate_RMI_stub();
-        System.out.println("run testApp do restore 00");
         service_handlers.get(operation).run();
-        System.out.println("run testApp do restore 01");
     }
 
     /**

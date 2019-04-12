@@ -66,9 +66,10 @@ public class Message implements Serializable {
     }
     fileID = args[2];
     if (type != Categoria_Mensagem.DELETE && type != Categoria_Mensagem.DELETED) {
-      if (type == Categoria_Mensagem.GETCHUNK || type == Categoria_Mensagem.ENH_GETCHUNK) {
+      if (type == Categoria_Mensagem.GETCHUNK || type == Categoria_Mensagem.ENH_GETCHUNK || type == Categoria_Mensagem.REMOVED) {
           String tmp = (args[3]).substring(3);
         chunkNo = Integer.parseInt(tmp);
+
       }else{
           chunkNo = Integer.parseInt(args[3]);
       }
@@ -129,12 +130,10 @@ public class Message implements Serializable {
         numberArgs = 5;
         break;
       case "GETCHUNK":
-        System.out.println("recebeu GETCHUNK do restore");
         type = Categoria_Mensagem.GETCHUNK;
         numberArgs = 5;
         break;
       case "CHUNK":
-        System.out.println("recebeu CHUNK do restore");
         type = Categoria_Mensagem.CHUNK;
         numberArgs = 5;
         break;

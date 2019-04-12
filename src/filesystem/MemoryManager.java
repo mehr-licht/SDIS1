@@ -22,6 +22,10 @@ public class MemoryManager extends PermanentStateClass {
     return this.usedMemory;
   }
 
+  public long getMaxMemory() {
+    return this.maxMemory;
+  }
+
   public long getAvailableMemory() {
     return maxMemory - usedMemory;
   }
