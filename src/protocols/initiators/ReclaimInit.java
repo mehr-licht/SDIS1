@@ -2,7 +2,7 @@ package protocols.initiators;
 
 import canais.Canal;
 import filesystem.ChunkInfo;
-import filesystem.MemoryManager;
+import filesystem.MemoryAdmin;
 import filesystem.SystemManager;
 import java.io.IOException;
 import network.Message;
@@ -27,7 +27,7 @@ public class ReclaimInit implements Runnable {
   /** Lançamento do reclaimInit */
   @Override
   public void run() {
-    MemoryManager memory_mgr = systemManager.get_memory_manager();
+    MemoryAdmin memory_mgr = systemManager.get_memory_manager();
     remove_chunks(memory_mgr);
 
     utilitarios.Notificacoes_Terminal.printNotificao("Memória disponível: " + memory_mgr.getAvailableMemory());
@@ -39,7 +39,7 @@ public class ReclaimInit implements Runnable {
    *
    * @param mem_mgr gerenciador de memória
    */
-  private void remove_chunks(MemoryManager mem_mgr) {
+  private void remove_chunks(MemoryAdmin mem_mgr) {
     while (mem_mgr.getAvailableMemory() < 0) {
       utilitarios.Notificacoes_Terminal.printNotificao("Memória disponível: " + mem_mgr.getAvailableMemory());
       ChunkInfo chunk_info = systemManager.get_database().getChunkForRemoval();

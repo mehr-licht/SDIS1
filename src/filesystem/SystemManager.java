@@ -22,7 +22,7 @@ public class SystemManager {
   private Peer parent_peer;
   private String root_path;
   private Database database;
-  private MemoryManager memoryManager;
+  private MemoryAdmin memoryManager;
 
   /**
    * construtor de SystemManager
@@ -216,9 +216,9 @@ public class SystemManager {
     File mm = new File(root_path + "memoryManager");
 
     if (mm.exists()) {
-      this.memoryManager = (MemoryManager) MemoryManager.loadFromFile(mm);
+      this.memoryManager = (MemoryAdmin) MemoryAdmin.loadFromFile(mm);
     } else {
-      this.memoryManager = new MemoryManager(max_memory, mm.getAbsolutePath());
+      this.memoryManager = new MemoryAdmin( mm.getAbsolutePath(),max_memory);
     }
   }
 
@@ -262,7 +262,7 @@ public class SystemManager {
     out.write(data);
     out.close();
 
-    memoryManager.increaseUsedMemory(data.length);
+    memoryManager.increase_peer_memory(data.length);
     return SAVE_STATE.SUCCESS;
   }
 
@@ -333,7 +333,7 @@ public class SystemManager {
     long chunk_size = get_file_size(path);
 
     delete_pathchunk(path);
-    memoryManager.reduceUsedMemory(chunk_size);
+    memoryManager.reduce_peer_memory(chunk_size);
     database.removeChunk(file_ID, chunk_No);
   }
 
@@ -353,7 +353,7 @@ public class SystemManager {
    *
    * @return
    */
-  public MemoryManager get_memory_manager() {
+  public MemoryAdmin get_memory_manager() {
     return memoryManager;
   }
 
