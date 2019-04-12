@@ -129,7 +129,7 @@ public class CaixaCorreio extends CTTpostBox {
     ChunkInfo chunkInfo = database.getChunkInfo(fileID, chunkNo);
 
     int perceivedReplication = database.getChunkPerceivedReplication(fileID, chunkNo);
-    int desiredReplication = chunkInfo.getReplicationDegree();
+    int desiredReplication = chunkInfo.get_replication_degree();
 
     if (perceivedReplication < desiredReplication) {
       byte[] chunkData = parent_peer.load_chunk(fileID, chunkNo);

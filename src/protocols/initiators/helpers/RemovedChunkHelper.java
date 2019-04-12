@@ -28,6 +28,6 @@ public class RemovedChunkHelper extends BackupChunkHelper {
    */
   @Override
   protected boolean achieved_replication_degree() {
-    return chunkInfo.getNumMirrors() >= chunkInfo.getReplicationDegree();
+    return chunkInfo.getNumMirrors() >= chunkInfo.get_replication_degree();
   }
 }
