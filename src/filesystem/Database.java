@@ -130,8 +130,8 @@ public class Database extends PermanentStateClass {
   public void addChunk(ChunkInfo chunkInfo, Integer parentPeerID) {
     chunkInfo.addMirror(parentPeerID);
 
-    String fileID = chunkInfo.getFileID();
-    int chunkNo = chunkInfo.getChunkNo();
+    String fileID = chunkInfo.get_file_ID();
+    int chunkNo = chunkInfo.get_chunk_No();
 
     ConcurrentMap<Integer, ChunkInfo> fileChunks;
     fileChunks = historic_chunks_backed_up.getOrDefault(fileID, new ConcurrentHashMap<>());

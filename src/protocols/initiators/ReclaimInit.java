@@ -44,14 +44,14 @@ public class ReclaimInit implements Runnable {
       utilitarios.Notificacoes_Terminal.printNotificao("Memória disponível: " + mem_mgr.getAvailableMemory());
       ChunkInfo chunk_info = systemManager.getDatabase().getChunkForRemoval();
 
-      byte[] chunkData = systemManager.loadChunk(chunk_info.getFileID(), chunk_info.getChunkNo());
+      byte[] chunkData = systemManager.loadChunk(chunk_info.get_file_ID(), chunk_info.get_chunk_No());
       if (chunkData == null) {
         utilitarios.Notificacoes_Terminal.printAviso("Não existe a ChunkData seleccionada para recuperar");
         continue;
       }
 
-      systemManager.deleteChunk(chunk_info.getFileID(), chunk_info.getChunkNo());
-      send_removed(chunk_info.getFileID(), chunk_info.getChunkNo());
+      systemManager.deleteChunk(chunk_info.get_file_ID(), chunk_info.get_chunk_No());
+      send_removed(chunk_info.get_file_ID(), chunk_info.get_chunk_No());
     }
   }
 

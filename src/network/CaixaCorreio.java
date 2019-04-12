@@ -49,7 +49,7 @@ public class CaixaCorreio extends CTTpostBox {
   }
 
   private void handleUP(Message msg) {
-    if (enhancements_compatible(parent_peer, msg, DELETE_ENH)) {
+    if (enhancements_compatible(parent_peer, msg, DELETEENH)) {
       executor.execute(new DeleteEnhHelper(msg, parent_peer));
     }
   }
@@ -57,7 +57,7 @@ public class CaixaCorreio extends CTTpostBox {
   private void handleDELETED(Message msg) {
     Database database = parent_peer.get_database();
 
-    if (enhancements_compatible(parent_peer, msg, DELETE_ENH)) {
+    if (enhancements_compatible(parent_peer, msg, DELETEENH)) {
       database.deleteFileMirror(msg.get_file_ID(), msg.get_sender_ID());
     }
   }
@@ -71,7 +71,7 @@ public class CaixaCorreio extends CTTpostBox {
       return;
     }
 
-    if (!enhancement_compatible_msg(msg, RESTORE_ENH)) {
+    if (!enhancement_compatible_msg(msg, RESTOREENH)) {
       peerData.get_restored_chunk_data(new ChunkData(msg.get_file_ID(), msg.get_chunk_numero(), msg.get_Corpo_Mensagem()));
     }
   }
@@ -128,7 +128,7 @@ public class CaixaCorreio extends CTTpostBox {
     ChunkInfo chunkInfo = database.getChunkInfo(fileID, chunkNo);
 
     int perceivedReplication = database.getChunkPerceivedReplication(fileID, chunkNo);
-    int desiredReplication = chunkInfo.getReplicationDegree();
+    int desiredReplication = chunkInfo.get_replication_degree();
 
     if (perceivedReplication < desiredReplication) {
       byte[] chunkData = parent_peer.load_chunk(fileID, chunkNo);

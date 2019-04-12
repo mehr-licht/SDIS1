@@ -59,7 +59,7 @@ public class Delete implements Runnable {
     Collection<ChunkInfo> chunks = chunkMap.values();
     for (ChunkInfo chunk : chunks) {
 
-      parent_peer.get_system_manager().deleteChunk(chunk.getFileID(), chunk.getChunkNo());
+      parent_peer.get_system_manager().deleteChunk(chunk.get_file_ID(), chunk.get_chunk_No());
     }
   }
 
@@ -81,7 +81,7 @@ public class Delete implements Runnable {
    * Verifica a compatibilidade e envia o datagrama para o canal multicast
    */
   private void enhancement_compatibility_send() {
-    if (enhancements_compatible(parent_peer, request, DELETE_ENH)) {
+    if (enhancements_compatible(parent_peer, request, DELETEENH)) {
       send_to_multicast(request);
     }
   }

@@ -33,13 +33,13 @@ public class Utils {
   public static final int MAX_CHUNK_SIZE = 64000;
 
   /** versão do melhoramento pedido para o sub-protocolo BACKUP * */
-  public static final String BACKUP_ENH = "1.1";
+  public static final String BACKUPENH = "1.1";
 
   /** versão do melhoramento pedido para o sub-protocolo RESTORE * */
-  public static final String RESTORE_ENH = "1.2";
+  public static final String RESTOREENH = "1.2";
 
   /** versão do melhoramento pedido para o sub-protocolo DELETE * */
-  public static final String DELETE_ENH = "1.3";
+  public static final String DELETEENH = "1.3";
 
   /** versão com todos os melhoramentos pedidos para todos os sub-protocolos * */
   public static final String ENHANCEMENTS = "2.0";

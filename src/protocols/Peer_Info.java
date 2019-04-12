@@ -129,7 +129,7 @@ public class Peer_Info {
    * @param chunk data do chunk
    */
   public void get_restored_chunk_data(ChunkData chunk) {
-    ChunkData ret = restored_chunks.get(chunk.getFileID()).putIfAbsent(chunk.getChunkNo(), chunk);
+    ChunkData ret = restored_chunks.get(chunk.get_file_ID()).putIfAbsent(chunk.get_chunk_No(), chunk);
 
     if (ret != null) {
       utilitarios.Notificacoes_Terminal.printAviso("ChunkData already exists!");

@@ -157,7 +157,7 @@ public class BackupInit implements Runnable {
     ChunkInfo[] chunk_info_array = new ChunkInfo[chunks.size()];
     for (int i = 0; i < chunks.size(); i++) {
       ChunkData chunk = chunks.get(i);
-      chunk_info_array[i] = new ChunkInfo(file_ID, chunk.getChunkNo(), chunk.getReplicationDegree(),
+      chunk_info_array[i] = new ChunkInfo(file_ID, chunk.get_chunk_No(), chunk.get_replication_degree(),
           chunk.getSize());
     }
     parent_peer.get_database()

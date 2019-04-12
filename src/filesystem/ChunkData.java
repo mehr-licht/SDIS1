@@ -11,13 +11,13 @@ public class ChunkData extends BaseChunk {
 
   public ChunkData(String fileID, int chunkNo, int replicationDegree, byte[] data) {
     this(fileID, chunkNo, data);
-    setReplicationDegree(replicationDegree);
+    set_replication_degree(replicationDegree);
 
     utilitarios.Notificacoes_Terminal.printNotificao("Created CHUNK " + fileID + " @" + chunkNo);
   }
 
   public ChunkData(ChunkInfo chunkInfo, byte[] data) {
-    this(chunkInfo.getFileID(), chunkInfo.getChunkNo(), chunkInfo.getReplicationDegree(), data);
+    this(chunkInfo.get_file_ID(), chunkInfo.get_chunk_No(), chunkInfo.get_replication_degree(), data);
   }
 
 

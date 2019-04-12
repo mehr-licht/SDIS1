@@ -75,7 +75,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
    */
   private void enhancement_compatibility_handle(String file_ID, int chunk_No,
       byte[] chunk_data, String chunk_path, int replication_degree) {
-    if (enhancements_compatible(parent_peer, request, BACKUP_ENH)) {
+    if (enhancements_compatible(parent_peer, request, BACKUPENH)) {
       handle_enhanced_request(file_ID, chunk_No, chunk_data, chunk_path, replication_degree);
     } else {
       handle_standard_request(file_ID, chunk_No, chunk_path, chunk_data, replication_degree);

@@ -115,7 +115,7 @@ public class StateInit implements Runnable {
       tmp +=
           "\n ChunkData: "
               + "\n  ChunkID: "
-              + chunk.getChunkNo()
+              + chunk.get_chunk_No()
               + "\n  Size: "
               + (float)chunk.getSize() / 1000
               + "\n  Perceived Replication: "
@@ -171,7 +171,7 @@ public class StateInit implements Runnable {
   private String add_chunk_IDs_loop(ChunkInfo[] fileChunks) {
     String tmp = "";
     for (ChunkInfo chunk : fileChunks) {
-      tmp += "\n   ChunkID:" + chunk.getChunkNo();
+      tmp += "\n   ChunkID:" + chunk.get_chunk_No();
     }
     return tmp;
   }

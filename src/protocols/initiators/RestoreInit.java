@@ -1,7 +1,7 @@
 package protocols.initiators;
 
 import static filesystem.SystemManager.fileMerge;
-import static utilitarios.Utils.RESTORE_ENH;
+import static utilitarios.Utils.RESTOREENH;
 import static utilitarios.Utils.TCPSERVER_PORT;
 import static utilitarios.Utils.enhancement_compatible_peer;
 
@@ -52,7 +52,7 @@ public class RestoreInit implements Runnable {
       return;
     }
     parent_peer.set_restoring(true, file_info.getFileID());
-    if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
+    if (enhancement_compatible_peer(parent_peer, RESTOREENH)) {
       initialize_TCP_server();
     }
     //send_getchunk();
@@ -60,7 +60,7 @@ public class RestoreInit implements Runnable {
     while (!parent_peer.has_restore_finished(file_path, file_info.getFileID())) {
       Thread.yield();
     }
-    if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
+    if (enhancement_compatible_peer(parent_peer, RESTOREENH)) {
       close_TCP_server();
     }
     utilitarios.Notificacoes_Terminal.printAviso("Todos os chunks recebidos");
@@ -98,7 +98,7 @@ public class RestoreInit implements Runnable {
    */
   private void send_getchunk() {
     for (int i = 0; i < file_info.getNumChunks(); i++) {
-      if (enhancement_compatible_peer( parent_peer,RESTORE_ENH)) {
+      if (enhancement_compatible_peer( parent_peer, RESTOREENH)) {
         send_message(Message.Categoria_Mensagem.ENH_GETCHUNK, i);
       } else {
         send_message(Message.Categoria_Mensagem.GETCHUNK, i);

@@ -29,7 +29,7 @@ public class BackupChunkHelper implements Runnable {
     this.chunk = chunk;
     this.parent_peer = backup_init.get_parent_peer();
     this.protocol_version = backup_init.get_version();
-    this.chunk_replic = parent_peer.get_peer_data().get_replic(chunk.getFileID());
+    this.chunk_replic = parent_peer.get_peer_data().get_replic(chunk.get_file_ID());
   }
 
   /**
@@ -86,10 +86,10 @@ public class BackupChunkHelper implements Runnable {
    * @return verdadeiro ou falso
    */
   protected boolean achieved_replication_degree() {
-    utilitarios.Notificacoes_Terminal.printNotificao("grau de replicação atual do chunk " + chunk.getChunkNo() + ": " + chunk_replic
-        .get(chunk.getChunkNo()));
-    return chunk_replic != null && chunk_replic.get(chunk.getChunkNo()) >= chunk
-        .getReplicationDegree();
+    utilitarios.Notificacoes_Terminal.printNotificao("grau de replicação atual do chunk " + chunk.get_chunk_No() + ": " + chunk_replic
+        .get(chunk.get_chunk_No()));
+    return chunk_replic != null && chunk_replic.get(chunk.get_chunk_No()) >= chunk
+        .get_replication_degree();
   }
 
   /**
@@ -116,9 +116,9 @@ public class BackupChunkHelper implements Runnable {
     String[] args = {
         version,
         Integer.toString(parent_peer.get_ID()),
-        chunk.getFileID(),
-        Integer.toString(chunk.getChunkNo()),
-        Integer.toString(chunk.getReplicationDegree())
+        chunk.get_file_ID(),
+        Integer.toString(chunk.get_chunk_No()),
+        Integer.toString(chunk.get_replication_degree())
     };
 
     return new Message(Message.Categoria_Mensagem.PUTCHUNK, args, chunk.getData());
