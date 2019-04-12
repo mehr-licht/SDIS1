@@ -19,7 +19,7 @@ public class SystemManager {
   private Peer parentPeer;
   private String rootPath;
   private Database database;
-  private MemoryManager memoryManager;
+  private MemoryAdmin memoryManager;
 
   public SystemManager(Peer parentPeer, long maxMemory) {
     this.parentPeer = parentPeer;
@@ -126,9 +126,9 @@ public class SystemManager {
     File mm = new File(rootPath + "memoryManager");
 
     if (mm.exists()) {
-      this.memoryManager = (MemoryManager) MemoryManager.loadFromFile(mm);
+      this.memoryManager = (MemoryAdmin) MemoryAdmin.loadFromFile(mm);
     } else {
-      this.memoryManager = new MemoryManager(mm.getAbsolutePath(), maxMemory);
+      this.memoryManager = new MemoryAdmin(mm.getAbsolutePath(), maxMemory);
     }
   }
 
@@ -211,7 +211,7 @@ public class SystemManager {
     database.removeChunk(fileID, chunkNo);
   }
 
-  public MemoryManager getMemoryManager() {
+  public MemoryAdmin getMemoryManager() {
     return memoryManager;
   }
 

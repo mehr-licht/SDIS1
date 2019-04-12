@@ -3,7 +3,7 @@ package protocols.initiators;
 import filesystem.ChunkInfo;
 import filesystem.Database;
 import filesystem.FileInfo;
-import filesystem.MemoryManager;
+import filesystem.MemoryAdmin;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,7 +39,7 @@ public class StateInit implements Runnable {
     String out = get_output(files, chunks);
 
     // Storage capacity
-    MemoryManager mm = parent_peer.get_system_manager().getMemoryManager();
+    MemoryAdmin mm = parent_peer.get_system_manager().getMemoryManager();
    /* long available=  mm.getMaximum_Memory() - mm.getUsed_memory();
     System.out.println("mem:"+mm.getMemory());
     System.out.println("max:"+mm.getMaximum_Memory());
