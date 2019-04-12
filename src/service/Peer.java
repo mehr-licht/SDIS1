@@ -276,7 +276,7 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void reclaim(int space) {
-    system_manager.getMemoryManager().setMaxMemory(space);
+    system_manager.getMemoryManager().setMaximum_Memory(space);
     executor.execute(new ReclaimInit(protocol_version, this));
   }
 

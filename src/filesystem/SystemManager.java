@@ -128,7 +128,7 @@ public class SystemManager {
     if (mm.exists()) {
       this.memoryManager = (MemoryManager) MemoryManager.loadFromFile(mm);
     } else {
-      this.memoryManager = new MemoryManager(maxMemory, mm.getAbsolutePath());
+      this.memoryManager = new MemoryManager(mm.getAbsolutePath(), maxMemory);
     }
   }
 
@@ -159,7 +159,7 @@ public class SystemManager {
     out.write(data);
     out.close();
 
-    memoryManager.increaseUsedMemory(data.length);
+    memoryManager.increase_peer_memory(data.length);
     return SAVE_STATE.SUCCESS;
   }
 
@@ -207,7 +207,7 @@ public class SystemManager {
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't delete file: " + path);
     }
-    memoryManager.reduceUsedMemory(chunkSize);
+    memoryManager.reduce_peer_memory(chunkSize);
     database.removeChunk(fileID, chunkNo);
   }
 

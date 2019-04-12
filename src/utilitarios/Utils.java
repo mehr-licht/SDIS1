@@ -64,6 +64,11 @@ public class Utils {
   public static final int MSG_CORE_POOL_SIZE = 5;
 
   /**
+   * Intervalo de tempo entre cada save do file
+   * @miliseconds
+   * */
+  public static final long SAVE_PERIOD = 1000;
+  /**
    * Conversor de Bytes para Hexadecimal
    *
    * @param bytes array a ser transformado num string hexadecimal

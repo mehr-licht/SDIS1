@@ -56,6 +56,9 @@ public class Database extends PermanentStateClass {
     this.setUp(savePath);
   }
 
+
+
+
   public boolean addToFilesToDelete(String fileID) {
     return files_trash_deleted.add(fileID);
   }

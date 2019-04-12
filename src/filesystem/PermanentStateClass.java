@@ -1,15 +1,13 @@
 package filesystem;
 
+import jdk.jshell.execution.Util;
+import utilitarios.Utils;
+
 import java.io.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class PermanentStateClass implements Serializable {
-
-  /**
-   * Period between file saves, in milliseconds
-   */
-  private final long SAVE_PERIOD = 1000;
 
   private String savePath;
 
@@ -44,7 +42,7 @@ public abstract class PermanentStateClass implements Serializable {
       public void run() {
         obj.savePermanentState();
       }
-    }, SAVE_PERIOD, SAVE_PERIOD);
+    }, Utils.SAVE_PERIOD, Utils.SAVE_PERIOD);
   }
 
   synchronized void savePermanentState() {

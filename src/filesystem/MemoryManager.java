@@ -1,51 +1,69 @@
 package filesystem;
 
+
+/**
+ * Usado para o reclaim
+ * */
 public class MemoryManager extends PermanentStateClass {
 
-  private static final long serialVersionUID = 2L;
+    /*For serialization*/
+    private static final long serialVersionUID = 2L;
 
-  private long maxMemory;
-  private long usedMemory;
+    private long maximum_Memory;
+    private long used_memory;
 
-  MemoryManager(long maxMemory, String savePath) {
-    this.maxMemory = maxMemory;
-    this.usedMemory = 0;
+    /**
+     * */
+    MemoryManager(String savePath, long maxMemory) {
+        this.maximum_Memory = maxMemory;
+        this.used_memory = 0;
 
-    this.setUp(savePath);
-  }
-
-    public void setMaxMemory(int maxMemory) {
-    this.maxMemory = maxMemory;
-  }
-
-  public long getUsedMemory() {
-    return this.usedMemory;
-  }
-
-  public long getMaxMemory() {
-    return this.maxMemory;
-  }
-
-  public long getAvailableMemory() {
-    return maxMemory - usedMemory;
-  }
-
-  public void reduceUsedMemory(long n) {
-    usedMemory -= n;
-    if (usedMemory < 0) {
-      usedMemory = 0;
-      utilitarios.Notificacoes_Terminal.printMensagemError("Used memory went below 0");
+        this.setUp(savePath);
     }
-  }
 
-  public boolean increaseUsedMemory(long n) {
-    if (usedMemory + n > maxMemory) {
-      utilitarios.Notificacoes_Terminal.printAviso("Tried to surpass memory restrictions");
-      return false;
+    /**
+     * Diminuir memoria disponivel no peer
+     * */
+    public void reduce_peer_memory(long n) {
+        used_memory = used_memory - n;
+        if (used_memory < 0) {
+            used_memory = 0;
+            utilitarios.Notificacoes_Terminal.printMensagemError("TESTE : mem < 0");
+        }
     }
-    usedMemory += n;
-    utilitarios.Notificacoes_Terminal.printAviso("Used memory: " + usedMemory + " / " + maxMemory);
-    return true;
-  }
+
+    /**
+     * Aumentar a memoria disponvel no peer
+     * */
+    public boolean increase_peer_memory(long n) {
+        if (used_memory + n > maximum_Memory) {
+            utilitarios.Notificacoes_Terminal.printAviso("Limite de memória ultrapassada");
+            return false;
+        }
+        used_memory += n;
+        utilitarios.Notificacoes_Terminal.printAviso("Memória Usada: " + used_memory + " / " + maximum_Memory);
+        return true;
+    }
+
+
+    /**
+     * GETS AND SETTERS
+     */
+    public void setMaximum_Memory(int maximum_Memory) {
+        this.maximum_Memory = maximum_Memory;
+    }
+
+    public long getUsed_memory() {
+        return this.used_memory;
+    }
+
+    public long getMaximum_Memory() {
+        return this.maximum_Memory;
+    }
+
+    public long getAvailableMemory() {
+        return maximum_Memory - used_memory;
+    }
+
 
 }
