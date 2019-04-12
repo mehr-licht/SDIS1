@@ -59,7 +59,7 @@ public class Delete implements Runnable {
     Collection<ChunkInfo> chunks = chunkMap.values();
     for (ChunkInfo chunk : chunks) {
 
-      parent_peer.get_system_manager().deleteChunk(chunk.get_file_ID(), chunk.get_chunk_No());
+      parent_peer.get_system_manager().delete_chunk(chunk.get_file_ID(), chunk.get_chunk_No());
     }
   }
 

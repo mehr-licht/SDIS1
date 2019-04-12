@@ -62,7 +62,7 @@ public class Peer implements My_Interface_Remote {
     this.server_access_point = server_access_point;
 
     system_manager = new SystemManager(this, MAX_SYSTEM_MEMORY);
-    database = system_manager.getDatabase();
+    database = system_manager.get_database();
 
     setup_channels(mc_address, mdb_address, mdr_address);
     setup_message_handler();
@@ -277,7 +277,7 @@ public class Peer implements My_Interface_Remote {
    */
   @Override
   public void reclaim(int space) {
-    system_manager.getMemoryManager().setMaxMemory(space);
+    system_manager.get_memory_manager().setMaxMemory(space);
     executor.execute(new ReclaimInit(protocol_version, this));
   }
 
@@ -309,9 +309,9 @@ public class Peer implements My_Interface_Remote {
     String pathname;
 
     if (path.equals("backup")){//CH
-      pathname = system_manager.getChunksPath();
+      pathname = system_manager.get_chunks_path();
     }else if (path.equals("restored")){
-      pathname = system_manager.getRestoredPath();
+      pathname = system_manager.get_restored_path();
     }else{
       pathname = "";
     }
@@ -356,7 +356,7 @@ public class Peer implements My_Interface_Remote {
    * @return
    */
   public byte[] load_chunk(String file_ID, int chunk_No) {
-    return system_manager.loadChunk(file_ID, chunk_No);
+    return system_manager.load_chunk(file_ID, chunk_No);
   }
 
   /**
