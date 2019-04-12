@@ -31,6 +31,7 @@ public class Database extends AuxMemAdmin {
 
     /**
      * Registo das copias dos files nos peers
+     *
      * @param String ficheiro ID
      * @param Set<Int> ids dos peers que contem o file
      */
@@ -64,14 +65,25 @@ public class Database extends AuxMemAdmin {
     }
 
     public void add_to_history_file_copys_in_peers(String fileID, int senderID) {
-        history_file_copys_on_peers.putIfAbsent(fileID, new ConcurrentSkipListSet<>());
-        history_file_copys_on_peers.get(fileID).add(senderID);
+        try {
+            history_file_copys_on_peers.putIfAbsent(fileID, new ConcurrentSkipListSet<>());
+            history_file_copys_on_peers.get(fileID).add(senderID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 
     public void add_restorable_file(FileInfo fileInfo) {
-        historic_files_backed_Up.put(fileInfo.getFileID(), fileInfo);
-        historic_files_Path.put(fileInfo.getPath(), fileInfo);
+
+        try {
+            historic_files_backed_Up.put(fileInfo.getFileID(), fileInfo);
+            historic_files_Path.put(fileInfo.getPath(), fileInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void add_to_history_chunks__backed_up(ChunkInfo chunkInfo, Integer parentPeerID) {
@@ -79,12 +91,17 @@ public class Database extends AuxMemAdmin {
 
         String fileID = chunkInfo.get_file_ID();
         int chunkNo = chunkInfo.get_chunk_No();
+        try {
+            ConcurrentMap<Integer, ChunkInfo> fileChunks;
+            fileChunks = historic_chunks_backed_up.getOrDefault(fileID, new ConcurrentHashMap<>());
+            fileChunks.putIfAbsent(chunkNo, chunkInfo);
 
-        ConcurrentMap<Integer, ChunkInfo> fileChunks;
-        fileChunks = historic_chunks_backed_up.getOrDefault(fileID, new ConcurrentHashMap<>());
-        fileChunks.putIfAbsent(chunkNo, chunkInfo);
+            historic_chunks_backed_up.putIfAbsent(fileID, fileChunks);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        historic_chunks_backed_up.putIfAbsent(fileID, fileChunks);
+
     }
 
     public Boolean add_to_history_chunks_backed_upMirror(String fileID, int chunkNo, int peerID) {
@@ -113,15 +130,24 @@ public class Database extends AuxMemAdmin {
 
     //Delete file from database
     public void final_remove_file_from_database(FileInfo fileInfo) {
-        historic_files_backed_Up.remove(fileInfo.getFileID());
-        historic_files_Path.remove(fileInfo.getPath());
+        try {
+            historic_files_backed_Up.remove(fileInfo.getFileID());
+            historic_files_Path.remove(fileInfo.getPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void remove_from_history_file_copys_on_peers(String fileID, int senderID) {
         Set<Integer> peers = history_file_copys_on_peers.get(fileID);
-        if (peers != null) {
-            peers.remove(senderID);
+        try {
+            if (peers != null) {
+                peers.remove(senderID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     public void remove_from_history_chunks_backed_up(String fileID, int chunkNo) {
@@ -130,7 +156,13 @@ public class Database extends AuxMemAdmin {
             return;
         }
 
-        historic_chunks_backed_up.get(fileID).remove(chunkNo);
+        try {
+            historic_chunks_backed_up.get(fileID).remove(chunkNo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     public Map<Integer, ChunkInfo> remove_from_history_chunks_backed_up_By_File_ID(String fileID) {
@@ -163,7 +195,12 @@ public class Database extends AuxMemAdmin {
 
 
     public void remove_from_historiy_files_path(String path) {
-        final_remove_file_from_database(historic_files_Path.get(path));
+        try {
+            final_remove_file_from_database(historic_files_Path.get(path));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -188,9 +225,6 @@ public class Database extends AuxMemAdmin {
     }
 
 
-
-
-
     public boolean has_chunks(String fileID) {
 
         return historic_chunks_backed_up.containsKey(fileID);
@@ -208,20 +242,27 @@ public class Database extends AuxMemAdmin {
 
     public Set<String> getFiles_to_delete(int senderID) {
         Set<String> files = new ConcurrentSkipListSet<>();
-        for (Map.Entry<String, Set<Integer>> fileMirrorEntry : history_file_copys_on_peers.entrySet()) {
-            aux_get_files_to_delete(senderID, files, fileMirrorEntry);
+        try {
+            for (Map.Entry<String, Set<Integer>> fileMirrorEntry : history_file_copys_on_peers.entrySet()) {
+                aux_get_files_to_delete(senderID, files, fileMirrorEntry);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
         return files;
     }
 
     private void aux_get_files_to_delete(int senderID, Set<String> files, Map.Entry<String, Set<Integer>> fileMirrorEntry) {
-        for (Integer mirrorID : fileMirrorEntry.getValue()) {
-            String fileID = fileMirrorEntry.getKey();
-            if (mirrorID == senderID && files_trash_deleted.contains(fileID)) {
-                files.add(fileID);
-                break;
+        try {
+            for (Integer mirrorID : fileMirrorEntry.getValue()) {
+                String fileID = fileMirrorEntry.getKey();
+                if (mirrorID == senderID && files_trash_deleted.contains(fileID)) {
+                    files.add(fileID);
+                    break;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -275,19 +316,26 @@ public class Database extends AuxMemAdmin {
         return getMostBackedUpChunk();
     }
 
+    /**
+     * Calcula o chuck que tem mais replicas
+     * */
     private ChunkInfo getMostBackedUpChunk() {
         ChunkInfo mostBackedUpChunk = null;
         int maxMirroring = -1;
-
-        for (ConcurrentMap.Entry<String, ConcurrentMap<Integer, ChunkInfo>> fileEntry : historic_chunks_backed_up
-                .entrySet()) {
-            for (ConcurrentMap.Entry<Integer, ChunkInfo> chunkEntry : fileEntry.getValue().entrySet()) {
-                int numMirrors = chunkEntry.getValue().getNumMirrors();
-                if (numMirrors > maxMirroring) {
-                    maxMirroring = numMirrors;
-                    mostBackedUpChunk = chunkEntry.getValue();
+        try {
+            for (ConcurrentMap.Entry<String, ConcurrentMap<Integer, ChunkInfo>> fileEntry : historic_chunks_backed_up
+                    .entrySet()) {
+                for (ConcurrentMap.Entry<Integer, ChunkInfo> chunkEntry : fileEntry.getValue().entrySet()) {
+                    int numMirrors = chunkEntry.getValue().getNumMirrors();
+                    if (numMirrors > maxMirroring) {
+                        maxMirroring = numMirrors;
+                        mostBackedUpChunk = chunkEntry.getValue();
+                    }
                 }
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return mostBackedUpChunk;
