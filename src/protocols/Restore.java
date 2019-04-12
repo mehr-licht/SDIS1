@@ -1,7 +1,7 @@
 package protocols;
 
 import static utilitarios.Utils.enhancements_compatible;
-import static utilitarios.Utils.RESTORE_ENH;
+import static utilitarios.Utils.RESTOREENH;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -62,7 +62,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
    * @param chunkData dados do chunk
    */
   private void send_message_by_channels(byte[] chunkData) {
-    if (enhancements_compatible(parent_peer, request, RESTORE_ENH)) {
+    if (enhancements_compatible(parent_peer, request, RESTOREENH)) {
       send_message_by_TCP(request, chunkData);
       send_message_by_MDR(request, null);
     } else {

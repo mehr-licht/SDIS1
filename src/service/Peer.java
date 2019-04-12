@@ -322,7 +322,7 @@ public class Peer implements My_Interface_Remote {
    * Envia mensagem a dizer que está ativo. Fundamental para versão 1.3
    */
   private void send_UP_message() {
-    if (enhancement_compatible_peer(this, DELETE_ENH)) {
+    if (enhancement_compatible_peer(this, DELETEENH)) {
       String[] args = {
           get_version(), Integer.toString(get_ID()),
       };
