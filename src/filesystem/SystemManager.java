@@ -126,7 +126,7 @@ public class SystemManager {
     File mm = new File(rootPath + "memoryManager");
 
     if (mm.exists()) {
-      this.memoryManager = (MemoryAdmin) MemoryAdmin.loadFromFile(mm);
+      this.memoryManager = (MemoryAdmin) MemoryAdmin.load_from_file(mm);
     } else {
       this.memoryManager = new MemoryAdmin(mm.getAbsolutePath(), maxMemory);
     }
@@ -136,7 +136,7 @@ public class SystemManager {
     File db = new File(rootPath + "db");
 
     if (db.exists()) {
-      this.database = (Database) Database.loadFromFile(db);
+      this.database = (Database) Database.load_from_file(db);
     } else {
       this.database = new Database(db.getAbsolutePath());
     }
