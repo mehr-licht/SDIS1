@@ -4,7 +4,7 @@ import static filesystem.SystemManager.fileMerge;
 import static utilitarios.Utils.RESTORE_ENH;
 import static utilitarios.Utils.TCPSERVER_PORT;
 import static utilitarios.Utils.enhancement_compatible_peer;
-import static utilitarios.Utils.isPeerCompatibleWithEnhancement;
+
 
 import canais.Canal;
 import filesystem.ChunkData;
@@ -56,7 +56,7 @@ public class RestoreInit implements Runnable {
       initialize_TCP_server();
     }
     //send_getchunk();
-    getChunk();
+    send_getchunk();
     while (!parent_peer.has_restore_finished(file_path, file_info.getFileID())) {
       Thread.yield();
     }
@@ -96,10 +96,9 @@ public class RestoreInit implements Runnable {
   /**
    * Envia GETCHUNK para o canal multicast
    */
-  private void getChunk() {
-    // Send GETCHUNK to MC
+  private void send_getchunk() {
     for (int i = 0; i < file_info.getNumChunks(); i++) {
-      if (isPeerCompatibleWithEnhancement(RESTORE_ENH, parent_peer)) {
+      if (enhancement_compatible_peer( parent_peer,RESTORE_ENH)) {
         send_message(Message.Categoria_Mensagem.ENH_GETCHUNK, i);
       } else {
         send_message(Message.Categoria_Mensagem.GETCHUNK, i);
@@ -107,37 +106,6 @@ public class RestoreInit implements Runnable {
     }
   }
 
-  private void sendMessageToMC(Message.Categoria_Mensagem type, int chunkNo) {
-    String[] args = {
-        version,
-        Integer.toString(parent_peer.get_ID()),
-        file_info.getFileID(),
-        Integer.toString(chunkNo),
-        Integer.toString(parent_peer.get_ID() + TCPSERVER_PORT)
-    };
-
-    Message msg = new Message(type, args);
-
-    sendMsg(msg);
-  }
-
-  private void sendMsg(Message msg) {
-    try {
-      parent_peer.send_message(msg,Canal.ChannelType.MC);
-    } catch (IOException e) {
-      utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't send message to multicast channel!");
-    }
-  }
-  /*
-  private void send_getchunk() {
-    for (int i = 0; i < file_info.getNumChunks(); i++) {
-      if (enhancement_compatible_peer(parent_peer, RESTORE_ENH)) {
-        send_message(Categoria_Mensagem.ENH_GETCHUNK, i);
-      } else {
-        send_message(Categoria_Mensagem.GETCHUNK, i);
-      }
-    }
-  }*/
 
   /**
    * Encerra o servidor TCP

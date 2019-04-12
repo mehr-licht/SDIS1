@@ -66,12 +66,14 @@ public class Message implements Serializable {
     }
     fileID = args[2];
     if (type != Categoria_Mensagem.DELETE && type != Categoria_Mensagem.DELETED) {
-      if (type == Categoria_Mensagem.GETCHUNK || type == Categoria_Mensagem.ENH_GETCHUNK || type == Categoria_Mensagem.REMOVED) {
-          String tmp = (args[3]).substring(3);
+      if (type == Categoria_Mensagem.GETCHUNK
+          || type == Categoria_Mensagem.ENH_GETCHUNK
+          || type == Categoria_Mensagem.REMOVED) {
+        String tmp = (args[3]).substring(3);
         chunkNo = Integer.parseInt(tmp);
 
-      }else{
-          chunkNo = Integer.parseInt(args[3]);
+      } else {
+        chunkNo = Integer.parseInt(args[3]);
       }
     }
     if (type == Categoria_Mensagem.PUTCHUNK) {
