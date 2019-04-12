@@ -29,7 +29,7 @@ public class MemoryAdmin extends AuxMemAdmin {
         used_memory = used_memory - n;
         if (!(used_memory > 0)) {
             used_memory = 0;
-            utilitarios.Notificacoes_Terminal.printMensagemError("Memoria reduzida para 0");
+            utilitarios.Notificacoes_Terminal.printAviso("Memória reduzida para 0");
         }
     }
 

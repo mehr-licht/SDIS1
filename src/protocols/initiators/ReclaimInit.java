@@ -27,7 +27,7 @@ public class ReclaimInit implements Runnable {
   /** Lançamento do reclaimInit */
   @Override
   public void run() {
-    MemoryAdmin memory_mgr = systemManager.getMemoryManager();
+    MemoryAdmin memory_mgr = systemManager.get_memory_manager();
     remove_chunks(memory_mgr);
 
     utilitarios.Notificacoes_Terminal.printNotificao("Memória disponível: " + memory_mgr.getAvailableMemory());
@@ -42,15 +42,15 @@ public class ReclaimInit implements Runnable {
   private void remove_chunks(MemoryAdmin mem_mgr) {
     while (mem_mgr.getAvailableMemory() < 0) {
       utilitarios.Notificacoes_Terminal.printNotificao("Memória disponível: " + mem_mgr.getAvailableMemory());
-      ChunkInfo chunk_info = systemManager.getDatabase().getChunkForRemoval();
+      ChunkInfo chunk_info = systemManager.get_database().getChunkForRemoval();
 
-      byte[] chunkData = systemManager.loadChunk(chunk_info.get_file_ID(), chunk_info.get_chunk_No());
+      byte[] chunkData = systemManager.load_chunk(chunk_info.get_file_ID(), chunk_info.get_chunk_No());
       if (chunkData == null) {
         utilitarios.Notificacoes_Terminal.printAviso("Não existe a ChunkData seleccionada para recuperar");
         continue;
       }
 
-      systemManager.deleteChunk(chunk_info.get_file_ID(), chunk_info.get_chunk_No());
+      systemManager.delete_chunk(chunk_info.get_file_ID(), chunk_info.get_chunk_No());
       send_removed(chunk_info.get_file_ID(), chunk_info.get_chunk_No());
     }
   }

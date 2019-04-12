@@ -2,7 +2,7 @@ package protocols.initiators;
 
 import static utilitarios.Utils.MAX_NUM_CHUNKS;
 import static utilitarios.Utils.MAX_REPLICATION_DEGREE;
-import static filesystem.SystemManager.splitFileInChunks;
+import static filesystem.SystemManager.file_into_chunks;
 
 import service.Peer;
 import utilitarios.Utils;
@@ -52,10 +52,10 @@ public class BackupInit implements Runnable {
    */
   @Override
   public void run() {
-    file_data = SystemManager.loadFile(pathname);
+    file_data = SystemManager.load_file(pathname);
 
     String file_ID = generate_file_ID(pathname);
-    ArrayList<ChunkData> chunks = splitFileInChunks(file_data, file_ID, replic_degree);
+    ArrayList<ChunkData> chunks = file_into_chunks(file_ID, replic_degree, file_data);
 
     if (!valid_backup(replic_degree, chunks.size())) {
       return;
@@ -158,7 +158,7 @@ public class BackupInit implements Runnable {
     for (int i = 0; i < chunks.size(); i++) {
       ChunkData chunk = chunks.get(i);
       chunk_info_array[i] = new ChunkInfo(file_ID, chunk.get_chunk_No(), chunk.get_replication_degree(),
-          chunk.getSize());
+          chunk.get_size());
     }
     parent_peer.get_database()
         .addRestorableFile(new FileInfo(pathname, file_ID, replic_degree, chunk_info_array));

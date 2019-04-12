@@ -18,12 +18,12 @@ public class Utils {
   public static final String bi_CRLF = "" + (char) 0x0D + (char) 0x0A + (char) 0x0D + (char) 0x0A;
   private static final char[] hex_digits_usados_no_nome = "0123456789ABCDEF".toCharArray();
 
-
-  /**  Set the default time-to-live for multicast packets sent out on this
-   * MulticastSocket in order to control the scope of the multicasts.
+  /**
+   * Set the default time-to-live for multicast packets sent out on this MulticastSocket in order to
+   * control the scope of the multicasts.
    */
   public static final int TTL = 1;
-   /**Tamanho maximo da mensagem envia no canal*/
+  /** Tamanho maximo da mensagem envia no canal */
   public static final int MAXIMO_TAMANHO_MESSAGE_CANAL = 65000;
 
   /** Número de tentativas de envio de PUTCHUNK (enunciado) * */
@@ -44,7 +44,7 @@ public class Utils {
   /** versão com todos os melhoramentos pedidos para todos os sub-protocolos * */
   public static final String ENHANCEMENTS = "2.0";
 
-  /** Atraso máximo para o tempo de espera aleatório da resposta STORED (enunciado 400ms)*/
+  /** Atraso máximo para o tempo de espera aleatório da resposta STORED (enunciado 400ms) */
   public static final int MAX_DELAY = 400;
 
   /** Memória máxima do sistema (8MB) * */
@@ -61,6 +61,7 @@ public class Utils {
 
   /** Numero de threads a manter na pool * */
   public static final int PEER_CORE_POOL_SIZE = 10;
+
   public static final int MSG_CORE_POOL_SIZE = 5;
 
   /**
@@ -189,10 +190,28 @@ public class Utils {
   public static Registry get_registry(String[] service_access_point) {
     Registry registry = null;
     // Bind the remote object's stub in the registry
-    if (service_access_point[1] == null) {
-      registry = locate_registry(service_access_point[0]);
-    } else {
-      registry = locate_registryAP(service_access_point);
+    try {
+      if (service_access_point[1] == null) {
+        if (service_access_point[0] == "localhost") {
+
+          registry = LocateRegistry.getRegistry();
+
+        } else {
+          registry = LocateRegistry.getRegistry(service_access_point[0]);
+        }
+
+      } else {
+        if (service_access_point[0] == "localhost") {
+          registry = LocateRegistry.getRegistry(service_access_point[1]);
+        } else {
+          registry =
+              LocateRegistry.getRegistry(
+                  service_access_point[0], Integer.parseInt(service_access_point[1]));
+        }
+        registry = locate_registryAP(service_access_point);
+      }
+    } catch (RemoteException e) {
+      e.printStackTrace();
     }
     return registry;
   }
@@ -250,11 +269,10 @@ public class Utils {
   public static boolean enhancements_compatible(
       Peer peer, Message request, String enhanced_version) {
 
-      return ((request.get_version().equals(enhanced_version)
-          || request.get_version().equals(ENHANCEMENTS))
-          && (peer.get_version().equals(enhanced_version)
-          || peer.get_version().equals(ENHANCEMENTS)));
-
+    return ((request.get_version().equals(enhanced_version)
+            || request.get_version().equals(ENHANCEMENTS))
+        && (peer.get_version().equals(enhanced_version)
+            || peer.get_version().equals(ENHANCEMENTS)));
   }
 
   public static boolean isPeerCompatibleWithEnhancement(String enhancedVersion, Peer peer) {
@@ -274,7 +292,6 @@ public class Utils {
     } else {
       return false;
     }
-
   }
 
   /**

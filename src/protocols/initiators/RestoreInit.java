@@ -1,6 +1,6 @@
 package protocols.initiators;
 
-import static filesystem.SystemManager.fileMerge;
+import static filesystem.SystemManager.file_merge;
 import static utilitarios.Utils.RESTOREENH;
 import static utilitarios.Utils.TCPSERVER_PORT;
 import static utilitarios.Utils.enhancement_compatible_peer;
@@ -83,10 +83,10 @@ public class RestoreInit implements Runnable {
     try {
       parent_peer
           .get_system_manager()
-          .saveFile(
+          .save_file(
               file_info.getFileName(),
               path_to_save,
-              fileMerge(new ArrayList<>(restored_chunks.values())));
+              file_merge(new ArrayList<>(restored_chunks.values())));
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError(
           "Erro ao gravar ficheiro em " + file_info.getPath());

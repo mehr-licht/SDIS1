@@ -121,7 +121,7 @@ public class BackupChunkHelper implements Runnable {
         Integer.toString(chunk.get_replication_degree())
     };
 
-    return new Message(Message.Categoria_Mensagem.PUTCHUNK, args, chunk.getData());
+    return new Message(Message.Categoria_Mensagem.PUTCHUNK, args, chunk.get_data());
   }
 
 }

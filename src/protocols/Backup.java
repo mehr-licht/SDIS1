@@ -1,6 +1,6 @@
 package protocols;
 
-import static filesystem.SystemManager.createFolder;
+import static filesystem.SystemManager.create_folder;
 import static utilitarios.Utils.*;
 
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
     byte[] chunk_data = request.get_Corpo_Mensagem();
 
     String chunk_path = parent_peer.get_path("backup") + "/" + file_ID;
-    createFolder(parent_peer.get_path("backup") + "/" + file_ID);
+    create_folder(parent_peer.get_path("backup") + "/" + file_ID);
 
     enhancement_compatibility_handle(file_ID, chunk_No, chunk_data, chunk_path, replication_degree);
 
@@ -168,7 +168,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
       String chunk_path, int replication_degree) {
     SAVE_STATE ret;
     try {
-      ret = parent_peer.get_system_manager().saveFile(
+      ret = parent_peer.get_system_manager().save_file(
           "chk"+ chunk_No,
           chunk_path,
           chunk_data

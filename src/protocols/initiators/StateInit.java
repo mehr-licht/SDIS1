@@ -39,8 +39,8 @@ public class StateInit implements Runnable {
     String out = get_output(files, chunks);
 
     // Storage capacity
-    MemoryAdmin mm = parent_peer.get_system_manager().getMemoryManager();
-   /* long available=  mm.getMaximum_Memory() - mm.getUsed_memory();
+    MemoryAdmin mm = parent_peer.get_system_manager().get_memory_manager();
+   /* long available=  mm.getMaximum_Memory() - mm.getUsed_Memory();
     System.out.println("mem:"+mm.getMemory());
     System.out.println("max:"+mm.getMaximum_Memory());
     System.out.println("used:"+mm.getUsed_memory());
