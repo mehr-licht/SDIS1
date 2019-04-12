@@ -1,13 +1,13 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
     echo $# arguments
-    echo usage: "sh ./createPeers.sh number_of_peers"
+    echo usage: "sh ./createPeers.sh version number_of_peers"
     exit 1
 fi
 
-version=1.0
-peers=$1
+version=$1
+peers=$2
 
 
 echo "Creating $peers peers"

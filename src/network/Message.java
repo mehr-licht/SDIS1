@@ -76,6 +76,7 @@ public class Message implements Serializable {
         chunkNo = Integer.parseInt(args[3]);
       }
     }
+
     if (type == Categoria_Mensagem.PUTCHUNK) {
       replicationDegree = Integer.parseInt(args[4]);
     }
@@ -83,6 +84,8 @@ public class Message implements Serializable {
       mTCPPort = Integer.parseInt(args[4]);
       mTCPHost = get_IPv4_address();
     }
+
+    System.out.println("\nmensagem:"+type+"\nFileID:"+fileID+"\nchunkNo:"+chunkNo+"\n");
   }
 
   /** Constructor pra enviar mensagens com corpo */
