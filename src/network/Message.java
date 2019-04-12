@@ -107,6 +107,7 @@ public class Message implements Serializable {
   }
 
   /**
+   * Extrai o cabeçalho da mensagem de dentro
    *
    * @param data
    * @return
@@ -115,20 +116,19 @@ public class Message implements Serializable {
     ByteArrayInputStream stream = new ByteArrayInputStream(data);
     BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
-    String header = "";
-
-    header = read_header(reader, header);
+    String header = read_header(reader);
 
     return header;
   }
 
   /**
+   * Lê o cabeçalho
    *
-   * @param reader
-   * @param header
-   * @return
+   * @param reader um bufferedReader
+   * @return cabeçalho
    */
-  private String read_header(BufferedReader reader, String header) {
+  private String read_header(BufferedReader reader) {
+    String header = "";
     try {
       header = reader.readLine();
     } catch (IOException e) {
@@ -138,11 +138,12 @@ public class Message implements Serializable {
   }
 
   /**
+   * Extrai o corpo da mensagem de dentro do datagrama
    *
-   * @param data
-   * @param header_length
-   * @param data_length
-   * @return
+   * @param data dados
+   * @param header_length tamanho do cabeçalho
+   * @param data_length tamanho dos dados
+   * @return conteúdo do corpo da mensagem
    */
   private byte[] extract_body(byte[] data, int header_length, int data_length) {
     int length = data_length;
@@ -157,8 +158,8 @@ public class Message implements Serializable {
   /**
    * Define os tipos de mensagens recebidas segundo as categorias definidas
    *
-   * @param header
-   * @return
+   * @param header cabeçalho do datagrama
+   * @return verdadeiro se efetuado com sucesso ou falso no caso contrário
    */
   private boolean parse_identificar_protocolo(String header) {
 
@@ -236,8 +237,9 @@ public class Message implements Serializable {
   }
 
   /**
+   * Obtem cabeçalho do datagram como string
    *
-   * @return
+   * @return cabeçalho do datagrama
    */
   public String get_header_as_string() {
     String str;
@@ -304,6 +306,7 @@ public class Message implements Serializable {
   }
 
   /**
+   * obtem datagrama
    *
    * @return
    */
@@ -315,9 +318,10 @@ public class Message implements Serializable {
   }
 
   /**
+   * cria datagrama em array de bytes
    *
-   * @param header
-   * @return
+   * @param header cabeçalho da mensagem
+   * @return datagrama
    */
   private byte[] write_oos(byte[] header) {
     if (body != null) {
@@ -327,7 +331,7 @@ public class Message implements Serializable {
         outputStream.write(body);
       } catch (IOException e) {
         utilitarios.Notificacoes_Terminal.printMensagemError(
-            "Couldn't create message byte[] to send!");
+            "Não foi possível criar a mensagem de array de bytes para enviar");
       }
       return outputStream.toByteArray();
 
@@ -335,8 +339,9 @@ public class Message implements Serializable {
   }
 
   /**
+   * Faz uma string de acordo com o especificado para os headers
    *
-   * @return
+   * @return string de acordo com o especificado para os headers
    */
   @Override
   public String toString() {
@@ -368,32 +373,36 @@ public class Message implements Serializable {
   /** GETS METODOS */
 
   /**
+   * Obtem o nome do servidor TCP
    *
-   * @return
+   * @return nome do servidor TCP
    */
   public String get_TCP_hostname() {
     return m_TCP_host;
   }
 
   /**
+   * Obtem o porto TCP
    *
-   * @return
+   * @return porto TCP
    */
   public int get_TCP_porta() {
     return m_TCP_port;
   }
 
   /**
+   * Obtem tipo da mensagem
    *
-   * @return
+   * @return tipo da mensagem
    */
   public Categoria_Mensagem get_type() {
     return type;
   }
 
   /**
+   * Obtem numero do chunk
    *
-   * @return
+   * @return numero do chunk
    */
   public int get_chunk_numero() {
     return chunkNo;
