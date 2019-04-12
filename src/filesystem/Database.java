@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-public class Database extends PermanentStateClass {
+public class Database extends AuxMemAdmin {
 
   private static final long serialVersionUID = 1L;
   /**
@@ -53,7 +53,7 @@ public class Database extends PermanentStateClass {
     fileMirrors = new ConcurrentHashMap<>();
     files_trash_deleted = new HashSet<>();
 
-    this.setUp(savePath);
+    this.set_up(savePath);
   }
 
 

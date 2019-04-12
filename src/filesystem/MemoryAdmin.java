@@ -4,7 +4,7 @@ package filesystem;
 /**
  * Usado para o reclaim
  * */
-public class MemoryAdmin extends PermanentStateClass {
+public class MemoryAdmin extends AuxMemAdmin {
 
     /*For serialization*/
     private static final long serialVersionUID = 2L;
@@ -18,7 +18,7 @@ public class MemoryAdmin extends PermanentStateClass {
         this.maximum_Memory = maxMemory;
         this.used_memory = 0;
 
-        this.setUp(savePath);
+        this.set_up(savePath);
     }
 
     /**
