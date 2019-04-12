@@ -59,13 +59,13 @@ public abstract class CTTpostBox implements Runnable {
      */
     private void processamento_msg_inicial(Message message) {
         //Ignoring invalid messages
-        if (message == null || message.get_Sender_ID() == parent_peer.get_ID()) {
+        if (message == null || message.get_sender_ID() == parent_peer.get_ID()) {
             return;
         }else {
 
             utilitarios.Notificacoes_Terminal.printNotificao("Recetor: " + message.toString());
 
-            MessageHandler messageHandler = map_message_handlers.get(message.getType());
+            MessageHandler messageHandler = map_message_handlers.get(message.get_type());
             if (messageHandler != null) {
                 messageHandler.handle(message);
             } else {

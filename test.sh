@@ -1,5 +1,7 @@
 !/bin/bash
 
+version=1.0;
+
 ##mudar teste rmi para rebind [NAO SEI SE NO SCRIPT SE NO tESTApp
 
 ######################  FUNCTIONS  ###########################
@@ -60,7 +62,7 @@ echo " "
 echo "%%%%%%%%%%%%%%%%%%%%%% create 5 peers %%%%%%%%%%%%%%%%%%%%%%"
 echo " "
 echo " "
-sh createPeers.sh 5
+sh createPeers.sh $version 5
 echo " "
 echo " "
 $(state_confirm)

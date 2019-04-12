@@ -46,7 +46,7 @@ public class TCPClientHandler implements Runnable {
       return;
     }
 
-    peer_data.get_restored_chunk_data(new ChunkData(msg.get_file_ID(), msg.get_Chunk_Numero(), msg.get_Corpo_Mensagem()));
+    peer_data.get_restored_chunk_data(new ChunkData(msg.get_file_ID(), msg.get_chunk_numero(), msg.get_Corpo_Mensagem()));
   }
 
   /**

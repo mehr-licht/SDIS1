@@ -59,7 +59,7 @@ public class CaixaCorreio extends CTTpostBox {
     Database database = parent_peer.get_database();
 
     if (enhancements_compatible(parent_peer, msg, DELETE_ENH)) {
-      database.deleteFileMirror(msg.get_file_ID(), msg.get_Sender_ID());
+      database.deleteFileMirror(msg.get_file_ID(), msg.get_sender_ID());
     }
   }
 
@@ -73,7 +73,7 @@ public class CaixaCorreio extends CTTpostBox {
     }
 
     if (!enhancement_compatible_msg(msg, RESTORE_ENH)) {
-      peerData.get_restored_chunk_data(new ChunkData(msg.get_file_ID(), msg.get_Chunk_Numero(), msg.get_Corpo_Mensagem()));
+      peerData.get_restored_chunk_data(new ChunkData(msg.get_file_ID(), msg.get_chunk_numero(), msg.get_Corpo_Mensagem()));
     }
   }
 
@@ -81,14 +81,14 @@ public class CaixaCorreio extends CTTpostBox {
     Database database = parent_peer.get_database();
     database.removeFromFilesToDelete(msg.get_file_ID());
 
-    if (database.hasChunk(msg.get_file_ID(), msg.get_Chunk_Numero())) {
+    if (database.hasChunk(msg.get_file_ID(), msg.get_chunk_numero())) {
       // If chunk is backed up by parent_peer, notify
       Map<Integer, Future> fileBackUpHandlers = backUpHandlers.get(msg.get_file_ID());
       if (fileBackUpHandlers == null) {
         return;
       }
 
-      final Future handler = fileBackUpHandlers.remove(msg.get_Chunk_Numero());
+      final Future handler = fileBackUpHandlers.remove(msg.get_chunk_numero());
       if (handler == null) {
         return;
       }
@@ -108,20 +108,20 @@ public class CaixaCorreio extends CTTpostBox {
     parent_peer.get_peer_data().notify_stored_observers(msg);
 
     Database database = parent_peer.get_database();
-    if (database.hasChunk(msg.get_file_ID(), msg.get_Chunk_Numero())) {
-      database.addChunkMirror(msg.get_file_ID(), msg.get_Chunk_Numero(), msg.get_Sender_ID());
+    if (database.hasChunk(msg.get_file_ID(), msg.get_chunk_numero())) {
+      database.addChunkMirror(msg.get_file_ID(), msg.get_chunk_numero(), msg.get_sender_ID());
     } else if (database.hasBackedUpFileById(msg.get_file_ID())) {
-      parent_peer.get_peer_data().inc_chunk_replic(msg.get_file_ID(), msg.get_Chunk_Numero());
-      database.addFileMirror(msg.get_file_ID(), msg.get_Sender_ID());
+      parent_peer.get_peer_data().inc_chunk_replic(msg.get_file_ID(), msg.get_chunk_numero());
+      database.addFileMirror(msg.get_file_ID(), msg.get_sender_ID());
     }
   }
 
   private void handleREMOVED(Message msg) {
     Database database = parent_peer.get_database();
     String fileID = msg.get_file_ID();
-    int chunkNo = msg.get_Chunk_Numero();
+    int chunkNo = msg.get_chunk_numero();
 
-    if (database.removeChunkMirror(fileID, chunkNo, msg.get_Sender_ID()) == null) {
+    if (database.removeChunkMirror(fileID, chunkNo, msg.get_sender_ID()) == null) {
       utilitarios.Notificacoes_Terminal.printNotificao("Ignoring REMOVED of non-local ChunkData");
       return;
     }
@@ -141,7 +141,7 @@ public class CaixaCorreio extends CTTpostBox {
       );
 
       backUpHandlers.putIfAbsent(msg.get_file_ID(), new HashMap<>());
-      backUpHandlers.get(msg.get_file_ID()).put(msg.get_Chunk_Numero(), handler);
+      backUpHandlers.get(msg.get_file_ID()).put(msg.get_chunk_numero(), handler);
     }
   }
 

@@ -45,10 +45,10 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
    */
   @Override
   public void run() {
-    int sender_ID = request.get_Sender_ID();
+    int sender_ID = request.get_sender_ID();
     String file_ID = request.get_file_ID();
-    int chunk_No = request.get_Chunk_Numero();
-    int replication_degree = request.get_File_Replication_Degree();
+    int chunk_No = request.get_chunk_numero();
+    int replication_degree = request.get_file_replication_degree();
 
     if (sender_ID == parent_peer.get_ID()) { // a peer never stores the chunks of its own files
       return;
@@ -232,7 +232,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
         parent_peer.get_version(),
         Integer.toString(parent_peer.get_ID()),
         request.get_file_ID(),
-        Integer.toString(request.get_Chunk_Numero())
+        Integer.toString(request.get_chunk_numero())
     };
 
     return new Message(Message.Categoria_Mensagem.STORED, args);
@@ -248,12 +248,12 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
     if (this.handler == null) {
       return;
     }
-    if ((!(msg.get_file_ID().equals(request.get_file_ID()))) || (!(msg.get_Chunk_Numero() == request.get_Chunk_Numero()))) {
+    if ((!(msg.get_file_ID().equals(request.get_file_ID()))) || (!(msg.get_chunk_numero() == request.get_chunk_numero()))) {
       return;
     }
 
     //stored_count += 1;
-    if (!(request.get_File_Replication_Degree() > ++stored_count)) {
+    if (!(request.get_file_replication_degree() > ++stored_count)) {
       // Cancela se o grau de replicação já atingiu o definido
       this.handler.cancel(true);
     }

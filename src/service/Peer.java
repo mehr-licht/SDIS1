@@ -201,7 +201,7 @@ public class Peer implements My_Interface_Remote {
           "Erro ao enviar mensagem para o canal "
               + channel_type
               + " - "
-              + message.getHeaderAsString());
+              + message.get_header_as_string());
     }
   }
 
@@ -214,7 +214,7 @@ public class Peer implements My_Interface_Remote {
    */
   public void send_message(Message message, ChannelType channel_type) throws IOException {
     utilitarios.Notificacoes_Terminal.printNotificao("Emissor: " + message.toString());
-    channels.get(channel_type).sendMessage(message.getBytes());
+    channels.get(channel_type).sendMessage(message.get_bytes());
   }
 
   /**

@@ -47,7 +47,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
       return;
     }
     String file_ID = request.get_file_ID();
-    int chunk_No = request.get_Chunk_Numero();
+    int chunk_No = request.get_chunk_numero();
     if (!chunk_found(chunk_No, file_ID)) {
       return;
     }
@@ -92,7 +92,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
    * @return verdadeiro ou falso
    */
   private boolean is_owned() {
-    if (request.get_Sender_ID() == parent_peer.get_ID()) {
+    if (request.get_sender_ID() == parent_peer.get_ID()) {
       return true;
     }
     return false;
@@ -110,7 +110,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
         parent_peer.get_version(),
         Integer.toString(parent_peer.get_ID()),
         request.get_file_ID(),
-        Integer.toString(request.get_Chunk_Numero())
+        Integer.toString(request.get_chunk_numero())
     };
 
     return new Message(Message.Categoria_Mensagem.CHUNK, args, chunk_data);
@@ -203,7 +203,7 @@ public class Restore implements Runnable, Peer_Info.MessageObserver {
     if (this.handler == null) {
       return;
     }
-    if (msg.get_file_ID().equals(request.get_file_ID()) && msg.get_Chunk_Numero() == request.get_Chunk_Numero()) {
+    if (msg.get_file_ID().equals(request.get_file_ID()) && msg.get_chunk_numero() == request.get_chunk_numero()) {
       this.handler.cancel(true);
       utilitarios.Notificacoes_Terminal.printNotificao("datagrama cancelado para não assoberbar o host");
     }
