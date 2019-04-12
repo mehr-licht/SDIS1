@@ -179,7 +179,7 @@ public class Backup implements Runnable, Peer_Info.MessageObserver {
     }
 
     if (ret == SAVE_STATE.SUCCESS) {
-      parent_peer.get_database().addChunk(
+      parent_peer.get_database().add_to_history_chunks__backed_up(
           new ChunkInfo(file_ID, chunk_No, replication_degree, chunk_data.length),
           parent_peer.get_ID()
       );

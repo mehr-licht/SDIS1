@@ -55,7 +55,7 @@ public class Delete implements Runnable {
    * @param file_ID identicador do ficheiro
    */
   private void delete_loop(String file_ID) {
-    Map<Integer, ChunkInfo> chunkMap = database.removeChunksBackedUpByFileID(file_ID);
+    Map<Integer, ChunkInfo> chunkMap = database.remove_from_history_chunks_backed_up_By_File_ID(file_ID);
     Collection<ChunkInfo> chunks = chunkMap.values();
     for (ChunkInfo chunk : chunks) {
 
@@ -70,7 +70,7 @@ public class Delete implements Runnable {
    * @return verdadeiro ou falso
    */
   private boolean chunks_in_database(String file_ID) {
-    if (!database.hasChunks(file_ID)) {
+    if (!database.has_chunks(file_ID)) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Não há chunks - a abortar");
       return true;
     }

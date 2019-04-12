@@ -334,7 +334,7 @@ public class SystemManager {
 
     delete_pathchunk(path);
     memoryManager.reduce_peer_memory(chunk_size);
-    database.removeChunk(file_ID, chunk_No);
+    database.remove_from_history_chunks_backed_up(file_ID, chunk_No);
   }
 
   /**

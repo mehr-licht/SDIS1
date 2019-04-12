@@ -19,7 +19,7 @@ public class MemoryAdmin extends AuxMemAdmin {
         this.used_memory = 0;
 
         this.set_up(savePath);
-        
+
     }
 
     /**

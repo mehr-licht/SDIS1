@@ -47,12 +47,12 @@ public class DeleteInit implements Runnable {
       return;
     }
 
-    database.addToFilesToDelete(fileInfo.getFileID());
+    database.add_files_to_trash(fileInfo.getFileID());
 
     send_message_MC(fileInfo);
     delete_file();
 
-    database.removeRestorableFile(fileInfo);
+    database.final_remove_file_from_database(fileInfo);
     utilitarios.Notificacoes_Terminal.printAviso("Acabei de apagar o ficheiro");
   }
 
