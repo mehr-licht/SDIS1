@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public class Database extends PermanentStateClass {
 
   private static final long serialVersionUID = 1L;
-
   /**
-   * Contains local files that were backed up, and may be restored. Maps (fileID -> FileInfo)
+   * @param string file id
+   * @param FileInfo  informaçãod do ficheiro inclui chunks informacao
    */
-  private ConcurrentMap<String, FileInfo> filesBackedUp;
+  private ConcurrentMap<String, FileInfo> historic_files_backed_Up;
 
   /**
    * Maps (filePath -> FileInfo)
@@ -23,12 +23,16 @@ public class Database extends PermanentStateClass {
   private ConcurrentMap<String, FileInfo> filesByPath;
 
   /**
-   * Contains backed up Chunks (on disk memory). Maps (fileID -> (ChunkNum -> ChunkInfo))
+   * History of the chunks in peer
+   * @param String file id
+   * @param <Int,Chunk Info> chunk number, chunk information
    */
-  private ConcurrentMap<String, ConcurrentMap<Integer, ChunkInfo>> chunksBackedUp;
+  private ConcurrentMap<String, ConcurrentMap<Integer, ChunkInfo>> historic_chunks_backed_up;
 
   /**
    * Contains peerIDs of mirrors of local files. Maps (fileID -> Set<PeerID>)
+   * @param String ficheiro ID
+   * @param Set<Int> ids dos peers
    */
   private ConcurrentMap<String, Set<Integer>> fileMirrors;
 
@@ -39,9 +43,9 @@ public class Database extends PermanentStateClass {
   private Set<String> filesToDelete;
 
   Database(String savePath) {
-    filesBackedUp = new ConcurrentHashMap<>();
+    historic_files_backed_Up = new ConcurrentHashMap<>();
     filesByPath = new ConcurrentHashMap<>();
-    chunksBackedUp = new ConcurrentHashMap<>();
+    historic_chunks_backed_up = new ConcurrentHashMap<>();
 
     fileMirrors = new ConcurrentHashMap<>();
     filesToDelete = new HashSet<>();
@@ -53,9 +57,13 @@ public class Database extends PermanentStateClass {
     return filesToDelete.add(fileID);
   }
 
+  /**
+   * Remove o file do lixo - é como se fosse o TRASH do ubuntu
+   * */
   public boolean removeFromFilesToDelete(String fileID) {
     return filesToDelete.remove(fileID);
   }
+
 
   public void addFileMirror(String fileID, int senderID) {
     fileMirrors.putIfAbsent(fileID, new ConcurrentSkipListSet<>());
@@ -85,13 +93,13 @@ public class Database extends PermanentStateClass {
   }
 
   public void addRestorableFile(FileInfo fileInfo) {
-    filesBackedUp.put(fileInfo.getFileID(), fileInfo);
+    historic_files_backed_Up.put(fileInfo.getFileID(), fileInfo);
     filesByPath.put(fileInfo.getPath(), fileInfo);
   }
 
   //Delete file from database
   public void removeRestorableFile(FileInfo fileInfo) {
-    filesBackedUp.remove(fileInfo.getFileID());
+    historic_files_backed_Up.remove(fileInfo.getFileID());
     filesByPath.remove(fileInfo.getPath());
   }
 
@@ -100,7 +108,7 @@ public class Database extends PermanentStateClass {
   }
 
   public boolean hasBackedUpFileById(String fileID) {
-    return filesBackedUp.containsKey(fileID);
+    return historic_files_backed_Up.containsKey(fileID);
   }
 
   public boolean hasBackedUpFileByPath(String path) {
@@ -111,10 +119,10 @@ public class Database extends PermanentStateClass {
     return filesByPath.get(pathName);
   }
 
-  // chunksBackedUp
+  // historic_chunks_backed_up
   public boolean hasChunk(String fileID, int chunkNo) {
 
-    Map<Integer, ChunkInfo> fileChunks = chunksBackedUp.get(fileID);
+    Map<Integer, ChunkInfo> fileChunks = historic_chunks_backed_up.get(fileID);
 
     return fileChunks != null && fileChunks.containsKey(chunkNo);
   }
@@ -126,33 +134,33 @@ public class Database extends PermanentStateClass {
     int chunkNo = chunkInfo.getChunkNo();
 
     ConcurrentMap<Integer, ChunkInfo> fileChunks;
-    fileChunks = chunksBackedUp.getOrDefault(fileID, new ConcurrentHashMap<>());
+    fileChunks = historic_chunks_backed_up.getOrDefault(fileID, new ConcurrentHashMap<>());
     fileChunks.putIfAbsent(chunkNo, chunkInfo);
 
-    chunksBackedUp.putIfAbsent(fileID, fileChunks);
+    historic_chunks_backed_up.putIfAbsent(fileID, fileChunks);
   }
 
   public ChunkInfo getChunkInfo(String fileID, int chunkNo) {
-    Map<Integer, ChunkInfo> fileChunks = chunksBackedUp.get(fileID);
+    Map<Integer, ChunkInfo> fileChunks = historic_chunks_backed_up.get(fileID);
 
     return fileChunks != null ? fileChunks.get(chunkNo) : null;
   }
 
   public void removeChunk(String fileID, int chunkNo) {
 
-    if (!chunksBackedUp.containsKey(fileID)) {
+    if (!historic_chunks_backed_up.containsKey(fileID)) {
       return;
     }
 
-    chunksBackedUp.get(fileID).remove(chunkNo);
+    historic_chunks_backed_up.get(fileID).remove(chunkNo);
   }
 
   public Map<Integer, ChunkInfo> removeChunksBackedUpByFileID(String fileID) {
-    if (!chunksBackedUp.containsKey(fileID)) {
+    if (!historic_chunks_backed_up.containsKey(fileID)) {
       return null;
     }
 
-    return chunksBackedUp.remove(fileID);
+    return historic_chunks_backed_up.remove(fileID);
   }
 
   public int getNumChunksByFilePath(String path) {
@@ -160,13 +168,13 @@ public class Database extends PermanentStateClass {
   }
 
   public String getFileInfoByFileID(String fileID) {
-    return filesBackedUp.get(fileID).getPath();
+    return historic_files_backed_Up.get(fileID).getPath();
   }
 
   public Boolean addChunkMirror(String fileID, int chunkNo, int peerID) {
     boolean ret;
     try {
-      ret = chunksBackedUp.get(fileID).get(chunkNo).addMirror(peerID);
+      ret = historic_chunks_backed_up.get(fileID).get(chunkNo).addMirror(peerID);
     } catch (NullPointerException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("addChunkMirror " + e.getMessage());
       return null;
@@ -186,7 +194,7 @@ public class Database extends PermanentStateClass {
   public Boolean removeChunkMirror(String fileID, int chunkNo, int peerID) {
     boolean ret;
     try {
-      ret = chunksBackedUp.get(fileID).get(chunkNo).removeMirror(peerID);
+      ret = historic_chunks_backed_up.get(fileID).get(chunkNo).removeMirror(peerID);
     } catch (NullPointerException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("(removeChunkMirror) ChunkData not found: " + e.getMessage());
       return null;
@@ -199,7 +207,7 @@ public class Database extends PermanentStateClass {
 
     int ret;
     try {
-      ret = chunksBackedUp.get(fileID).get(chunkNo).getNumMirrors();
+      ret = historic_chunks_backed_up.get(fileID).get(chunkNo).getNumMirrors();
     } catch (NullPointerException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("getChunkPerceivedReplication " + e.getMessage());
       return null;
@@ -209,15 +217,15 @@ public class Database extends PermanentStateClass {
   }
 
   public boolean hasChunks(String fileID) {
-    return chunksBackedUp.containsKey(fileID);
+    return historic_chunks_backed_up.containsKey(fileID);
   }
 
-  public Collection<FileInfo> getFilesBackedUp() {
-    return filesBackedUp.values();
+  public Collection<FileInfo> getHistoric_files_backed_Up() {
+    return historic_files_backed_Up.values();
   }
 
-  public ConcurrentMap<String, ConcurrentMap<Integer, ChunkInfo>> getChunksBackedUp() {
-    return chunksBackedUp;
+  public ConcurrentMap<String, ConcurrentMap<Integer, ChunkInfo>> getHistoric_chunks_backed_up() {
+    return historic_chunks_backed_up;
   }
 
   /**
@@ -234,7 +242,7 @@ public class Database extends PermanentStateClass {
     ChunkInfo mostBackedUpChunk = null;
     int maxMirroring = -1;
 
-    for (ConcurrentMap.Entry<String, ConcurrentMap<Integer, ChunkInfo>> fileEntry : chunksBackedUp
+    for (ConcurrentMap.Entry<String, ConcurrentMap<Integer, ChunkInfo>> fileEntry : historic_chunks_backed_up
         .entrySet()) {
       for (ConcurrentMap.Entry<Integer, ChunkInfo> chunkEntry : fileEntry.getValue().entrySet()) {
         int numMirrors = chunkEntry.getValue().getNumMirrors();

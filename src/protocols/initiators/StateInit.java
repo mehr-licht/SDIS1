@@ -33,9 +33,9 @@ public class StateInit implements Runnable {
   @Override
   public void run() {
     // Obtain info of the files from Database
-    Collection<FileInfo> files = database.getFilesBackedUp();
+    Collection<FileInfo> files = database.getHistoric_files_backed_Up();
     // Obtain info of the chunks from Database
-    ConcurrentMap<String, ConcurrentMap<Integer, ChunkInfo>> chunks = database.getChunksBackedUp();
+    ConcurrentMap<String, ConcurrentMap<Integer, ChunkInfo>> chunks = database.getHistoric_chunks_backed_up();
     String out = get_output(files, chunks);
 
     // Storage capacity

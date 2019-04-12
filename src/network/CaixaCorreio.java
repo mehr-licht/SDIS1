@@ -32,7 +32,6 @@ public class CaixaCorreio extends CTTpostBox {
 
     this.parent_peer = parentPeer;
     this.executor = Executors.newScheduledThreadPool(MSG_CORE_POOL_SIZE);
-
     this.backUpHandlers = new HashMap<>();
     this.random = new Random();
   }

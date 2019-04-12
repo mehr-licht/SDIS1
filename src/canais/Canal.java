@@ -48,7 +48,6 @@ public abstract class Canal implements Runnable {
 
     }
 
-
     /**
      * Implementa a classe Runnable. Assim que a thread é lançada faz o run()
      * Os 3 canais de comunicação ficam à escuta por mensages que serão reenviadas para o peer
