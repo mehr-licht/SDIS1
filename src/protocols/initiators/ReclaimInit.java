@@ -3,7 +3,7 @@ package protocols.initiators;
 import canais.Canal;
 import filesystem.ChunkInfo;
 import filesystem.MemoryAdmin;
-import filesystem.SystemManager;
+import filesystem.FolderManagerSystem;
 import java.io.IOException;
 import network.Message;
 import service.Peer;
@@ -11,7 +11,7 @@ import service.Peer;
 public class ReclaimInit implements Runnable {
 
   private Peer parentPeer;
-  private SystemManager systemManager;
+  private FolderManagerSystem systemManager;
   private String version;
 
 

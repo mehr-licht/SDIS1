@@ -50,7 +50,6 @@ public class SystemManager {
     } catch (IOException e) {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't create file directory!");
     }
-  }
 
   /**
    * carrega um ficheiro
@@ -80,8 +79,6 @@ public class SystemManager {
       utilitarios.Notificacoes_Terminal.printMensagemError("Couldn't read data of a file!");
     }
 
-    return data;
-  }
 
   /**
    * obtem tamanho do ficheiro
@@ -203,7 +200,6 @@ public class SystemManager {
     } catch (IOException | ClassNotFoundException e) {
       e.printStackTrace();
     }
-  }
 
   /**
    * Inicializa gerenciador da memória
@@ -220,7 +216,6 @@ public class SystemManager {
     } else {
       this.memoryManager = new MemoryAdmin( mm.getAbsolutePath(),max_memory);
     }
-  }
 
   /**
    *
@@ -230,12 +225,33 @@ public class SystemManager {
   private void initialize_database() throws IOException, ClassNotFoundException {
     File db = new File(root_path + "db");
 
-    if (db.exists()) {
-      this.database = (Database) Database.load_from_file(db);
-    } else {
-      this.database = new Database(db.getAbsolutePath());
+        }
+
+        String filePath = pathname + "/" + fileName;
+
+        try {
+            if (Files.exists(Paths.get(filePath))) {
+                utilitarios.Notificacoes_Terminal.printAviso("Ficheiro existe em disco");
+                return SAVE_STATE.EXISTS;
+            }
+        } catch (Exception e) {
+            utilitarios.Notificacoes_Terminal.printMensagemError("line 181");
+        }
+
+
+        OutputStream out = Files.newOutputStream(Paths.get(filePath));
+
+        try {
+            out.write(data);
+            out.close();
+        }catch(Exception e){
+            utilitarios.Notificacoes_Terminal.printMensagemError("line 192");
+
+        }
+        memoryManager.increase_peer_memory(data.length);
+
+        return SAVE_STATE.SUCCESS;
     }
-  }
 
   /**
    *
@@ -262,9 +278,8 @@ public class SystemManager {
     out.write(data);
     out.close();
 
-    memoryManager.increase_peer_memory(data.length);
-    return SAVE_STATE.SUCCESS;
-  }
+        String chunkPath = getChunkPath(fileid, chunk_numb);
+        Path path = Paths.get(chunkPath);
 
   /**
    *
@@ -276,7 +291,14 @@ public class SystemManager {
 
     return get_chunks_path() + file_ID + "/chk" + chunk_No;
 
-  }
+    /**
+     * ENUMERATION
+     */
+    public enum SAVE_STATE {
+        EXISTS,
+        SUCCESS,
+        FAILURE
+    }
 
   /**
    *

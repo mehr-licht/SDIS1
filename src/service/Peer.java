@@ -15,7 +15,7 @@ import network.CTTpostBox;
 import network.CaixaCorreio;
 import network.Message;
 import filesystem.Database;
-import filesystem.SystemManager;
+import filesystem.FolderManagerSystem;
 import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -42,7 +42,7 @@ public class Peer implements My_Interface_Remote {
   //serviço Executor service responsável pelo escalonamento das respostas e fazer todas as tarefas dos sub-protocolos RMI.
   private ScheduledExecutorService executor;
 
-  private SystemManager system_manager;
+  private FolderManagerSystem system_manager;
   private Database database;
   private Peer_Info peer_info;
 
@@ -406,7 +406,7 @@ public class Peer implements My_Interface_Remote {
    *
    * @return dados do sistema
    */
-  public SystemManager get_system_manager() {
+  public FolderManagerSystem get_system_manager() {
     return system_manager;
   }
 

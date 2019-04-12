@@ -8,7 +8,7 @@ import java.util.Random;
 import canais.Canal;
 import service.Peer;
 import filesystem.ChunkInfo;
-import filesystem.SystemManager.SAVE_STATE;
+import filesystem.FolderManagerSystem.SAVE_STATE;
 import network.Message;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;

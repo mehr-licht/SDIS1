@@ -9,7 +9,7 @@ import utilitarios.Utils;
 import filesystem.ChunkData;
 import filesystem.ChunkInfo;
 import filesystem.FileInfo;
-import filesystem.SystemManager;
+import filesystem.FolderManagerSystem;
 import protocols.initiators.helpers.BackupChunkHelper;
 import java.io.IOException;
 import java.nio.file.Files;
