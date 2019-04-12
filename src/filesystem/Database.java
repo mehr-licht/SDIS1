@@ -35,12 +35,15 @@ public class Database extends PermanentStateClass {
    * @param Set<Int> ids dos peers
    */
   private ConcurrentMap<String, Set<Integer>> fileMirrors;
-
   /**
-   * Contains fileIDs of files that were deleted on the peer's network. DELETE -> add fileID to Set
-   * PUTCHUNK -> remove fileID from Set
+   * Nosso Trash antes de apagar o ficheiro totalmente
+   * @param String file id
+   * TODO Check PUTCHUNK -> remove fileID from Set
    */
-  private Set<String> filesToDelete;
+  private Set<String> files_trash_deleted;
+
+
+
 
   Database(String savePath) {
     historic_files_backed_Up = new ConcurrentHashMap<>();
@@ -48,20 +51,20 @@ public class Database extends PermanentStateClass {
     historic_chunks_backed_up = new ConcurrentHashMap<>();
 
     fileMirrors = new ConcurrentHashMap<>();
-    filesToDelete = new HashSet<>();
+    files_trash_deleted = new HashSet<>();
 
     this.setUp(savePath);
   }
 
   public boolean addToFilesToDelete(String fileID) {
-    return filesToDelete.add(fileID);
+    return files_trash_deleted.add(fileID);
   }
 
   /**
    * Remove o file do lixo - é como se fosse o TRASH do ubuntu
    * */
   public boolean removeFromFilesToDelete(String fileID) {
-    return filesToDelete.remove(fileID);
+    return files_trash_deleted.remove(fileID);
   }
 
 
@@ -75,7 +78,7 @@ public class Database extends PermanentStateClass {
     for (Map.Entry<String, Set<Integer>> fileMirrorEntry : fileMirrors.entrySet()) {
       for (Integer mirrorID : fileMirrorEntry.getValue()) {
         String fileID = fileMirrorEntry.getKey();
-        if (mirrorID == senderID && filesToDelete.contains(fileID)) {
+        if (mirrorID == senderID && files_trash_deleted.contains(fileID)) {
           files.add(fileID);
           break;
         }
