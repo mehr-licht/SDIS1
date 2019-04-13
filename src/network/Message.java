@@ -19,8 +19,8 @@ public class Message implements Serializable {
     REMOVED,
     DELETE,
     ENH_GETCHUNK,
-    DELETED,
-    UP,
+    HASDELETED,
+    ACTIVE,
     CHUNK
   }
 
@@ -66,11 +66,11 @@ public class Message implements Serializable {
     this.type = type;
     version = args[0];
     sender_ID = Integer.parseInt(args[1]);
-    if (type == Categoria_Mensagem.UP) {
+    if (type == Categoria_Mensagem.ACTIVE) {
       return;
     }
     file_ID = args[2];
-    if (type != Categoria_Mensagem.DELETE && type != Categoria_Mensagem.DELETED) {
+    if (type != Categoria_Mensagem.DELETE && type != Categoria_Mensagem.HASDELETED) {
       if (type == Categoria_Mensagem.GETCHUNK
           || type == Categoria_Mensagem.ENH_GETCHUNK
           || type == Categoria_Mensagem.REMOVED) {
@@ -188,8 +188,8 @@ public class Message implements Serializable {
         type = Categoria_Mensagem.DELETE;
         numberArgs = 4;
         break;
-      case "DELETED":
-        type = Categoria_Mensagem.DELETED;
+      case "HASDELETED":
+        type = Categoria_Mensagem.HASDELETED;
         numberArgs = 4;
         break;
       case "REMOVED":
@@ -200,8 +200,8 @@ public class Message implements Serializable {
         type = Categoria_Mensagem.ENH_GETCHUNK;
         numberArgs = 6;
         break;
-      case "UP":
-        type = Categoria_Mensagem.UP;
+      case "ACTIVE":
+        type = Categoria_Mensagem.ACTIVE;
         numberArgs = 3;
         break;
       default:
@@ -216,7 +216,7 @@ public class Message implements Serializable {
     // <Sender ID>
     sender_ID = Integer.parseInt(mensagem_em_array[2]);
 
-    if (type == Categoria_Mensagem.UP) return true;
+    if (type == Categoria_Mensagem.ACTIVE) return true;
 
     // <FileId>
     file_ID = mensagem_em_array[3];
@@ -262,7 +262,7 @@ public class Message implements Serializable {
                 + Utils.bi_CRLF;
         break;
       case DELETE:
-      case DELETED:
+      case HASDELETED:
         str = type + " " + version + " " + sender_ID + " " + file_ID + " " + Utils.bi_CRLF;
         break;
       case ENH_GETCHUNK:
@@ -283,7 +283,7 @@ public class Message implements Serializable {
                 + " "
                 + Utils.bi_CRLF;
         break;
-      case UP:
+      case ACTIVE:
         str = type + " " + version + " " + sender_ID + " " + Utils.bi_CRLF;
         break;
       default:
@@ -352,7 +352,7 @@ public class Message implements Serializable {
         str = type + " " + version + " " + sender_ID + " " + file_ID + " " + chunkNo;
         break;
       case DELETE:
-      case DELETED:
+      case HASDELETED:
         str = type + " " + version + " " + sender_ID + " " + file_ID;
         break;
       case ENH_GETCHUNK:
@@ -360,7 +360,7 @@ public class Message implements Serializable {
             type + " " + version + " " + sender_ID + " " + file_ID + " " + chunkNo + " " + m_TCP_host
                 + ":" + m_TCP_port;
         break;
-      case UP:
+      case ACTIVE:
         str = type + " " + version + " " + sender_ID;
         break;
       default:

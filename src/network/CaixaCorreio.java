@@ -36,25 +36,25 @@ public class CaixaCorreio extends CTTpostBox {
     this.random = new Random();
   }
 
-  private void handleGETCHUNK(Message msg) {
+  private void handle_GETCHUNK(Message msg) {
     Restore restore_enh = new Restore(parent_peer, msg);
     executor.execute(restore_enh);
   }
 
-  private void handleDELETE(Message msg) {
+  private void handle_DELETE(Message msg) {
     parent_peer.get_database().add_files_to_trash(msg.get_file_ID());
 
     Delete delete = new Delete(parent_peer, msg);
     executor.execute(delete);
   }
 
-  private void handleUP(Message msg) {
+  private void handle_ACTIVE(Message msg) {
     if (enhancements_compatible(parent_peer, msg, DELETEENH)) {
       executor.execute(new DeleteEnhHelper(msg, parent_peer));
     }
   }
 
-  private void handleDELETED(Message msg) {
+  private void handle_HASDELETED(Message msg) {
     Database database = parent_peer.get_database();
 
     if (enhancements_compatible(parent_peer, msg, DELETEENH)) {
@@ -62,7 +62,7 @@ public class CaixaCorreio extends CTTpostBox {
     }
   }
 
-  private void handleCHUNK(Message msg) {
+  private void handle_CHUNK(Message msg) {
     Peer_Info peerData = parent_peer.get_peer_data();
 
     peerData.notify_chunk_observers(msg);
@@ -76,7 +76,7 @@ public class CaixaCorreio extends CTTpostBox {
     }
   }
 
-  private void handlePUTCHUNK(Message msg) {
+  private void handle_PUTCHUNK(Message msg) {
     Database database = parent_peer.get_database();
     database.remove_file_from_trash(msg.get_file_ID());
 
@@ -102,7 +102,7 @@ public class CaixaCorreio extends CTTpostBox {
     }
   }
 
-  private void handleSTORED(Message msg) {
+  private void handle_STORED(Message msg) {
 
     parent_peer.get_peer_data().notify_stored_observers(msg);
 
@@ -115,7 +115,7 @@ public class CaixaCorreio extends CTTpostBox {
     }
   }
 
-  private void handleREMOVED(Message msg) {
+  private void handle_REMOVED(Message msg) {
     Database database = parent_peer.get_database();
     String fileID = msg.get_file_ID();
     int chunkNo = msg.get_chunk_numero();
@@ -150,15 +150,15 @@ public class CaixaCorreio extends CTTpostBox {
    * */
   @Override
   protected void configuracao_mensagem_handlers() {
-    adiciona_handle_mensagem(PUTCHUNK, this::handlePUTCHUNK);
-    adiciona_handle_mensagem(STORED, this::handleSTORED);
-    adiciona_handle_mensagem(GETCHUNK, this::handleGETCHUNK);
-    adiciona_handle_mensagem(ENH_GETCHUNK, this::handleGETCHUNK);
-    adiciona_handle_mensagem(CHUNK, this::handleCHUNK);
-    adiciona_handle_mensagem(REMOVED, this::handleREMOVED);
-    adiciona_handle_mensagem(DELETE, this::handleDELETE);
-    adiciona_handle_mensagem(DELETED, this::handleDELETED);
-    adiciona_handle_mensagem(UP, this::handleUP);
+    adiciona_handle_mensagem(PUTCHUNK, this::handle_PUTCHUNK);
+    adiciona_handle_mensagem(STORED, this::handle_STORED);
+    adiciona_handle_mensagem(GETCHUNK, this::handle_GETCHUNK);
+    adiciona_handle_mensagem(ENH_GETCHUNK, this::handle_GETCHUNK);
+    adiciona_handle_mensagem(CHUNK, this::handle_CHUNK);
+    adiciona_handle_mensagem(REMOVED, this::handle_REMOVED);
+    adiciona_handle_mensagem(DELETE, this::handle_DELETE);
+    adiciona_handle_mensagem(HASDELETED, this::handle_HASDELETED);
+    adiciona_handle_mensagem(ACTIVE, this::handle_ACTIVE);
   }
 
 }

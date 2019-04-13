@@ -328,7 +328,7 @@ public class Peer implements My_Interface_Remote {
           get_version(), Integer.toString(get_ID()),
       };
 
-      Message msg = new Message(Message.Categoria_Mensagem.UP, args);
+      Message msg = new Message(Message.Categoria_Mensagem.ACTIVE, args);
 
       try {
         send_message(msg, Canal.ChannelType.MC);

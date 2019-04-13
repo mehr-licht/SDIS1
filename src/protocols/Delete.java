@@ -114,7 +114,7 @@ public class Delete implements Runnable {
         request.get_file_ID()
     };
 
-    return new Message(Message.Categoria_Mensagem.DELETED, args);
+    return new Message(Message.Categoria_Mensagem.HASDELETED, args);
   }
 
 }
