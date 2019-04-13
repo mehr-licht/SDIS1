@@ -9,7 +9,10 @@ version=1.0;
 #SÓ O y É QUE ESTÁ A FUNCIONAR : SE SE FIZER < y ENTER > O SCRIPT CONTINUA : VER OUTROS EXEMPLOS
 confirm(){
 #wait for yes to continue or exit to exit...
+local msg= " "
+echo msg > /dev/tty
 read -p "Continue (y)es/(n)o/(e)exit?" choice
+echo msg > /dev/tty
 
 while [ $choice != "y" ] 
 do
@@ -33,15 +36,20 @@ done
 
 ask_state (){
 #ask for the state of the 5 peers
+local msg= " "
+echo msg > /dev/tty
+echo msg > /dev/tty
 local msg1="asking each peer for their state"
 local msg2="check their state on each tab"
 echo $msg1 > /dev/tty
+echo msg > /dev/tty
 java -classpath bin service.TestApp //localhost/1 STATE
 java -classpath bin service.TestApp //localhost/2 STATE
 java -classpath bin service.TestApp //localhost/3 STATE
 java -classpath bin service.TestApp //localhost/4 STATE
 java -classpath bin service.TestApp //localhost/5 STATE
 echo $msg2 > /dev/tty 
+echo msg > /dev/tty
 }
 
 
@@ -139,22 +147,22 @@ echo " "
 ######################################delete test
 echo " "
 echo " "
-echo ">>>>>>>>>>>> SE CONFIRMAR QUE QUER CONTINUAR VAI APAGAR O FICHEIRO stf.txt - É APENAS UM Olá Mundo - é facilmente refeito <<<<<<<<<<<<<<"
-$(confirm)
-echo " "
-echo " "
-echo "%%%%%%%%%%%%%%%%%%%%%% delete "files/stf.txt" from 1 %%%%%%%%%%%%%%%%%%%%%%"
-echo " "
-echo " "
-java -classpath bin service.TestApp //localhost/1 delete "files/stf.txt"
-echo " "
-echo " "
-echo "%%%%%%%%%%%%%%%%%%%%%% please check peer1 for a file not found error %%%%%%%%%%%%%%%%%%%%%%"
-echo " "
-echo " "
-$(confirm)
-echo " "
-echo " "
+#echo ">>>>>>>>>>>> SE CONFIRMAR QUE QUER CONTINUAR VAI APAGAR O FICHEIRO stf.txt - É APENAS UM Olá Mundo - é facilmente refeito <<<<<<<<<<<<<<"
+#$(confirm)
+#echo " "
+#echo " "
+#echo "%%%%%%%%%%%%%%%%%%%%%% delete "files/stf.txt" from 1 %%%%%%%%%%%%%%%%%%%%%%"
+#echo " "
+#echo " "
+#java -classpath bin service.TestApp //localhost/1 delete "files/stf.txt"
+#echo " "
+#echo " "
+#echo "%%%%%%%%%%%%%%%%%%%%%% please check peer1 for a file not found error %%%%%%%%%%%%%%%%%%%%%%"
+#echo " "
+#echo " "
+#$(confirm)
+#echo " "
+#echo " "
 echo "%%%%%%%%%%%%%%%%%%%%%% backup 'files/stf.txt' from 1 with replication 3 %%%%%%%%%%%%%%%%%%%%%%"
 echo " "
 echo " "
@@ -164,6 +172,8 @@ echo " "
 echo "%%%%%%%%%%%%%%%%%%%%%% delete "files/stf.txt" from 1"
 echo " "
 echo " "
+echo ">>>>>>>>>>>> SE CONFIRMAR QUE QUER CONTINUAR VAI APAGAR O FICHEIRO stf.txt - É APENAS UM Olá Mundo - é facilmente refeito <<<<<<<<<<<<<<"
+$(confirm)
 java -classpath bin service.TestApp //localhost/1 delete "files/stf.txt %%%%%%%%%%%%%%%%%%%%%%"
 echo " "
 echo " "

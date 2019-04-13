@@ -13,8 +13,8 @@ peers=$2
 echo "Creating $peers peers"
 echo .
 #clear the peers' file system
-echo 'Running: sh ./clearFileSystem.sh'
-sh ./clearFileSystem.sh
+echo 'Running: sh ./clearFiles.sh'
+sh ./clearFiles.sh
 echo 'Warning: all peers files system cleared'
 echo .
 #compile in LINUX/UNIX
