@@ -1,129 +1,132 @@
-# Distributed backup service
-
-## How to run
-From the Project's root folder:
-
-1. To compile in LINUX/UNIX: using a terminal, navigate to the project's root folder and run the 'compile.sh' script:
-  > sh compile.sh
-
-2. To start the RMI registry run the 'rmi.sh' script:
-  > sh rmi.sh  
-
-3. To start a peer, use the 'peer.sh' script:
-  > sh peer.sh <protocol_version> <peer_id>
-
-(_e.g._ ```sh peer.sh 2.0 1```)
-
-4. To run the TestApp:
-  - open a terminal, navigate to the project's root folder and type "sh <test_action>.sh"
-    - <test_action> is one of ```backup```, ```restore```, ```reclaim```, ```delete``` or ```state```.
-	
-
-- To clear the peers' file system, run the 'clearFilesystem.sh' script:
-  > sh clearFilesystem.sh
-	
-
-## How to compile
-
-The project can be compiled as usual with the ```javac``` command, or by running ```sh compile.sh``` from the project's root folder.
-
-## RMI registry
-
-As suggested, the interface implementation uses RMI. In order to interact with the service, an *rmiregistry* instance must be running inside **bin** folder.
-
-The following command launches an *rmiregistry* instance in the background:
-```rmiregistry &```
 
 
-## Peer
+**Serviço de Backup Distribuído**
 
-If the user intends to interact with a peer, a name for the remote object must be specified, hence the alternative usages:
+Este &quot;read me&quot; explica como correr o Serviço de Backup Distribuído.
 
-```
-To run a peer:
-Usage: java -classpath bin service.Peer <protocol_version> <server_id> <service_access_point> <mc:port> <mdb:port> <mdr:port>
+**Como correr**
 
-Argument description:
-		protocol_version - version of protocol used (1.0, 1.1, 1.2, 1.3 or 2.0)
-		server_id - Integer representing the peer’s unique identifier
-		service_access_point - host to access the rmi registry (format explained on RMI Registry section)
-		mc:port - IP address:Port of the CONTROL channel
-		mdb:port – IP address:Port of the BACKUP channel
-		mdr:port – IP address:Port of the RESTORE channel
-				
-        Protocol version:                   service_access_point:
-          1.0 -> Default                          - Formats on Peer: //host(:port)?/
-          1.1 -> Backup Enhancement               - Formats on testApp: //host(:port)?/peerID
-          1.2 -> Restore Enhancement
-          1.3 -> Delete Enhancement
-          2.0 -> All Enhancement
-		
-Eg. java -classpath bin service.Peer "$1" "$2" //localhost/ 224.0.0.0:8000 224.0.0.0:8001 224.0.0.0:8002
+Em linux, abrir um terminal e, a partir do diretório da raiz do projeto, correr:
 
-```
+1. 1)sh createPeers.sh \&lt;versão\&gt; \&lt;nºpeers\&gt;
 
-## Test App
+Por exemplo, sh createPeers.sh 1.0  5
 
-```
-To run test app
- Usage: java TestApp <peer_ap> <sub_protocol> <opnd_1> <opnd_2
- 
- Argument description:
-		peer_app – local peer access point
-		sub-protocol – can be BACKUP, RESTORE, RECLAIM, DELETE or STATE
-		opnd_1 – path name of the file or amount of space to be reclaim
-		opnd_2 – specifies the desired replication degree. Applies only to backup sub-protocol
- 
-Eg.
- java -classpath bin service.TestApp //localhost/1 BACKUP "files/image1.png" 1
- java -classpath bin service.TestApp //localhost/1 DELETE "files/image1.png"
- java -classpath bin service.TestApp //localhost/2 RECLAIM 140000
- java -classpath bin service.TestApp //localhost/1 RESTORE "files/image1.png"
- java -classpath bin service.TestApp //localhost/1 STATE
- 
-```
+Este é um script que limpa os chunks e ficheiros restaurados, compila, verifica se o serviço RMI está a correr e inicializa-o caso não esteja e cria a quantidade de peers passada como argumento com a versão do protocolo também indicada na chamada.
 
-### Defaults
+Em alternativa, pode-se fazer estes passos em separado:
 
-Usages where the user does not specify the multicast addresses and ports will have the following defaults (on script):
+| sh clearFiles.sh // limpa os chunks e ficheiros restauradossh compile.sh // compila o projeto (também possível com o comando javac)sh rmi.sh // inicializa o serviço RMI em segundo planosh peer.sh \&lt;versão\&gt; \&lt;peer\_id\&gt; // lançar um para cada peer que se queira criar e idealmente em tabs separadas |
+| --- |
 
-|RMI              |MC            |MDB           |MDR           |
-|-----------------|--------------|--------------|--------------|
-|//localhost:1099/|224.0.0.0:8000|224.0.0.0:8001|224.0.0.0:8002|
+As versões do protocolo podem ser verificadas mais abaixo.
 
-The default size of a peer on system is 8MB.
+2) A seguir, lançar a aplicação testApp no terminal inicial ou num novo no directório da raiz do projeto com:
+sh run.sh \&lt;peer\_id\&gt; \&lt;serviço\&gt; \&lt;operando1\&gt; \&lt;operando2\&gt;
+
+em que o serviço pode ser BACKUP, RESTORE, RECLAIM, DELETE ou STATE. Operando1, no caso do serviço ser BACKUP, RESTORE ou DELETE é o nome do ficheiro e no caso de ser RECLAIM indica o espaço de memória que se quer dedicada ao peer.
+
+Por exemplo,
+
+| sh run.sh 1 BACKUP &quot;files/lusiadas.txt&quot; 3
+sh run.sh 1 RESTORE &quot;files/lusiadas.txt&quot;
+sh run.sh 1 DELETE &quot;files/lusiadas.txt&quot;
+sh run.sh 1 STATE
+sh run.sh 1 RECLAIM 63000 |
+| --- |
+
+**Versões do protocolo**
+
+Além do protocolo base da versão normal, implementamos mais quatro versões para os três melhoramentos:
+
+Versão **1.0** : versão normal
+
+Versão **1.1** : melhoramento do sub-protocolo de backup
+
+Versão **1.2** : melhoramento do sub-protocolo de restore
+
+Versão **1.3** : melhoramento do sub-protocolo de delete
+
+Versão **2.0** : todos os anteriores melhoramentos em ação
 
 
-### Local files and configuration
 
-- The source files are under the project **src** folder.
+**Para compilar**
 
-- The class files are under the project **bin** folder.
+Conforme já indicado, pode-se compilar o projeto com
 
-- The files used to test are under the project **files** folder.
+| javac -d bin -sourcepath src src/service/TestApp.java src/service/Peer.java |
+| --- |
 
-- The filesystem of each pear are under the project **fileSystem** folder, on each peer contains a **peerID** folder that contains **chunks** folder, **restore** folder and **db** file. Each **chunks** folder contains folders named by fileID that contains chunks backed up which belongs to that file.
+ou com o script fornecido
 
-You need not generate these files manually. Once the *Peer* is launched for the very first time, they will be automatically created.
+| sh compile.sh |
+| --- |
 
-You should not manually edit **db**. These files are managed by the service.
+**Lançar o serviço RMI**
 
-## Scripts' Specification
+Implementamos o serviço RMI que deve estar a correr quando se corre o Serviço Distribuído de Backup.
 
-- compile.sh
-  - Script to compile java classes into a bin folder.
+Para iniciar o serviço, deve-se correr
 
-- clearFileSystem.sh
-  - Script to delete fileSystem of peers.
+| sh rmi.sh |
+| --- |
 
-- peer.sh
-  - Script to launch an instance of a peer with some parameters.
+Que chama o comando rmiregistry &amp;
 
-    Usage: peer.sh <version> <peer_num>
-      Eg. sh peer.sh 1.0 1
+**Criar peers**
 
-- Others scripts
-  - Action scripts (backup.sh, restore.sh, delete.sh) run in peer 1 with default file as image1.png
-  - The script 'reclaim.sh' runs in peer 2 with a size of 140000 (reclaiming all used memory above 140KB).
-  - And the script state.sh retrieve information about peer 1 and peer 2.
-  - All scripts use the ```localhost``` ip by default (127.0.0.1).
+Pode-se criar cada peer através de
+
+| java -classpath bin service.Peer \&lt;versão\&gt; \&lt;peer\_id\&gt; \&lt;peer\_ap\&gt; \&lt;mc:porto\&gt; \&lt;mdb:porto\&gt; \&lt;mdr:porto\&gt; |
+| --- |
+
+Em que, mc é o canal multicast, mdb é o canal de backup de dados e mdr é o canal de restore de dados.
+
+Por exemplo, com os valores default para os canais e ponto de acesso:
+
+| java -classpath bin service.Peer 1.0 1 //localhost:1099/ 224.0.0.0:8000 224.0.0.0:8001 224.0.0.0:8002 |
+| --- |
+
+
+
+**Correr a aplicação Test App**
+
+Pode-se lançar a Test App através de
+
+| java -classpath bin service.TestApp \&lt;PEER\_AP\&gt; \&lt;SERVIÇO\&gt; \&lt;OPERANDO1\&gt; \&lt;OPERANDO2\&gt; |
+| --- |
+
+em que o serviço pode ser BACKUP, RESTORE, RECLAIM, DELETE ou STATE. Operando1, no caso do serviço ser BACKUP, RESTORE ou DELETE é o nome do ficheiro e no caso de ser RECLAIM indica o espaço de memória que se quer dedicada ao peer.
+
+Por exemplo,
+
+| java -classpath bin service.TestApp //localhost/1 BACKUP &quot;files/lusiadas.txt&quot; 1java -classpath bin service.TestApp //localhost/1 RESTORE &quot;files/lusiadas.txt&quot;java -classpath bin service.TestApp //localhost/1 DELETE &quot;files/lusiadas.txt&quot;java -classpath bin service.TestApp //localhost/1 STATEjava -classpath bin service.TestApp //localhost/1 RECLAIM 63000 |
+| --- |
+
+**Estrutura de diretórios**
+
+- src/ : directório com o código fonte
+- bin/ : directório com os ficheiros das classes
+- files/ : directório com os ficheiros a testar
+- fileSystem/ : diretório onde será criado o sistema de ficheiros de cada peer com a estrutura exigida para o trabalho:
+  - peer#
+    - ■backup
+      - 0x#####################################
+        - chk0
+        - chk1
+        - …
+    - ■restored
+      - lusiadas.txt
+
+
+
+**Os nossos scripts**
+
+- sh : script para compilar o projeto
+- sh : script para verificar se o serviço rmi está a correr (se for necessário termina-lo usar kill -9 pid
+- sh : script para lançar o serviço rmi em segundo plano
+- sh : script para limpar sistema de ficheiros dos peers
+- sh : script para iniciar/criar cada peer
+- sh : script para correr os sub-protocolos
+- sh : script com uma bateria de testes (backup, state, restore, reclaim e delete) em que devemos confirmar o resultado
