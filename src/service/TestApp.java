@@ -48,11 +48,11 @@ public class TestApp implements Runnable {
    *
    * @param args [0] <peer_ap> acess point
    * @param args [1] <operation> recebe o nome do subprotocol (BACKUP | RESTORE | DELETE | RECLAIM |
-   *     STATE) ou no caso de melhoramentos ( BACKUPENH | RESTOREENH | DELETEENH | RECLAIMENH )
+   *     STATE)
    * @param args [2] <opnd_1> pathname of the file case: (BACKUP | RESTORE | DELETE ) or espaço
-   *     maximo do disco KBYTE case: ( RECLAIM )
+   *     maximo do disco BYTE case: ( RECLAIM )
    * @param args [3] <opnd_2> grau de replicação = replication degree VALID only on ( BACKUP |
-   *     BACKUPENH ) NOTE: IF (args[2] == deletion){doRECLAIMprotocol;}
+   *     BACKUP ) NOTE: IF (args[2] == deletion){doRECLAIM protocol;}
    */
   public static void main(String[] args) {
     if (!confirmacao_numero_args(args)) {
@@ -101,7 +101,7 @@ public class TestApp implements Runnable {
   }
 
   /**
-   * Verificação se o número de argumentos está correcto
+   * Verificação se o número de argumentos está correto
    *
    * @param args arguments recebidos pela main
    * @return verdadeiro ou falso
