@@ -3,7 +3,7 @@ package filesystem;
 
 /**
  * Usado para o reclaim
- * */
+ */
 public class MemoryAdmin extends AuxMemAdmin {
 
     /*For serialization*/
@@ -24,8 +24,9 @@ public class MemoryAdmin extends AuxMemAdmin {
 
     /**
      * Diminuir memoria disponivel no peer
+     *
      * @param n nivel desejado
-     * */
+     */
     public void reduce_peer_memory(long n) {
         used_memory = used_memory - n;
         if (!(used_memory > 0)) {
@@ -36,19 +37,23 @@ public class MemoryAdmin extends AuxMemAdmin {
 
     /**
      * Aumentar a memoria disponvel no peer
+     *
      * @param n nível desejado
-     * */
+     */
     public boolean increase_peer_memory(long n) {
         long sum = used_memory + n;
-
-        if (sum > maximum_Memory) {
-            utilitarios.Notificacoes_Terminal.printAviso("Limite de memória ultrapassada. Alteracoees nao efectuadas");
-            return false;
+        try {
+            if (sum > maximum_Memory) {
+                utilitarios.Notificacoes_Terminal.printAviso("Limite de memória ultrapassada. Alteracoees nao efectuadas");
+                return false;
+            }
+            used_memory = used_memory + n;
+            utilitarios.Notificacoes_Terminal.printAviso("Memória Usada: " + used_memory + " / " + maximum_Memory);
+            long divisium = (used_memory / maximum_Memory) * 100;
+            utilitarios.Notificacoes_Terminal.printAviso("Percentagem: " + divisium + "% ");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        used_memory = used_memory + n;
-        utilitarios.Notificacoes_Terminal.printAviso("Memória Usada: " + used_memory + " / " + maximum_Memory);
-        long divisium = (used_memory / maximum_Memory)*100;
-        utilitarios.Notificacoes_Terminal.printAviso("Percentagem: " + divisium + "% ");
 
         return true;
     }
