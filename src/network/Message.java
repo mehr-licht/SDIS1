@@ -113,6 +113,7 @@ public class Message implements Serializable {
    * @return
    */
   private String extractHeader(byte[] data) {
+
     ByteArrayInputStream stream = new ByteArrayInputStream(data);
     BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
@@ -314,7 +315,9 @@ public class Message implements Serializable {
 
     byte header[] = get_header_as_string().getBytes();
 
-    return write_oos(header);
+    byte[] datagrama = write_oos(header);
+
+    return datagrama;
   }
 
   /**
@@ -333,9 +336,13 @@ public class Message implements Serializable {
         utilitarios.Notificacoes_Terminal.printMensagemError(
             "Não foi possível criar a mensagem de array de bytes para enviar");
       }
-      return outputStream.toByteArray();
+      byte[] process_by = outputStream.toByteArray();
+      return process_by;
 
-    } else return header;
+    } else{
+      return header;
+    }
+
   }
 
   /**

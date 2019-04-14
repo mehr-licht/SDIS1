@@ -1,4 +1,6 @@
+svn-commit.tmp
 bin/
 .idea/
+.svn
 fileSystem/*/
 ..gitignore.swp
