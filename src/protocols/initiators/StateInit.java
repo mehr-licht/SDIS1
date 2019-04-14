@@ -40,20 +40,15 @@ public class StateInit implements Runnable {
 
     // Storage capacity
     MemoryAdmin mm = parent_peer.get_system_manager().get_memory_manager();
-   /* long available=  mm.getMaximum_Memory() - mm.getUsed_Memory();
-    System.out.println("mem:"+mm.getMemory());
-    System.out.println("max:"+mm.getMaximum_Memory());
-    System.out.println("used:"+mm.getUsed_memory());
-    System.out.println("avail:"+mm.getAvailableMemory());
-*/
+
    float perc = (((float) mm.getUsed_memory()) / mm.getMaximum_Memory())*100;
     out +=
         "\n\nStorage: "
-            + "\n Total memory: "
+            + "\n Memória Total: "
             + mm.getMaximum_Memory()
-            + "\n Used memory: "
+            + "\n Memória Usada: "
             + mm.getUsed_memory()
-            + "\n Available memory: "
+            + "\n Memória Disponível: "
             + mm.getAvailableMemory()
              +  "\n Perc: " + perc + " % memoria usada";
 

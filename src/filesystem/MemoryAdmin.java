@@ -1,6 +1,8 @@
 package filesystem;
 
 
+import static java.lang.StrictMath.round;
+
 /**
  * Usado para o reclaim
  */
@@ -54,6 +56,13 @@ public class MemoryAdmin extends AuxMemAdmin {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        used_memory = used_memory + n;
+        utilitarios.Notificacoes_Terminal.printAviso("Memória Usada: " + used_memory + " / " + maximum_Memory);
+      //  long divisium = (used_memory / maximum_Memory)*100;
+     double divisium = round(  ((double) used_memory / (double) maximum_Memory) * 100) ;
+      divisium = (divisium * 1000d) / 1000d;
+
+        utilitarios.Notificacoes_Terminal.printAviso("Percentagem: " + divisium + "% ");
 
         return true;
     }
