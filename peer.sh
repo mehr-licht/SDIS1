@@ -4,4 +4,4 @@ if [ "$#" -ne 2 ]; then
   exit 1
 fi
 
-java -classpath bin service.Peer "$1" "$2" //localhost/ 224.0.0.0:8000 224.0.0.0:8001 224.0.0.0:8002
+java -classpath bin service.Peer "$1" "$2" //localhost:1099/ 224.0.0.0:8000 224.0.0.0:8001 224.0.0.0:8002
